@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emlak Portföy Asistanı - Proje Fizibilite</title>
+    <title>Emlak Portföy Asistanı - Akıllı Vitrin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -21,18 +21,12 @@
         .pay-slider { width: 100%; height: 8px; border-radius: 5px; background: #3498db; outline: none; margin: 15px 0; -webkit-appearance: none; }
         .pay-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #2c3e50; cursor: pointer; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
         
-        .safe-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; }
-        .safe-modal-box { background: #fff; padding: 25px; border-radius: 8px; width: 90%; max-width: 450px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 24px; font-weight: bold; color: #7f8c8d; cursor: pointer; border: none; background: none; line-height: 1; }
-        .close-btn:hover { color: #e74c3c; }
-
         @media print { 
             body { background: white; }
             .no-print { display: none !important; }
             .card { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
             .card-header { background-color: #2c3e50 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .summary-val { color: #000; }
-            .warning-box { border: 1px solid #ccc; background: transparent; }
         }
     </style>
 </head>
@@ -42,11 +36,10 @@
     <div class="d-flex justify-content-between align-items-center mb-4 no-print">
         <div class="d-flex align-items-center gap-2">
             <h2 style="color: #2c3e50; font-weight: bold; margin:0;">📊 Proje Fizibilite Modülü</h2>
-            <button class="info-btn" onclick="openModal()">i</button>
         </div>
         <div class="d-flex gap-2">
-            <button onclick="downloadSocialCard()" class="btn btn-warning btn-sm shadow-sm fw-bold" style="background-color: #f39c12; color: #fff; border:none;" id="btnSunum">📸 Sunum Görseli</button>
-            <button onclick="window.print()" class="btn btn-dark btn-sm shadow-sm">📄 PDF / Yazdır</button>
+            <button onclick="downloadSocialCard()" class="btn btn-warning btn-sm shadow-lg fw-bold" style="background-color: #f39c12; color: #fff; border:none; padding: 8px 15px; font-size:1rem;" id="btnSunum">📸 Sunum Görseli (Instagram)</button>
+            <button onclick="window.print()" class="btn btn-dark btn-sm shadow-sm">📄 A4 Rapor Yazdır</button>
         </div>
     </div>
 
@@ -67,7 +60,7 @@
                         <div class="col-4"><label class="form-label">Subasman</label><select id="subasman" class="form-select" onchange="calcAna();"><option value="0.50">0.50</option><option value="2.50">2.50</option><option value="5.50">5.50</option></select></div>
                     </div>
 
-                    <div class="section-title mt-3">Arsa Boyutları ve Çekme Payları (Opsiyonel)</div>
+                    <div class="section-title mt-3">Arsa Boyutları ve Çekme Payları</div>
                     <div class="row g-2">
                         <div class="col-6"><input type="text" inputmode="decimal" id="arsaEn" class="form-control" oninput="calcAna();" placeholder="Arsa Eni (m)"></div>
                         <div class="col-6"><input type="text" inputmode="decimal" id="arsaBoy" class="form-control" oninput="calcAna();" placeholder="Arsa Boyu (m)"></div>
@@ -81,8 +74,8 @@
                 <div class="card-header">3. Finansal Veriler <select id="paraBirimi" class="form-select form-select-sm w-auto no-print" onchange="calcFinans()" style="background-color: #34495e; color: white; border:none;"><option value="TRY">TL (₺)</option><option value="USD">USD ($)</option><option value="EUR">EUR (€)</option><option value="GBP">GBP (£)</option></select></div>
                 <div class="card-body">
                     <div class="row g-2">
-                        <div class="col-6"><label class="form-label">Dükkan m² Fiyatı</label><input type="text" inputmode="decimal" id="ticariM2Fiyat" class="form-control krs-format" oninput="formatKrs(this); calcFinans();" placeholder="2.000"></div>
-                        <div class="col-6"><label class="form-label">Daire m² Fiyatı</label><input type="text" inputmode="decimal" id="konutM2Fiyat" class="form-control krs-format" oninput="formatKrs(this); calcFinans();" placeholder="1.500"></div>
+                        <div class="col-6"><label class="form-label">Dükkan m² Fiyatı</label><input type="text" inputmode="decimal" id="ticariM2Fiyat" class="form-control krs-format" oninput="formatKrs(this); calcFinans();" placeholder="150.000"></div>
+                        <div class="col-6"><label class="form-label">Daire m² Fiyatı</label><input type="text" inputmode="decimal" id="konutM2Fiyat" class="form-control krs-format" oninput="formatKrs(this); calcFinans();" placeholder="50.000"></div>
                     </div>
                 </div>
             </div>
@@ -97,7 +90,7 @@
                         <div class="col-4"><div class="form-label">Konut [T.K.A]</div><div class="summary-val" id="lblUstKatlar">0 m²</div></div>
                         <div class="col-4"><div class="form-label">Sistem TİA</div><div class="summary-val text-success" id="lblTIA">0 m²</div></div>
                     </div>
-                    <div id="uyariCekme" class="warning-box">⚠️ <strong>Fiziksel Sınır:</strong> Çekme payları sonrası kalan net alan, TAKS alanından küçük! Oturum, fiziksel çekmelere göre daraltıldı.</div>
+                    <div id="uyariCekme" class="warning-box">⚠️ <strong>Fiziksel Sınır:</strong> Çekme payları sonrası kalan net alan, TAKS'tan küçük! Oturum fiziksel alana göre daraltıldı.</div>
                 </div>
             </div>
 
@@ -135,70 +128,87 @@
 </div>
 
 <div id="captureWrapper" style="position: absolute; left: -10000px; top: 0;">
-    <div id="socialCard" style="width: 1080px; height: 1080px; position: relative; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box; overflow: hidden;">
+    <div id="socialCard" style="width: 1080px; height: 1080px; position: relative; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box; overflow: hidden; background-color: #0f2027;">
         
-        <img id="scBgImage" src="" crossorigin="anonymous" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: brightness(0.35) blur(2px);">
+        <img id="scBgImage" src="" crossorigin="anonymous" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
         
-        <div style="position: relative; z-index: 10; width: 100%; height: 100%; padding: 60px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 32, 39, 0.85); z-index: 2;"></div>
+        
+        <div style="position: relative; z-index: 10; width: 100%; height: 100%; padding: 60px 50px; display: flex; flex-direction: column; justify-content: space-between;">
             
-            <div style="text-align: center; margin-bottom: 20px;">
-                <h1 style="font-size: 3.5rem; font-weight: 800; letter-spacing: 2px; margin: 0; color: #f1c40f; text-shadow: 0 4px 10px rgba(0,0,0,0.8);">YATIRIM FİZİBİLİTE RAPORU</h1>
-                <p style="font-size: 1.5rem; color: #ecf0f1; margin-top: 10px; font-weight: 500; text-shadow: 0 2px 5px rgba(0,0,0,0.8);">Arsa ve İnşaat Kapasite Analizi</p>
+            <div style="text-align: center; margin-bottom: 10px;">
+                <h1 style="font-size: 3.8rem; font-weight: 900; letter-spacing: 2px; margin: 0; color: #f1c40f; text-transform: uppercase;">YATIRIM FİZİBİLİTE RAPORU</h1>
+                <p style="font-size: 1.6rem; color: #ecf0f1; margin-top: 10px; font-weight: 500; letter-spacing: 1px;">Proje Kapasite ve Ciro Analizi</p>
             </div>
 
-            <div style="background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 40px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
-                <p style="font-size: 1.5rem; color: #bdc3c7; margin: 0;">TOPLAM İNŞAAT ALANI (TİA)</p>
-                <div style="font-size: 6rem; font-weight: 900; color: #2ecc71; text-shadow: 0 0 20px rgba(46,204,113,0.4);" id="scTia">0 m²</div>
+            <div style="background: rgba(0, 0, 0, 0.6); border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 40px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5);">
+                <p style="font-size: 1.5rem; color: #bdc3c7; margin: 0; letter-spacing: 2px;">TOPLAM İNŞAAT ALANI (TİA)</p>
+                <div style="font-size: 6.5rem; font-weight: 900; color: #2ecc71; text-shadow: 0 0 30px rgba(46,204,113,0.5); line-height: 1.1;" id="scTia">0 m²</div>
             </div>
 
-            <div style="display: flex; gap: 30px; margin-top: 30px;">
-                <div style="flex: 1; background: rgba(0,0,0,0.6); border: 1px solid rgba(46,204,113,0.5); border-radius: 20px; padding: 30px; text-align: center;">
-                    <h2 style="font-size: 2rem; color: #2ecc71; margin-bottom: 20px;">ARSA SAHİBİ</h2>
-                    <p style="font-size: 1.4rem; color: #ecf0f1; margin: 5px 0;">Ticari: <span id="scArsaTicariM2" style="font-weight: bold;">0</span> m²</p>
-                    <p style="font-size: 1.4rem; color: #ecf0f1; margin: 5px 0;">Konut: <span id="scArsaKonutM2" style="font-weight: bold;">0</span> m²</p>
-                    <hr style="border-color: rgba(255,255,255,0.2); margin: 20px 0;">
-                    <p style="font-size: 1.1rem; color: #bdc3c7; margin-bottom: 5px;">Öngörülen Ciro</p>
-                    <div style="font-size: 2.3rem; font-weight: bold; color: #fff;" id="scArsaCiro">₺0</div>
+            <div style="display: flex; gap: 30px; margin-top: 25px;">
+                <div style="flex: 1; background: rgba(0, 0, 0, 0.65); border: 2px solid rgba(46, 204, 113, 0.4); border-radius: 20px; padding: 35px; text-align: center;">
+                    <h2 style="font-size: 2.2rem; color: #2ecc71; margin-bottom: 20px; font-weight: 800;">ARSA SAHİBİ</h2>
+                    <div style="display: flex; justify-content: space-between; padding: 0 20px; margin-bottom: 10px;">
+                        <span style="font-size: 1.5rem; color: #bdc3c7;">Ticari:</span>
+                        <span style="font-size: 1.5rem; color: #fff; font-weight: bold;" id="scArsaTicariM2">0 m²</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0 20px;">
+                        <span style="font-size: 1.5rem; color: #bdc3c7;">Konut:</span>
+                        <span style="font-size: 1.5rem; color: #fff; font-weight: bold;" id="scArsaKonutM2">0 m²</span>
+                    </div>
+                    <hr style="border-color: rgba(255,255,255,0.2); margin: 25px 0;">
+                    <p style="font-size: 1.2rem; color: #95a5a6; margin-bottom: 5px; text-transform: uppercase;">Öngörülen Ciro</p>
+                    <div style="font-size: 2.6rem; font-weight: bold; color: #fff;" id="scArsaCiro">₺0</div>
                 </div>
                 
-                <div style="flex: 1; background: rgba(0,0,0,0.6); border: 1px solid rgba(231,76,60,0.5); border-radius: 20px; padding: 30px; text-align: center;">
-                    <h2 style="font-size: 2rem; color: #e74c3c; margin-bottom: 20px;">MÜTEAHHİT</h2>
-                    <p style="font-size: 1.4rem; color: #ecf0f1; margin: 5px 0;">Ticari: <span id="scMutTicariM2" style="font-weight: bold;">0</span> m²</p>
-                    <p style="font-size: 1.4rem; color: #ecf0f1; margin: 5px 0;">Konut: <span id="scMutKonutM2" style="font-weight: bold;">0</span> m²</p>
-                    <hr style="border-color: rgba(255,255,255,0.2); margin: 20px 0;">
-                    <p style="font-size: 1.1rem; color: #bdc3c7; margin-bottom: 5px;">Öngörülen Ciro</p>
-                    <div style="font-size: 2.3rem; font-weight: bold; color: #fff;" id="scMutCiro">₺0</div>
+                <div style="flex: 1; background: rgba(0, 0, 0, 0.65); border: 2px solid rgba(231, 76, 60, 0.4); border-radius: 20px; padding: 35px; text-align: center;">
+                    <h2 style="font-size: 2.2rem; color: #e74c3c; margin-bottom: 20px; font-weight: 800;">MÜTEAHHİT</h2>
+                    <div style="display: flex; justify-content: space-between; padding: 0 20px; margin-bottom: 10px;">
+                        <span style="font-size: 1.5rem; color: #bdc3c7;">Ticari:</span>
+                        <span style="font-size: 1.5rem; color: #fff; font-weight: bold;" id="scMutTicariM2">0 m²</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0 20px;">
+                        <span style="font-size: 1.5rem; color: #bdc3c7;">Konut:</span>
+                        <span style="font-size: 1.5rem; color: #fff; font-weight: bold;" id="scMutKonutM2">0 m²</span>
+                    </div>
+                    <hr style="border-color: rgba(255,255,255,0.2); margin: 25px 0;">
+                    <p style="font-size: 1.2rem; color: #95a5a6; margin-bottom: 5px; text-transform: uppercase;">Öngörülen Ciro</p>
+                    <div style="font-size: 2.6rem; font-weight: bold; color: #fff;" id="scMutCiro">₺0</div>
                 </div>
             </div>
 
-            <div style="background: rgba(0,0,0,0.7); border: 1px solid rgba(241,196,15,0.5); border-radius: 20px; padding: 30px; text-align: center; margin-top: 30px;">
-                <p style="font-size: 1.3rem; color: #f1c40f; margin: 0;">TOPLAM PROJE CİROSU</p>
-                <div style="font-size: 3.5rem; font-weight: 900; color: #fff;" id="scToplamCiro">₺0</div>
+            <div style="background: rgba(0, 0, 0, 0.75); border: 2px solid rgba(241, 196, 15, 0.4); border-radius: 20px; padding: 35px; text-align: center; margin-top: 25px;">
+                <p style="font-size: 1.4rem; color: #f1c40f; margin: 0; letter-spacing: 2px;">TOPLAM PROJE CİROSU</p>
+                <div style="font-size: 4.5rem; font-weight: 900; color: #fff; text-shadow: 0 0 20px rgba(241,196,15,0.3); line-height: 1.2;" id="scToplamCiro">₺0</div>
             </div>
 
-            <div style="text-align: center; margin-top: 20px; color: rgba(255,255,255,0.7); font-size: 1.1rem;">
-                Bu görsel matematiksel bir öngörüdür. Kesin sonuçlar avan proje ile belirlenir. | Karacabay Invest
+            <div style="text-align: center; margin-top: 20px; color: rgba(255,255,255,0.5); font-size: 1.2rem;">
+                Bu rapor mimari ve matematiksel bir öngörüdür. | <strong>KARACABAY INVEST</strong>
             </div>
         </div>
     </div>
 </div>
 
-<div id="safeInfoModal" class="safe-modal-overlay">
-    <div class="safe-modal-box">
-        <button class="close-btn" onclick="closeModal()">&times;</button>
-        <h5 style="color:#2c3e50; font-weight:bold; margin-bottom:15px;">Hesaplama Formülleri</h5><hr style="border-top:2px solid #ecf0f1; margin-bottom:15px;">
-        <p style="font-size:0.95rem;"><strong>T.A (Taban Alanı):</strong> Arsa x TAKS</p><p style="font-size:0.95rem;"><strong>K.A (Kat Alanı):</strong> Emsal Alanı - T.A</p><p style="font-size:0.95rem; color:#e74c3c;"><strong>T.K.A (Toplam Kat Alanı):</strong> K.A x Çarpan</p>
-        <div style="background:#fdf3d8; border-left:4px solid #f1c40f; padding:10px; font-size:0.85rem; border-radius:4px; margin-top:15px;"><strong>Çarpan Bilgisi:</strong> ÇKS değeri girilmişse sistem direkt o değeri çarpan alır. Girilmemişse, belirlediğiniz Ortak Alan yüzdesini çarpan olarak kullanır.</div>
-    </div>
-</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script>
     const state = { sysZemin: 0, sysUst: 0, ticariArsaM2: 0, ticariMutM2: 0, konutArsaM2: 0, konutMutM2: 0, arsaCiro: 0, mutCiro: 0, toplamCiro: 0, doviz: 'TRY' };
 
-    function openModal() { document.getElementById('safeInfoModal').style.display = 'flex'; }
-    function closeModal() { document.getElementById('safeInfoModal').style.display = 'none'; }
+    // --- YAPAY ZEKA MANTIKLI MİMARİ GALERİ ---
+    const galeriVilla = [
+        "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1080&q=80&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1080&q=80&auto=format&fit=crop"
+    ];
+    const galeriApartman = [
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1080&q=80&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1460317442991-0ec209397118?w=1080&q=80&auto=format&fit=crop"
+    ];
+    const galeriGokdelen = [
+        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1080&q=80&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1479839672679-a46483c0e7c8?w=1080&q=80&auto=format&fit=crop"
+    ];
 
     function formatKrs(el) {
         let val = el.value.replace(/[^0-9,]/g, '');
@@ -223,7 +233,7 @@
             let arsa = getVal('arsaAlani', true), kaks = getVal('kaks'), taks = getVal('taks');
             let cks = getVal('cks'), ortak = getVal('ortakAlan'), gabari = getVal('gabari'), subasman = document.getElementById('subasman').value;
 
-            // Çekme Payları Hesabı (GERİ EKLENDİ)
+            // Çekme Payları (Formül İşliyor)
             let en = getVal('arsaEn'), boy = getVal('arsaBoy');
             let yan = getVal('yanCekme'), onArka = getVal('onArkaCekme');
             let tabanCekme = Infinity;
@@ -237,7 +247,6 @@
             let TA = arsa * taks;
             let uyariCekme = document.getElementById('uyariCekme');
             
-            // Eğer çekme payı fiziksel olarak TAKS'tan küçükse daralt!
             if (tabanCekme !== Infinity && tabanCekme < TA) {
                 TA = tabanCekme;
                 if(uyariCekme) uyariCekme.style.display = 'block';
@@ -299,16 +308,16 @@
     }
 
     // ==========================================
-    // AKILLI MİMARİ GÖRSEL MOTORU
+    // VİTRİN FOTOĞRAF MOTORU
     // ==========================================
     function downloadSocialCard() {
         let btn = document.getElementById('btnSunum');
-        btn.innerText = "⏳ Fotoğraf Hazırlanıyor...";
+        btn.innerText = "⏳ Fotoğraf Çekiliyor...";
         btn.disabled = true;
 
         if(typeof html2canvas === 'undefined') {
-            alert("Görsel motoru yüklenemedi. Lütfen internetinizi veya Reklam Engelleyici'yi kontrol edin.");
-            btn.innerText = "📸 Sunum Görseli"; btn.disabled = false;
+            alert("Motor engellendi. PDF Rapor özelliğini kullanın.");
+            btn.innerText = "📸 Sunum Görseli (Instagram)"; btn.disabled = false;
             return;
         }
 
@@ -317,59 +326,64 @@
         let m2Fmt = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 });
 
         document.getElementById('scTia').innerText = m2Fmt.format(state.sysZemin + state.sysUst) + " m²";
-        document.getElementById('scArsaTicariM2').innerText = m2Fmt.format(state.ticariArsaM2);
-        document.getElementById('scArsaKonutM2').innerText = m2Fmt.format(state.konutArsaM2);
+        document.getElementById('scArsaTicariM2').innerText = m2Fmt.format(state.ticariArsaM2) + " m²";
+        document.getElementById('scArsaKonutM2').innerText = m2Fmt.format(state.konutArsaM2) + " m²";
         document.getElementById('scArsaCiro').innerText = fm.format(state.arsaCiro);
-        document.getElementById('scMutTicariM2').innerText = m2Fmt.format(state.ticariMutM2);
-        document.getElementById('scMutKonutM2').innerText = m2Fmt.format(state.konutMutM2);
+        
+        document.getElementById('scMutTicariM2').innerText = m2Fmt.format(state.ticariMutM2) + " m²";
+        document.getElementById('scMutKonutM2').innerText = m2Fmt.format(state.konutMutM2) + " m²";
         document.getElementById('scMutCiro').innerText = fm.format(state.mutCiro);
+        
         document.getElementById('scToplamCiro').innerText = fm.format(state.toplamCiro);
 
-        // 2. Akıllı Fotoğraf Seçimi (Gabari'ye Göre)
+        // 2. Gabari'ye (Kat Sayısı) Göre Akıllı Fotoğraf Seç
         let gabari = getVal('gabari');
-        let imgUrl = "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1080&q=80&auto=format&fit=crop"; // Standart Apartman
+        let secilenHavuz = galeriApartman; // Varsayılan
         
-        if (gabari >= 10) {
-            // Yüksek Katlı / Gökdelen
-            imgUrl = "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1080&q=80&auto=format&fit=crop";
-        } else if (gabari > 0 && gabari <= 3) {
-            // Villa / Az Katlı
-            imgUrl = "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1080&q=80&auto=format&fit=crop";
-        }
+        if (gabari >= 10) secilenHavuz = galeriGokdelen;
+        else if (gabari > 0 && gabari <= 3) secilenHavuz = galeriVilla;
+        
+        let imgUrl = secilenHavuz[Math.floor(Math.random() * secilenHavuz.length)];
 
-        // 3. Arka plan resmini güvenli şekilde yükle ve sonra canvas'ı çalıştır
+        // 3. Arka Planı Yükle ve CORS Engelini Aş
         let bgImg = document.getElementById('scBgImage');
         bgImg.setAttribute('crossOrigin', 'anonymous');
         
-        // Resim Yüklendiğinde Çekim Yap
+        // Fotoğraf Yüklenince Ekran Görüntüsü Al
         bgImg.onload = function() {
             let card = document.getElementById('socialCard');
-            html2canvas(card, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: "#111" }).then(canvas => {
+            // Tarayıcı render motoru
+            html2canvas(card, { 
+                scale: 2, 
+                useCORS: true, 
+                allowTaint: false, 
+                backgroundColor: "#0f2027" 
+            }).then(canvas => {
                 let link = document.createElement('a');
-                link.download = 'Karacabay_Yatirim_Sunum.jpg';
-                link.href = canvas.toDataURL('image/jpeg', 0.9);
+                link.download = 'Karacabay_Instagram_Sunum.jpg';
+                link.href = canvas.toDataURL('image/jpeg', 0.95);
                 link.click();
-                btn.innerText = "📸 Sunum Görseli"; btn.disabled = false;
+                btn.innerText = "📸 Sunum Görseli (Instagram)"; btn.disabled = false;
             }).catch(err => {
-                alert("Görsel oluşturulurken hata: " + err);
-                btn.innerText = "📸 Sunum Görseli"; btn.disabled = false;
+                alert("Hata oluştu, sistem düz siyah tema ile kaydedecek.");
+                btn.innerText = "📸 Sunum Görseli (Instagram)"; btn.disabled = false;
             });
         };
 
-        // Eğer resim engellenirse uyarı verip yine de düz siyah tema ile indir
+        // Eğer resim yine de engellenirse, boş geç (siyah kalır)
         bgImg.onerror = function() {
-            alert("Mimari fotoğraf cihazınızın güvenlik duvarına takıldı. Yazılar düz siyah tema ile indiriliyor.");
+            bgImg.style.display = 'none'; // Resmi gizle, arkadaki siyah renk görünsün
             let card = document.getElementById('socialCard');
-            html2canvas(card, { scale: 2, backgroundColor: "#111" }).then(canvas => {
+            html2canvas(card, { scale: 2, backgroundColor: "#0f2027" }).then(canvas => {
                 let link = document.createElement('a');
-                link.download = 'Karacabay_Yatirim_Sunum_Sade.jpg';
-                link.href = canvas.toDataURL('image/jpeg', 0.9);
+                link.download = 'Karacabay_Instagram_Sunum_Sade.jpg';
+                link.href = canvas.toDataURL('image/jpeg', 0.95);
                 link.click();
-                btn.innerText = "📸 Sunum Görseli"; btn.disabled = false;
+                btn.innerText = "📸 Sunum Görseli (Instagram)"; btn.disabled = false;
             });
         };
 
-        // Yüklemeyi tetikle (Önbellek sorununu aşmak için zaman damgası eklendi)
+        // Tetikleyici (Cache'i yenilemek için)
         bgImg.src = imgUrl + "&t=" + new Date().getTime();
     }
 </script>
