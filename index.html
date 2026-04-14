@@ -68,9 +68,9 @@
                 <div class="card-header"><i class="fa-solid fa-map"></i> 1. İmar ve Kütle Verileri <i class="fa-solid fa-circle-info info-btn" onclick="openInfo('ruhsat')"></i></div>
                 <div class="card-body pb-2">
                     <div class="row g-2 mb-2">
-                        <div class="col-6"><label class="form-label">Tapu Arsa (m²)</label><input type="text" id="fizArsa" class="form-control" oninput="formatCurrency(this); triggerAutoCalc();" placeholder="Örn: 1000"></div>
+                        <div class="col-6"><label class="form-label">Tapu Arsa (m²)</label><input type="text" id="fizArsa" class="form-control" oninput="formatCurrency(this); triggerAutoCalc();" placeholder="Örn: 1.000"></div>
                         <div class="col-6"><label class="form-label">Terk/DOP (%)</label><input type="number" step="0.1" id="fizTerk" class="form-control" placeholder="0" oninput="triggerAutoCalc();"></div>
-                        <div class="col-6"><label class="form-label">Emsal (KAKS)</label><input type="number" step="0.1" id="fizEmsal" class="form-control" placeholder="1.2" oninput="triggerAutoCalc();"></div>
+                        <div class="col-6"><label class="form-label">Emsal (KAKS)</label><input type="number" step="0.01" id="fizEmsal" class="form-control" placeholder="1.2" oninput="triggerAutoCalc();"></div>
                         <div class="col-6"><label class="form-label">TAKS</label><input type="number" step="0.01" id="fizTaks" class="form-control" placeholder="0.30" oninput="triggerAutoCalc();"></div>
                         <div class="col-6"><label class="form-label">Gabari (Kat)</label><input type="number" id="fizKat" class="form-control" placeholder="5" oninput="triggerAutoCalc();"></div>
                         <div class="col-6"><label class="form-label">ÇKS Çarpan</label><input type="number" step="0.01" id="fizCks" class="form-control" placeholder="Örn: 1.3" oninput="triggerAutoCalc();"></div>
@@ -285,8 +285,7 @@
         arsaKonutYuzde: 50, mutKonutYuzde: 50,
         ciroArsaT: 0, ciroMutT: 0, ciroArsaK: 0, ciroMutK: 0,
         toplamCiro: 0,
-        textReport: "",
-        htmlReport: ""
+        textReport: "", htmlReport: ""
     };
 
     // --- MODAL YÖNETİMİ ---
@@ -305,7 +304,7 @@
                         <li><b>Z (Emsal Alanı):</b> Arsa x KAKS</li>
                         <li><b>TA (Taban Alanı):</b> Arsa x TAKS</li>
                         <li><b>KA (Kat Alanı):</b> Z - TA</li>
-                        <li><b>TKA (Toplam Kat Alanı):</b> KA x Çarpan (ÇKS/Ortak)</li>
+                        <li><b>TKA (Toplam Kat Alanı):</b> KA x Çarpan (ÇKS)</li>
                     </ul>
                 </div>
                 <div>
@@ -334,14 +333,11 @@
             body = `
                 <div style="margin-bottom:15px;">
                     <h4 style="margin:0 0 5px 0; color:#2980b9;"><i class="fa-solid fa-ruler-combined"></i> İç Brüt (Balkon Dahil)</h4>
-                    <p style="margin:0;">Dairenin dış kapısından içeride kalan tüm alandır. Net kullanım alanına duvar kalınlıkları, kolonlar ve balkonlar dahildir.</p>
+                    <p style="margin:0;">Dairenin dış kapısından içeride kalan tüm alandır.</p>
                 </div>
                 <div style="margin-bottom:15px;">
                     <h4 style="margin:0 0 5px 0; color:#2980b9;"><i class="fa-solid fa-building"></i> Satış Brütü</h4>
                     <p style="margin:0;">İç brüt alana, kat holü, merdiven, asansör gibi ortak alanlardan daireye düşen payın eklenmiş halidir. Satış ve fiyatlandırmaya esas olan ticari alandır.</p>
-                </div>
-                <div style="background:#fef9e7; padding:10px; border-left:3px solid #f39c12; font-style:italic; font-size:12px;">
-                    Not: Bu sistemde, İç Brüt ile Satış Brütü arasındaki fark "Daire İçi Ortak (%)" katsayısı ile otomatik hesaplanmaktadır.
                 </div>
             `;
         }
@@ -357,18 +353,27 @@
         else input.value = ''; 
     }
 
-    function getNum(id) {
-        let val = document.getElementById(id).value;
-        if(!val) return 0;
-        return parseFloat(val.replace(/\./g, '').replace(',', '.'));
+    // HATA ÇÖZÜMÜ: Formattan gelen rakamlar için (Örn: 7.420 -> 7420)
+    function getFormattedNum(id) {
+        let el = document.getElementById(id);
+        if(!el || !el.value) return 0;
+        let val = el.value.replace(/\./g, '').replace(',', '.');
+        return parseFloat(val) || 0;
+    }
+
+    // HATA ÇÖZÜMÜ: Emsal gibi ondalıklı standart girişler için (Örn: 0.84 -> 0.84)
+    function getStandardNum(id) {
+        let el = document.getElementById(id);
+        if(!el || !el.value) return 0;
+        return parseFloat(el.value) || 0;
     }
 
     function setDisplay(id, show) { document.getElementById(id).style.display = show ? 'block' : 'none'; }
 
     // --- BRÜT / İÇ BRÜT DÖNÜŞÜMLERİ ---
     function calcBrutFromIc(icId, brutId) {
-        let icVal = getNum(icId);
-        let daireOrtak = getNum('fizDaireOrtak') || 0;
+        let icVal = getStandardNum(icId);
+        let daireOrtak = getStandardNum('fizDaireOrtak') || 0;
         if(icVal > 0) {
             let brut = icVal * (1 + (daireOrtak / 100));
             document.getElementById(brutId).value = parseFloat(brut.toFixed(2));
@@ -378,8 +383,8 @@
     }
 
     function calcIcFromBrut(brutId, icId) {
-        let brutVal = getNum(brutId);
-        let daireOrtak = getNum('fizDaireOrtak') || 0;
+        let brutVal = getStandardNum(brutId);
+        let daireOrtak = getStandardNum('fizDaireOrtak') || 0;
         if(brutVal > 0) {
             let ic = brutVal / (1 + (daireOrtak / 100));
             document.getElementById(icId).value = parseFloat(ic.toFixed(2));
@@ -396,33 +401,26 @@
         });
     }
 
-    // --- ANA HESAPLAMA MOTORU (İlk Kodun Mantığı Birebir) ---
+    // --- ANA HESAPLAMA MOTORU (Fiziksel Gabari Sınırı ile Düzeltilmiş Mantık) ---
     function triggerAutoCalc() {
-        state.arsaHam = getNum('fizArsa'); 
-        let terk = getNum('fizTerk'), emsal = getNum('fizEmsal');
-        let taks = getNum('fizTaks'), kat = getNum('fizKat'), cks = getNum('fizCks') || 1.3;
+        state.arsaHam = getFormattedNum('fizArsa'); 
+        let terk = getStandardNum('fizTerk'), emsal = getStandardNum('fizEmsal');
+        let taks = getStandardNum('fizTaks'), kat = getStandardNum('fizKat');
+        let cksInput = getStandardNum('fizCks');
+        let cks = cksInput > 0 ? cksInput : 1.3;
         let subasman = document.getElementById('fizSubasman').value;
-        let verim = getNum('fizVerim') || 80;
+        let verim = getStandardNum('fizVerim') || 80;
 
         if(!state.arsaHam || !emsal || !taks || !kat) return;
 
         state.arsaNet = state.arsaHam * (1 - (terk / 100));
-        state.TA = state.arsaNet * taks;
+        let maxTaban = state.arsaNet * taks;
         state.Z = state.arsaNet * emsal;
-        state.KA = Math.max(0, state.Z - state.TA);
-        state.TKA = state.KA * cks;
 
-        if(subasman === '0.50') state.TIA = state.TKA + state.TA;
-        else if(subasman === '2.50') state.TIA = (state.Z * cks) + state.TA;
-        else state.TIA = (state.Z * cks) + (state.TA * 2);
-
-        state.satilabilir = state.TIA * (verim / 100);
-        state.kayip = state.TIA - state.satilabilir;
-
-        // Geometri Sınırları ve Uyarılar
-        let cephe = getNum('fizCephe'), derinlik = getNum('fizDerinlik');
-        let cYan = getNum('fizCekmeYan'), cOnArka = getNum('fizCekmeOnArka');
-        let fizikiOturum = state.TA;
+        // Çap ve Çekme Sınırları
+        let cephe = getStandardNum('fizCephe'), derinlik = getStandardNum('fizDerinlik');
+        let cYan = getStandardNum('fizCekmeYan'), cOnArka = getStandardNum('fizCekmeOnArka');
+        let fizikiOturum = maxTaban;
 
         if(cephe > 0 && derinlik > 0) {
             let kalanCephe = Math.max(0, cephe - cYan);
@@ -430,11 +428,31 @@
             fizikiOturum = kalanCephe * kalanDerinlik;
         }
 
-        state.aktifTaban = Math.min(state.TA, fizikiOturum);
-        setDisplay('uyariGeometri', fizikiOturum < state.TA && cephe > 0);
+        // Aktif Taban: Yasal limit (TAKS) ile fiziksel limit (Çekmeler) kıyaslaması
+        state.aktifTaban = Math.min(maxTaban, fizikiOturum);
+        setDisplay('uyariGeometri', fizikiOturum < maxTaban && cephe > 0);
 
-        let gabariIleYapilabilen = state.aktifTaban * kat;
-        setDisplay('uyariEmsal', gabariIleYapilabilen < state.Z);
+        // Gabari kapasitesi ve Yanan Emsal Filtresi
+        let gabariKapasitesi = state.aktifTaban * kat;
+        let kullanilanZ = Math.min(state.Z, gabariKapasitesi);
+        
+        setDisplay('uyariEmsal', gabariKapasitesi < state.Z);
+
+        // Geri Kalan Tüm Alan Hesapları Daraltılmış/Gerçek Sınırlara Göre Yapılır
+        state.TA = state.aktifTaban;
+        state.KA = Math.max(0, kullanilanZ - state.TA);
+        state.TKA = state.KA * cks;
+
+        if(subasman === '0.50') {
+            state.TIA = state.TKA + state.TA;
+        } else if(subasman === '2.50') {
+            state.TIA = (kullanilanZ * cks) + state.TA;
+        } else {
+            state.TIA = (kullanilanZ * cks) + (state.TA * 2);
+        }
+
+        state.satilabilir = state.TIA * (verim / 100);
+        state.kayip = state.TIA - state.satilabilir;
 
         // Dükkan Payı Otomatik Hesaplama (Kullanıcı manuel girmediyse)
         let magazaPayInput = document.getElementById('payMagaza');
@@ -444,12 +462,14 @@
         }
 
         // Özet Ekranı Güncelleme
-        document.getElementById('outZ').innerText = Math.round(state.Z).toLocaleString('tr-TR') + " m²";
-        document.getElementById('outSatilabilir').innerText = Math.round(state.satilabilir).toLocaleString('tr-TR') + " m²";
-        document.getElementById('outTIA').innerText = Math.round(state.TIA).toLocaleString('tr-TR') + " m²";
+        let formatOps = { maximumFractionDigits: 0 };
+        document.getElementById('outZ').innerText = state.Z.toLocaleString('tr-TR', formatOps) + " m²";
+        document.getElementById('outSatilabilir').innerText = state.satilabilir.toLocaleString('tr-TR', formatOps) + " m²";
+        document.getElementById('outTIA').innerText = state.TIA.toLocaleString('tr-TR', formatOps) + " m²";
 
         // Pay Dağılımı Sınaması
-        let pM = getNum('payMagaza'), p1 = getNum('pay11'), p2 = getNum('pay21'), p3 = getNum('pay31');
+        let pM = getStandardNum('payMagaza'), p1 = getStandardNum('pay11');
+        let p2 = getStandardNum('pay21'), p3 = getStandardNum('pay31');
         let kalanPay = 100 - (pM + p1 + p2 + p3);
         let kalanKutu = document.getElementById('kalanPayUyari');
         
@@ -457,10 +477,10 @@
         else if(kalanPay < 0) { kalanKutu.innerHTML = "❌ Dağılım Hatası!"; kalanKutu.style.color = "#c0392b"; }
         else { kalanKutu.innerHTML = `Kalan Pay: %${kalanPay}`; kalanKutu.style.color = "#7f8c8d"; }
 
-        let m2M = getNum('m2Magaza');
+        let m2M = getStandardNum('m2Magaza');
         setDisplay('uyariDukkan', pM > 0 && m2M > state.aktifTaban);
 
-        // Finans ve Slider Güncelleme
+        // Finans ve Çift Slider Güncelleme
         state.arsaTicariYuzde = parseFloat(document.getElementById('ticariSlider').value) || 0;
         state.mutTicariYuzde = 100 - state.arsaTicariYuzde;
         state.arsaKonutYuzde = parseFloat(document.getElementById('konutSlider').value) || 0;
@@ -474,7 +494,7 @@
         state.ticariAlan = state.satilabilir * (pM / 100);
         state.konutAlan = state.satilabilir * ((p1 + p2 + p3) / 100);
 
-        let fTicari = getNum('fiyatTicari'), fKonut = getNum('fiyatKonut');
+        let fTicari = getFormattedNum('fiyatTicari'), fKonut = getFormattedNum('fiyatKonut');
         let paraBirimi = document.getElementById('paraBirimi').value;
         let fm = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: paraBirimi, maximumFractionDigits: 0 });
 
@@ -504,7 +524,7 @@
         let fm = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: paraBirimi, maximumFractionDigits: 0 });
         let nf = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 });
 
-        // 1. MİMARİ ANALİZ (İlk Kodun HTML Formülasyonu)
+        // 1. MİMARİ ANALİZ
         let outHtml = `<div style="font-weight:bold; font-size:15px; margin-bottom:5px; color:#2c3e50;">--- MİMARİ SINIRLAR VE ANALİZ ---</div>`;
         outHtml += `Tapu Arsa: <b>${nf.format(state.arsaHam)} m²</b> | Net İmar Parseli: <b style="color:#27ae60;">${nf.format(state.arsaNet)} m²</b><br>`;
         outHtml += `Emsal Alanı (Z): <b>${nf.format(state.Z)} m²</b><br>`;
@@ -519,10 +539,10 @@
         // 2. DAĞILIM VE DAİRE ÇIKTISI
         outHtml += `<div style="font-weight:bold; font-size:15px; margin-bottom:5px; color:#2c3e50;">--- DAĞILIM VE DAİRE ÇIKTISI ---</div>`;
         let totalAdet = 0;
-        let pM = getNum('payMagaza'), m2M = getNum('m2Magaza'), icM = getNum('icMagaza');
-        let p1 = getNum('pay11'), m21 = getNum('m211'), ic1 = getNum('ic11');
-        let p2 = getNum('pay21'), m22 = getNum('m221'), ic2 = getNum('ic21');
-        let p3 = getNum('pay31'), m23 = getNum('m231'), ic3 = getNum('ic31');
+        let pM = getStandardNum('payMagaza'), m2M = getStandardNum('m2Magaza'), icM = getStandardNum('icMagaza');
+        let p1 = getStandardNum('pay11'), m21 = getStandardNum('m211'), ic1 = getStandardNum('ic11');
+        let p2 = getStandardNum('pay21'), m22 = getStandardNum('m221'), ic2 = getStandardNum('ic21');
+        let p3 = getStandardNum('pay31'), m23 = getStandardNum('m231'), ic3 = getStandardNum('ic31');
 
         if(pM > 0 && m2M > 0) { let a = (state.satilabilir * (pM/100)) / m2M; totalAdet += a; 
             outHtml += `<div style="margin-bottom:6px;"><b>~${a.toFixed(1)} Adet</b> Dükkan/Mağaza (${m2M} m² Satış Brütü / ${icM} m² İç Brüt)</div>`; }
