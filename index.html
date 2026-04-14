@@ -31,6 +31,14 @@
         .plan-salon { width: 12px; background-color: #e67e22; }  
         .plan-oda { width: 6px; background-color: #3498db; }  
 
+        .info-btn { cursor: pointer; color: #f1c40f; margin-left: 5px; font-size: 14px; transition: 0.2s; vertical-align: middle; }
+        .info-btn:hover { color: #f39c12; transform: scale(1.1); }
+        .info-btn-dark { color: #3498db; }
+
+        /* Modal Sistemi */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; overflow-y: hidden; }
+        .modal-content-custom { background: white; margin: 5% auto; padding: 0; width: 90%; max-width: 450px; border-radius: 8px; position: relative; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden; font-size:13px; line-height:1.6;}
+
         #resFizibilite { background: #fff; padding: 15px; border-radius: 6px; border: 1px solid #ddd; font-size: 13px; line-height: 1.5; display: none; }
 
         @media print { 
@@ -57,7 +65,7 @@
         <div class="col-lg-5 no-print">
             
             <div class="card">
-                <div class="card-header"><i class="fa-solid fa-map"></i> 1. İmar ve Kütle Verileri</div>
+                <div class="card-header"><i class="fa-solid fa-map"></i> 1. İmar ve Kütle Verileri <i class="fa-solid fa-circle-info info-btn" onclick="openInfo('ruhsat')"></i></div>
                 <div class="card-body pb-2">
                     <div class="row g-2 mb-2">
                         <div class="col-6"><label class="form-label">Tapu Arsa (m²)</label><input type="text" id="fizArsa" class="form-control" oninput="formatCurrency(this); triggerAutoCalc();" placeholder="Örn: 1000"></div>
@@ -68,14 +76,15 @@
                         <div class="col-6"><label class="form-label">ÇKS Çarpan</label><input type="number" step="0.01" id="fizCks" class="form-control" placeholder="Örn: 1.3" oninput="triggerAutoCalc();"></div>
                     </div>
                     <div class="row g-2 p-2 bg-light rounded border mb-2">
-                        <div class="col-6"><label class="form-label">Subasman</label>
+                        <div class="col-4"><label class="form-label">Subasman</label>
                             <select id="fizSubasman" class="form-select" onchange="triggerAutoCalc();">
                                 <option value="0.50">0.50m (Standart)</option>
                                 <option value="2.50">2.50m (Ticari)</option>
                                 <option value="5.50">5.50m (Bodrumlu)</option>
                             </select>
                         </div>
-                        <div class="col-6"><label class="form-label">Verimlilik (%)</label><input type="number" id="fizVerim" class="form-control" value="80" oninput="triggerAutoCalc();"></div>
+                        <div class="col-4"><label class="form-label">Verimlilik % <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('dagilim')"></i></label><input type="number" id="fizVerim" class="form-control" value="80" oninput="triggerAutoCalc();"></div>
+                        <div class="col-4"><label class="form-label">Daire İçi Ort. % <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('brut')"></i></label><input type="number" id="fizDaireOrtak" class="form-control" value="25" oninput="updateAllBrut(); triggerAutoCalc();"></div>
                     </div>
 
                     <div class="section-title mt-2">Çap ve Çekme Payları (Opsiyonel)</div>
@@ -89,27 +98,39 @@
             </div>
 
             <div class="card">
-                <div class="card-header" style="background-color: #8e44ad !important;"><i class="fa-solid fa-layer-group"></i> 2. Bağımsız Bölüm Dağılımı</div>
+                <div class="card-header" style="background-color: #8e44ad !important;">
+                    <div><i class="fa-solid fa-layer-group"></i> 2. Bağımsız Bölüm Dağılımı <i class="fa-solid fa-circle-info info-btn" onclick="openInfo('dagilim')"></i></div>
+                </div>
                 <div class="card-body pb-2">
                     <div class="row mb-2 align-items-center">
-                        <div class="col-4 text-secondary" style="font-size:0.8rem; font-weight:bold;">TİP</div>
-                        <div class="col-4 text-secondary" style="font-size:0.8rem; font-weight:bold;">PAY (%)</div>
-                        <div class="col-4 text-secondary" style="font-size:0.8rem; font-weight:bold;">SATIŞ BRÜTÜ</div>
+                        <div class="col-3 text-secondary" style="font-size:0.75rem; font-weight:bold;">TİP</div>
+                        <div class="col-3 text-secondary" style="font-size:0.75rem; font-weight:bold;">PAY (%)</div>
+                        <div class="col-3 text-secondary" style="font-size:0.75rem; font-weight:bold;">İÇ BRÜT</div>
+                        <div class="col-3 text-secondary" style="font-size:0.75rem; font-weight:bold;">SATIŞ BRÜTÜ</div>
                     </div>
                     <div class="row g-2 mb-2 align-items-center">
-                        <div class="col-4"><div class="plan-group"><div class="plan-box plan-dukkan"></div></div> <small>Dükkan</small></div>
-                        <div class="col-4"><input type="number" id="payMagaza" class="form-control form-control-sm" placeholder="%" oninput="triggerAutoCalc();"></div>
-                        <div class="col-4"><input type="number" id="m2Magaza" class="form-control form-control-sm" placeholder="m²" oninput="triggerAutoCalc();"></div>
+                        <div class="col-3"><div class="plan-group"><div class="plan-box plan-dukkan"></div></div> <small>Dükkan</small></div>
+                        <div class="col-3"><input type="number" id="payMagaza" class="form-control form-control-sm" placeholder="%" oninput="triggerAutoCalc();"></div>
+                        <div class="col-3"><input type="number" id="icMagaza" class="form-control form-control-sm" placeholder="İç m²" oninput="calcBrutFromIc('icMagaza', 'm2Magaza'); triggerAutoCalc();"></div>
+                        <div class="col-3"><input type="number" id="m2Magaza" class="form-control form-control-sm" placeholder="Dış m²" oninput="calcIcFromBrut('m2Magaza', 'icMagaza'); triggerAutoCalc();"></div>
                     </div>
                     <div class="row g-2 mb-2 align-items-center">
-                        <div class="col-4"><div class="plan-group"><div class="plan-box plan-salon"></div><div class="plan-box plan-oda"></div></div> <small>1+1</small></div>
-                        <div class="col-4"><input type="number" id="pay11" class="form-control form-control-sm" placeholder="%" oninput="triggerAutoCalc();"></div>
-                        <div class="col-4"><input type="number" id="m211" class="form-control form-control-sm" placeholder="m²" oninput="triggerAutoCalc();"></div>
+                        <div class="col-3"><div class="plan-group"><div class="plan-box plan-salon"></div><div class="plan-box plan-oda"></div></div> <small>1+1</small></div>
+                        <div class="col-3"><input type="number" id="pay11" class="form-control form-control-sm" placeholder="%" oninput="triggerAutoCalc();"></div>
+                        <div class="col-3"><input type="number" id="ic11" class="form-control form-control-sm" placeholder="İç m²" oninput="calcBrutFromIc('ic11', 'm211'); triggerAutoCalc();"></div>
+                        <div class="col-3"><input type="number" id="m211" class="form-control form-control-sm" placeholder="Dış m²" oninput="calcIcFromBrut('m211', 'ic11'); triggerAutoCalc();"></div>
                     </div>
                     <div class="row g-2 mb-2 align-items-center">
-                        <div class="col-4"><div class="plan-group"><div class="plan-box plan-salon"></div><div class="plan-box plan-oda"></div><div class="plan-box plan-oda"></div></div> <small>2+1</small></div>
-                        <div class="col-4"><input type="number" id="pay21" class="form-control form-control-sm" placeholder="%" oninput="triggerAutoCalc();"></div>
-                        <div class="col-4"><input type="number" id="m221" class="form-control form-control-sm" placeholder="m²" oninput="triggerAutoCalc();"></div>
+                        <div class="col-3"><div class="plan-group"><div class="plan-box plan-salon"></div><div class="plan-box plan-oda"></div><div class="plan-box plan-oda"></div></div> <small>2+1</small></div>
+                        <div class="col-3"><input type="number" id="pay21" class="form-control form-control-sm" placeholder="%" oninput="triggerAutoCalc();"></div>
+                        <div class="col-3"><input type="number" id="ic21" class="form-control form-control-sm" placeholder="İç m²" oninput="calcBrutFromIc('ic21', 'm221'); triggerAutoCalc();"></div>
+                        <div class="col-3"><input type="number" id="m221" class="form-control form-control-sm" placeholder="Dış m²" oninput="calcIcFromBrut('m221', 'ic21'); triggerAutoCalc();"></div>
+                    </div>
+                    <div class="row g-2 mb-2 align-items-center">
+                        <div class="col-3"><div class="plan-group"><div class="plan-box plan-salon"></div><div class="plan-box plan-oda"></div><div class="plan-box plan-oda"></div><div class="plan-box plan-oda"></div></div> <small>3+1</small></div>
+                        <div class="col-3"><input type="number" id="pay31" class="form-control form-control-sm" placeholder="%" oninput="triggerAutoCalc();"></div>
+                        <div class="col-3"><input type="number" id="ic31" class="form-control form-control-sm" placeholder="İç m²" oninput="calcBrutFromIc('ic31', 'm231'); triggerAutoCalc();"></div>
+                        <div class="col-3"><input type="number" id="m231" class="form-control form-control-sm" placeholder="Dış m²" oninput="calcIcFromBrut('m231', 'ic31'); triggerAutoCalc();"></div>
                     </div>
                     <div id="kalanPayUyari" class="mt-2 text-end" style="font-size: 0.8rem; font-weight: bold;"></div>
                 </div>
@@ -175,6 +196,16 @@
     </div>
 </div>
 
+<div id="infoModal" class="modal-overlay" onclick="closeModalOutside(event, 'infoModal')">
+    <div class="modal-content-custom">
+        <div style="background:#2c3e50; padding:15px; display:flex; justify-content:space-between; align-items:center;">
+            <h3 id="infoModalTitle" style="color:white; margin:0; font-size:16px;"></h3>
+            <span onclick="closeModal('infoModal')" style="cursor:pointer; font-size:24px; color:white;">&times;</span>
+        </div>
+        <div id="infoModalBody" style="padding:20px; color:#333; background:#fdfdfd;"></div>
+    </div>
+</div>
+
 <div id="captureWrapper" style="position: absolute; left: -10000px; top: 0;">
     <div id="socialCard" style="width: 1080px; height: 1080px; position: relative; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-sizing: border-box; overflow: hidden; background-color: #0f2027;">
         <img id="scBgImage" src="" crossorigin="anonymous" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
@@ -233,6 +264,70 @@
         textReport: ""
     };
 
+    // --- MODAL YÖNETİMİ ---
+    function openModal(id){ document.getElementById(id).style.display='block'; }
+    function closeModal(id){ document.getElementById(id).style.display='none'; }
+    function closeModalOutside(e, id){ if(e.target === document.getElementById(id)) closeModal(id); }
+
+    function openInfo(type) {
+        let title = "";
+        let body = "";
+        
+        if(type === 'ruhsat') {
+            title = "Mimari Hesaplama Altyapısı";
+            body = `
+                <div style="margin-bottom:15px;">
+                    <h4 style="margin:0 0 5px 0; color:#2980b9;">Temel Değerler:</h4>
+                    <ul style="margin:0; padding-left:20px;">
+                        <li><b>Z (Emsal Alanı):</b> Arsa x KAKS</li>
+                        <li><b>TA (Taban Alanı):</b> Arsa x TAKS</li>
+                        <li><b>KA (Kat Alanı):</b> Z - TA</li>
+                        <li><b>TKA (Toplam Kat Alanı):</b> KA x Çarpan (ÇKS)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="margin:0 0 5px 0; color:#2980b9;">TİA (Toplam İnşaat Alanı) Formülleri:</h4>
+                    <ul style="margin:0; padding-left:20px;">
+                        <li><b>0.50m (Standart):</b> TİA = TKA + TA</li>
+                        <li><b>2.50m:</b> TİA = (Z x Çarpan) + TA</li>
+                        <li><b>5.50m (Bodrumlu):</b> TİA = (Z x Çarpan) + (TA x 2)</li>
+                    </ul>
+                </div>
+            `;
+        } else if(type === 'dagilim') {
+            title = "Satılabilir Alan ve Verimlilik";
+            body = `
+                <ul style="margin:0; padding-left:20px; margin-bottom:15px;">
+                    <li><b>TİA:</b> Otopark, şaft vb. dahil tüm beton alanıdır (ÇKS ile büyümüş yapı).</li>
+                    <li><b>Satılabilir Alan:</b> TİA x Verimlilik Oranı (Örn: %80)</li>
+                    <li><b>Kayıp Alan:</b> TİA - Satılabilir Alan (Zorunlu ortak alanlar)</li>
+                </ul>
+                <div style="background:#e8f4f8; padding:10px; border-radius:4px; font-weight:bold; color:#2c3e50;">
+                    Aşağıdaki daire hesapları TİA üzerinden değil, sadece <span style="color:#e67e22;">Satılabilir Alan</span> üzerinden yapılır.
+                </div>
+            `;
+        } else if(type === 'brut') {
+            title = "İç Brüt ve Satış Brütü";
+            body = `
+                <div style="margin-bottom:15px;">
+                    <h4 style="margin:0 0 5px 0; color:#2980b9;"><i class="fa-solid fa-ruler-combined"></i> İç Brüt (Balkon Dahil)</h4>
+                    <p style="margin:0;">Dairenin dış kapısından içeride kalan tüm alandır. Net kullanım alanına duvar kalınlıkları, kolonlar ve balkonlar dahildir.</p>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <h4 style="margin:0 0 5px 0; color:#2980b9;"><i class="fa-solid fa-building"></i> Satış Brütü</h4>
+                    <p style="margin:0;">İç brüt alana, kat holü, merdiven, asansör gibi ortak alanlardan daireye düşen payın eklenmiş halidir.</p>
+                </div>
+                <div style="background:#fef9e7; padding:10px; border-left:3px solid #f39c12; font-style:italic; font-size:12px;">
+                    Not: Bu sistemde, İç Brüt ile Satış Brütü arasındaki fark "Daire İçi Ortak (%)" katsayısı ile otomatik hesaplanmaktadır.
+                </div>
+            `;
+        }
+        
+        document.getElementById('infoModalTitle').innerHTML = `<i class="fa-solid fa-circle-info"></i> ${title}`;
+        document.getElementById('infoModalBody').innerHTML = body;
+        openModal('infoModal');
+    }
+
     // --- YARDIMCI FONKSİYONLAR ---
     function formatCurrency(input) { 
         let v = input.value.replace(/\D/g, ''); 
@@ -248,7 +343,38 @@
 
     function setDisplay(id, show) { document.getElementById(id).style.display = show ? 'block' : 'none'; }
 
-    // --- ANA HESAPLAMA MOTORU (Kod 1 + Kod 2 Entegrasyonu) ---
+    // --- BRÜT / İÇ BRÜT DÖNÜŞÜMLERİ ---
+    function calcBrutFromIc(icId, brutId) {
+        let icVal = getNum(icId);
+        let daireOrtak = getNum('fizDaireOrtak') || 0;
+        if(icVal > 0) {
+            let brut = icVal * (1 + (daireOrtak / 100));
+            document.getElementById(brutId).value = parseFloat(brut.toFixed(2));
+        } else {
+            document.getElementById(brutId).value = '';
+        }
+    }
+
+    function calcIcFromBrut(brutId, icId) {
+        let brutVal = getNum(brutId);
+        let daireOrtak = getNum('fizDaireOrtak') || 0;
+        if(brutVal > 0) {
+            let ic = brutVal / (1 + (daireOrtak / 100));
+            document.getElementById(icId).value = parseFloat(ic.toFixed(2));
+        } else {
+            document.getElementById(icId).value = '';
+        }
+    }
+
+    function updateAllBrut() {
+        ['Magaza', '11', '21', '31'].forEach(suffix => {
+            if(document.getElementById('ic'+suffix).value) {
+                calcBrutFromIc('ic'+suffix, 'm2'+suffix);
+            }
+        });
+    }
+
+    // --- ANA HESAPLAMA MOTORU ---
     function triggerAutoCalc() {
         let arsaHam = getNum('fizArsa'), terk = getNum('fizTerk'), emsal = getNum('fizEmsal');
         let taks = getNum('fizTaks'), kat = getNum('fizKat'), cks = getNum('fizCks') || 1.3;
@@ -288,14 +414,21 @@
 
         state.satilabilir = state.TIA * (verim / 100);
 
+        // Dükkan Payı Otomatik Hesaplama (Kullanıcı manuel girmediyse)
+        let magazaPayInput = document.getElementById('payMagaza');
+        if(state.satilabilir > 0 && state.aktifTaban > 0 && document.activeElement !== magazaPayInput) {
+            let dukkanPayi = Math.round((state.aktifTaban / state.satilabilir) * 100);
+            magazaPayInput.value = dukkanPayi;
+        }
+
         // Özet Ekranı Güncelleme
         document.getElementById('outZ').innerText = Math.round(state.Z).toLocaleString('tr-TR') + " m²";
         document.getElementById('outSatilabilir').innerText = Math.round(state.satilabilir).toLocaleString('tr-TR') + " m²";
         document.getElementById('outTIA').innerText = Math.round(state.TIA).toLocaleString('tr-TR') + " m²";
 
         // Pay Dağılımı ve Uyarılar
-        let pM = getNum('payMagaza'), p1 = getNum('pay11'), p2 = getNum('pay21');
-        let kalanPay = 100 - (pM + p1 + p2);
+        let pM = getNum('payMagaza'), p1 = getNum('pay11'), p2 = getNum('pay21'), p3 = getNum('pay31');
+        let kalanPay = 100 - (pM + p1 + p2 + p3);
         let kalanKutu = document.getElementById('kalanPayUyari');
         
         if(kalanPay === 0) { kalanKutu.innerHTML = "✅ Kalan Pay: %0"; kalanKutu.style.color = "#27ae60"; }
@@ -305,7 +438,7 @@
         let m2M = getNum('m2Magaza');
         setDisplay('uyariDukkan', pM > 0 && m2M > state.aktifTaban);
 
-        syncSlider(); // Finansalları tetikle
+        syncSlider(); 
     }
 
     function syncSlider() {
@@ -322,15 +455,17 @@
         let pM = getNum('payMagaza') / 100, m2M = getNum('m2Magaza');
         let p1 = getNum('pay11') / 100, m21 = getNum('m211');
         let p2 = getNum('pay21') / 100, m22 = getNum('m221');
+        let p3 = getNum('pay31') / 100, m23 = getNum('m231');
 
         let ticariAlan = state.satilabilir * pM;
-        let konutAlan = state.satilabilir * (p1 + p2); // Basitleştirilmiş toplam konut
+        let konutAlan = state.satilabilir * (p1 + p2 + p3);
 
         // Adet Hesaplamaları
         state.toplamBB = 0;
         if(m2M > 0) state.toplamBB += ticariAlan / m2M;
         if(m21 > 0) state.toplamBB += (state.satilabilir * p1) / m21;
         if(m22 > 0) state.toplamBB += (state.satilabilir * p2) / m22;
+        if(m23 > 0) state.toplamBB += (state.satilabilir * p3) / m23;
 
         let fTicari = getNum('fiyatTicari'), fKonut = getNum('fiyatKonut');
         let paraBirimi = document.getElementById('paraBirimi').value;
