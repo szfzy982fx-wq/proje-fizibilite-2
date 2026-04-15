@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -353,7 +354,6 @@
         else input.value = ''; 
     }
 
-    // HATA ÇÖZÜMÜ: Formattan gelen rakamlar için (Örn: 7.420 -> 7420)
     function getFormattedNum(id) {
         let el = document.getElementById(id);
         if(!el || !el.value) return 0;
@@ -361,7 +361,6 @@
         return parseFloat(val) || 0;
     }
 
-    // HATA ÇÖZÜMÜ: Emsal gibi ondalıklı standart girişler için (Örn: 0.84 -> 0.84)
     function getStandardNum(id) {
         let el = document.getElementById(id);
         if(!el || !el.value) return 0;
@@ -401,7 +400,7 @@
         });
     }
 
-    // --- ANA HESAPLAMA MOTORU (Fiziksel Gabari Sınırı ile Düzeltilmiş Mantık) ---
+    // --- ANA HESAPLAMA MOTORU ---
     function triggerAutoCalc() {
         state.arsaHam = getFormattedNum('fizArsa'); 
         let terk = getStandardNum('fizTerk'), emsal = getStandardNum('fizEmsal');
@@ -428,17 +427,14 @@
             fizikiOturum = kalanCephe * kalanDerinlik;
         }
 
-        // Aktif Taban: Yasal limit (TAKS) ile fiziksel limit (Çekmeler) kıyaslaması
         state.aktifTaban = Math.min(maxTaban, fizikiOturum);
         setDisplay('uyariGeometri', fizikiOturum < maxTaban && cephe > 0);
 
-        // Gabari kapasitesi ve Yanan Emsal Filtresi
         let gabariKapasitesi = state.aktifTaban * kat;
         let kullanilanZ = Math.min(state.Z, gabariKapasitesi);
         
         setDisplay('uyariEmsal', gabariKapasitesi < state.Z);
 
-        // Geri Kalan Tüm Alan Hesapları Daraltılmış/Gerçek Sınırlara Göre Yapılır
         state.TA = state.aktifTaban;
         state.KA = Math.max(0, kullanilanZ - state.TA);
         state.TKA = state.KA * cks;
@@ -454,20 +450,17 @@
         state.satilabilir = state.TIA * (verim / 100);
         state.kayip = state.TIA - state.satilabilir;
 
-        // Dükkan Payı Otomatik Hesaplama (Kullanıcı manuel girmediyse)
         let magazaPayInput = document.getElementById('payMagaza');
         if(state.satilabilir > 0 && state.aktifTaban > 0 && document.activeElement !== magazaPayInput) {
             let dukkanPayi = Math.round((state.aktifTaban / state.satilabilir) * 100);
             magazaPayInput.value = dukkanPayi;
         }
 
-        // Özet Ekranı Güncelleme
         let formatOps = { maximumFractionDigits: 0 };
         document.getElementById('outZ').innerText = state.Z.toLocaleString('tr-TR', formatOps) + " m²";
         document.getElementById('outSatilabilir').innerText = state.satilabilir.toLocaleString('tr-TR', formatOps) + " m²";
         document.getElementById('outTIA').innerText = state.TIA.toLocaleString('tr-TR', formatOps) + " m²";
 
-        // Pay Dağılımı Sınaması
         let pM = getStandardNum('payMagaza'), p1 = getStandardNum('pay11');
         let p2 = getStandardNum('pay21'), p3 = getStandardNum('pay31');
         let kalanPay = 100 - (pM + p1 + p2 + p3);
@@ -480,7 +473,6 @@
         let m2M = getStandardNum('m2Magaza');
         setDisplay('uyariDukkan', pM > 0 && m2M > state.aktifTaban);
 
-        // Finans ve Çift Slider Güncelleme
         state.arsaTicariYuzde = parseFloat(document.getElementById('ticariSlider').value) || 0;
         state.mutTicariYuzde = 100 - state.arsaTicariYuzde;
         state.arsaKonutYuzde = parseFloat(document.getElementById('konutSlider').value) || 0;
@@ -566,7 +558,13 @@
         outHtml += `Arsa Sahibi Toplam Ciro Payı: <b style="color:#27ae60;">${fm.format(arsaTotal)}</b><br>`;
         outHtml += `Müteahhit Toplam Ciro Payı: <b style="color:#c0392b;">${fm.format(mutTotal)}</b><br>`;
         outHtml += `<b>TOPLAM PROJE CİROSU:</b> <span style="font-size:1.1rem; color:#8e44ad; font-weight:bold;">${fm.format(state.toplamCiro)}</span><br><br>`;
-        outHtml += `<div style="font-size:11px; color:#7f8c8d; border-top:1px dashed #ccc; padding-top:10px;">⚠️ <b>YASAL UYARI:</b> Bu rapor matematiksel bir öngörüdür. Kesin sonuçlar avan proje çizimiyle netleşir.</div>`;
+
+        // 4. GİZLİ EMSALLER VE YASAL UYARI
+        outHtml += `<div style="font-weight:bold; font-size:15px; margin-top:15px; margin-bottom:5px; color:#8e44ad;">--- 💎 GİZLİ EMSALLER ---</div>`;
+        outHtml += `<p style="margin-bottom:8px;"><b>1. Kot Farkı Avantajı:</b> Arazinin topografik yapısından doğabilecek kot farkları bu hesaba katılmamıştır. Kot müsaitliğini (Plankote haritası ve ilgili belediyenin İmar Plan Notlarından) kontrol ediniz.</p>`;
+        outHtml += `<p style="margin-bottom:15px;"><b>2. Çatı Dubleks Potansiyeli:</b> Bu hesaplama normal katlar üzerinden yapılmıştır. En üst katların Çatı Dubleks olarak planlanması durumunda, mimari planlamaya göre bağımsız bölüm hacmi ve sayısı artış gösterebilecektir.</p>`;
+        
+        outHtml += `<div style="font-size:11px; color:#7f8c8d; border-top:1px dashed #ccc; padding-top:10px;">⚠️ <b>YASAL UYARI:</b> Bu rapor, matematiksel bir öngörü ve fikir vermek amacıyla hazırlanmıştır. Kesin sonuçlar için yetkili bir mimar tarafından avan proje çizilmesi gerekmektedir.</div>`;
 
         // TXT Versiyonu (Kopyalama için)
         state.textReport = `📌 PROJE ÖN FİZİBİLİTE RAPORU\n\n--- MİMARİ SINIRLAR VE ANALİZ ---\n`;
@@ -577,7 +575,11 @@
         state.textReport += `--- FİNANS VE PAYLAŞIM ---\n`;
         state.textReport += `Arsa Sahibi Ticari (%${state.arsaTicariYuzde}) - Konut (%${state.arsaKonutYuzde}) -> Toplam Ciro Payı: ${fm.format(arsaTotal)}\n`;
         state.textReport += `Müteahhit Ticari (%${state.mutTicariYuzde}) - Konut (%${state.mutKonutYuzde}) -> Toplam Ciro Payı: ${fm.format(mutTotal)}\n`;
-        state.textReport += `TOPLAM PROJE CİROSU: ${fm.format(state.toplamCiro)}\n`;
+        state.textReport += `TOPLAM PROJE CİROSU: ${fm.format(state.toplamCiro)}\n\n`;
+        state.textReport += `--- 💎 GİZLİ EMSALLER ---\n`;
+        state.textReport += `1. Kot Farkı Avantajı: Arazinin topografik yapısından doğabilecek kot farkları bu hesaba katılmamıştır. Kot müsaitliğini (Plankote haritası ve ilgili belediyenin İmar Plan Notlarından) kontrol ediniz.\n`;
+        state.textReport += `2. Çatı Dubleks Potansiyeli: Bu hesaplama normal katlar üzerinden yapılmıştır. En üst katların Çatı Dubleks olarak planlanması durumunda, mimari planlamaya göre bağımsız bölüm hacmi ve sayısı artış gösterebilecektir.\n\n`;
+        state.textReport += `⚠️ YASAL UYARI: Bu rapor, matematiksel bir öngörü ve fikir vermek amacıyla hazırlanmıştır. Kesin sonuçlar için yetkili bir mimar tarafından avan proje çizilmesi gerekmektedir.\n`;
 
         document.getElementById('resFizibilite').innerHTML = outHtml;
         document.getElementById('resFizibilite').style.display = 'block';
