@@ -128,17 +128,9 @@
                         <div class="col-6"><label class="form-label">Terk/DOP (%) <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('netparsel')"></i></label><input type="number" step="0.1" id="fizTerk" class="form-control" placeholder="0" oninput="triggerAutoCalc();"></div>
                         <div class="col-6"><label class="form-label">Emsal (KAKS)</label><input type="number" step="0.01" id="fizEmsal" class="form-control" placeholder="1.2" oninput="triggerAutoCalc();"></div>
                         <div class="col-6"><label class="form-label">TAKS</label><input type="number" step="0.01" id="fizTaks" class="form-control" placeholder="0.30" oninput="triggerAutoCalc();"></div>
-                        <div class="col-12"><label class="form-label">Gabari (Kat)</label><input type="number" id="fizKat" class="form-control" placeholder="5" oninput="triggerAutoCalc();"></div>
                         
-                        <div class="col-12 mt-2">
-                            <label class="form-label d-block text-primary">Emsal Harici & Ortak Alan <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('cks')"></i></label>
-                            <div class="input-group input-group-sm shadow-sm">
-                                <span class="input-group-text bg-light fw-bold" style="font-size:0.8rem;">ÇKS Çarpan</span>
-                                <input type="number" step="0.01" id="fizCks" class="form-control" placeholder="1.30" oninput="syncCks('cks')">
-                                <span class="input-group-text bg-light fw-bold text-muted" style="font-size:0.75rem;">VEYA Ortak %</span>
-                                <input type="number" id="fizDaireOrtak" class="form-control" placeholder="30" oninput="syncCks('ortak')">
-                            </div>
-                        </div>
+                        <div class="col-6"><label class="form-label">Gabari (Kat)</label><input type="number" id="fizKat" class="form-control" placeholder="5" oninput="triggerAutoCalc();"></div>
+                        <div class="col-6"><label class="form-label">ÇKS / Emsal Artış <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('cks')"></i></label><input type="number" step="0.01" id="fizCks" class="form-control" placeholder="Örn: 1.30" oninput="triggerAutoCalc();"></div>
                     </div>
                     
                     <div class="row g-2 p-2 bg-light rounded border mb-2 mt-2">
@@ -167,11 +159,21 @@
                     <div><i class="fa-solid fa-layer-group"></i> 2. Bağımsız Bölüm Dağılımı <i class="fa-solid fa-circle-info info-btn" onclick="openInfo('dagilim')"></i></div>
                 </div>
                 <div class="card-body pb-2">
+                    
+                    <div class="row g-2 mb-3 p-2 bg-light rounded border border-info align-items-center">
+                        <div class="col-9">
+                            <label class="form-label m-0 text-primary" style="font-size:0.85rem;">Satış Brütüne Eklenecek Ortak Alan Payı (%) <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('brut')"></i></label>
+                        </div>
+                        <div class="col-3">
+                            <input type="number" id="fizDaireOrtak" class="form-control form-control-sm text-center fw-bold border-primary" value="20" oninput="updateAllBrut(); triggerAutoCalc();">
+                        </div>
+                    </div>
+
                     <div class="row mb-2 align-items-center">
                         <div class="col-3 text-secondary" style="font-size:0.75rem; font-weight:bold;">TİP</div>
                         <div class="col-3 text-secondary" style="font-size:0.75rem; font-weight:bold;">PAY (%)</div>
-                        <div class="col-3 text-secondary" style="font-size:0.75rem; font-weight:bold;">İÇ BRÜT <i class="fa-solid fa-circle-info info-btn info-btn-dark" style="font-size:11px;" onclick="openInfo('brut')"></i></div>
-                        <div class="col-3 text-secondary" style="font-size:0.75rem; font-weight:bold;">SATIŞ BRÜTÜ <i class="fa-solid fa-circle-info info-btn info-btn-dark" style="font-size:11px;" onclick="openInfo('brut')"></i></div>
+                        <div class="col-3 text-secondary" style="font-size:0.75rem; font-weight:bold;">İÇ BRÜT</div>
+                        <div class="col-3 text-secondary" style="font-size:0.75rem; font-weight:bold;">SATIŞ BRÜTÜ</div>
                     </div>
                     <div class="row g-2 mb-2 align-items-center">
                         <div class="col-3"><div class="plan-group"><div class="plan-box plan-dukkan"></div></div> <small>Dükkan</small></div>
@@ -340,7 +342,6 @@
         'fiyatTicari', 'fiyatKonut', 'ticariSlider', 'konutSlider', 'paraBirimi'
     ];
 
-    // --- OTOMATİK BAŞLIK ---
     function autoGenerateTitle() {
         let il = document.getElementById('pIl').value.trim();
         let ilce = document.getElementById('pIlce').value.trim();
@@ -351,32 +352,6 @@
         let parts2 = (ada || parsel) ? `(${ada || '-'} / ${parsel || '-'})` : '';
         let finalTitle = `${parts1} ${parts2}`.trim();
         if(finalTitle) document.getElementById('pBaslik').value = finalTitle;
-    }
-
-    // --- ÇKS VE ORTAK ALAN BİRLEŞTİRME VE KİLİTLEME MANTIĞI ---
-    function syncCks(source) {
-        let elCks = document.getElementById('fizCks');
-        let elOrt = document.getElementById('fizDaireOrtak');
-        
-        if(source === 'cks') {
-            if(elCks.value !== "") {
-                elOrt.value = Math.round((parseFloat(elCks.value) - 1) * 100);
-                elOrt.disabled = true;
-            } else {
-                elOrt.disabled = false;
-                elOrt.value = "";
-            }
-        } else {
-            if(elOrt.value !== "") {
-                elCks.value = (1 + (parseFloat(elOrt.value) / 100)).toFixed(2);
-                elCks.disabled = true;
-            } else {
-                elCks.disabled = false;
-                elCks.value = "";
-            }
-        }
-        updateAllBrut();
-        triggerAutoCalc();
     }
 
     // --- BİLGİ PENCERELERİ ---
@@ -393,14 +368,14 @@
             title = "Satılabilir Alan";
             body = `<ul style="margin:0; padding-left:20px; margin-bottom:15px;"><li><b>TİA:</b> Otopark, şaft vb. dahil tüm beton alandır.</li><li><b>Satılabilir Alan:</b> TİA x Verimlilik Oranı (Örn: %80)</li></ul><div style="background:#e8f4f8; padding:10px; border-radius:4px; font-weight:bold; color:#2c3e50;">Aşağıdaki daire hesapları TİA üzerinden değil, sadece Satılabilir Alan üzerinden yapılır.</div>`;
         } else if(type === 'brut') {
-            title = "İç Brüt ve Satış Brütü Nedir?";
-            body = `<div style="margin-bottom:15px;"><h4 style="color:#2980b9;"><i class="fa-solid fa-ruler-combined"></i> İç Brüt (Net + Balkon)</h4><p>Dairenin dış çelik kapısından içeride kalan (duvarlar ve balkon dahil) süpürülebilir fiziki alandır.</p></div><div><h4 style="color:#2980b9;"><i class="fa-solid fa-building"></i> Satış Brütü (Dış Brüt)</h4><p>İç brüt alana; kat holü, merdiven, asansör, sığınak gibi ortak kullanım alanlarından o dairenin arsa payına düşen kısmın eklenmiş halidir. Fiyatlandırma bu alan üzerinden yapılır.</p></div>`;
+            title = "Satış Ortak Alan Payı";
+            body = `<p>Bu yüzde, dairenin Emsal Harici veya ÇKS hakkından değil; <b>satış ofisinde pazarlanırken</b> üzerine eklenecek olan gerçekçi koridor, lobi, asansör şaftı payını ifade eder.</p><p>Siz sadece <b>İç Brüt</b> (Dış kapıdan içeri tüm alan) veya <b>Dış Brüt</b> (Satış Brütü) yazdığınızda, sistem buradaki yüzdeye göre otomatik dönüştürme yapar.</p>`;
         } else if(type === 'netparsel') {
             title = "Tapu Arsa vs Net İmar Parseli";
             body = `<p><b>Tapu Arsa:</b> Tapu senedinde yazan ham arazinin metrekare büyüklüğüdür.</p><p><b>Net İmar Parseli:</b> Tapu alanından Belediye/Kamu adına yapılan yol veya yeşil alan terkleri (DOP Kesintisi) düşüldükten sonra geriye kalan, inşaat hakkınızın (Emsal/Taks) hesaplandığı gerçek ve net metrekaredir.</p>`;
         } else if(type === 'cks') {
-            title = "Emsal Harici & ÇKS Yönetimi";
-            body = `<p>Belediyeden belediyeye ÇKS oranlarının gösterimi değişebilir.</p><ul style="padding-left:20px;"><li>İmar planında <b>ÇKS: 1.30</b> yazıyorsa soldaki kutuya 1.30 girin. Sistem %30 ortak alanı otomatik hesaplar.</li><li>Plan notunda <b>"Emsal harici alanlar %30'u geçemez"</b> yazıyorsa, sağdaki kutuya 30 girin. Sistem çarpanı 1.30 olarak otomatik hesaplar.</li></ul><p>İki durum da aynı sonuca çıkar, mükerrer girişi önlemek için diğer kutu kilitlenir.</p>`;
+            title = "ÇKS / Emsal Artış Çarpanı";
+            body = `<p>Toplam İnşaat (TİA) betonunu hesaplarken kullanılır.</p><p>Eğer imar çap belgesinde <b>"Emsal harici alanlar %30'u geçemez"</b> yazıyorsa, bu alana çarpan olarak <b>1.30</b> girmelisiniz.</p><p>Daire metrekarelerine eklenecek olan "Satış Ortak Alanı"ndan (Örn: %15) tamamen bağımsızdır.</p>`;
         }
         document.getElementById('infoModalTitle').innerHTML = `<i class="fa-solid fa-circle-info"></i> ${title}`;
         document.getElementById('infoModalBody').innerHTML = body;
@@ -535,10 +510,6 @@
             }
         });
         
-        // ÇKS Senkronizasyonunu yüklerken de çalıştır
-        if(document.getElementById('fizCks').value) syncCks('cks');
-        else if(document.getElementById('fizDaireOrtak').value) syncCks('ortak');
-
         toggleSidePanel();
         triggerAutoCalc();
         document.getElementById('resFizibilite').style.display = 'none'; 
@@ -564,9 +535,8 @@
                     else el.value = (el.tagName === 'SELECT') ? el.options[0].value : "";
                 }
             });
-            document.getElementById('fizCks').disabled = false;
-            document.getElementById('fizDaireOrtak').disabled = false;
             document.getElementById('fizVerim').value = "80";
+            document.getElementById('fizDaireOrtak').value = "20";
             document.getElementById('ticariSlider').value = "50";
             document.getElementById('konutSlider').value = "50";
             triggerAutoCalc();
@@ -581,6 +551,7 @@
     function getStandardNum(id) { let el = document.getElementById(id); return el && el.value ? parseFloat(el.value) || 0 : 0; }
     function setDisplay(id, show) { document.getElementById(id).style.display = show ? 'block' : 'none'; }
 
+    // BURASI YENİ DÜZENE GÖRE ÇALIŞIR (Ortak alan yüzdesi ayrı bir kutudan gelir)
     function calcBrutFromIc(icId, brutId) {
         let icVal = getStandardNum(icId), daireOrtak = getStandardNum('fizDaireOrtak') || 0;
         document.getElementById(brutId).value = icVal > 0 ? parseFloat((icVal * (1 + (daireOrtak / 100))).toFixed(2)) : '';
@@ -601,8 +572,7 @@
         let taks = getStandardNum('fizTaks'), kat = getStandardNum('fizKat');
         
         let cksInput = getStandardNum('fizCks');
-        let ortakInput = getStandardNum('fizDaireOrtak');
-        let cks = cksInput > 0 ? cksInput : (ortakInput > 0 ? (1 + (ortakInput/100)) : 1.3);
+        let cks = cksInput > 0 ? cksInput : 1.30; // ÇKS girilmemişse standart 1.30 çalışır.
 
         let subasman = document.getElementById('fizSubasman').value;
         let verim = getStandardNum('fizVerim') || 80;
