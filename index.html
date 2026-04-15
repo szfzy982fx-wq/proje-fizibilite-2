@@ -42,12 +42,23 @@
 
         #resFizibilite { background: #fff; padding: 15px; border-radius: 6px; border: 1px solid #ddd; font-size: 13px; line-height: 1.5; display: none; }
 
+        /* A4 YAZDIRMA (PRINT) KURALLARI */
         @media print { 
-            body { background: white; }
-            .no-print { display: none !important; }
-            .card { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
-            .card-header { background-color: #2c3e50 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .alert-box { display: block !important; break-inside: avoid; }
+            @page { size: A4 portrait; margin: 15mm; } 
+            body { background: white !important; font-size: 11pt !important; color: #000 !important; }
+            .no-print, button, #btnSunum { display: none !important; } 
+            
+            .row { display: block !important; width: 100% !important; margin: 0 !important; }
+            .col-lg-5 { display: none !important; } 
+            .col-lg-7 { flex: 0 0 100% !important; max-width: 100% !important; width: 100% !important; padding: 0 !important; margin: 0 !important; }
+
+            .card { box-shadow: none !important; border: 1px solid #ddd !important; margin-bottom: 15px !important; break-inside: avoid; page-break-inside: avoid; }
+            #resFizibilite { border: none !important; padding: 0 !important; font-size: 11pt !important; }
+            
+            /* DÜZELTME: display:block!important kaldırıldı. Sadece bölünmeyi engelle. */
+            .alert-box { break-inside: avoid; page-break-inside: avoid; }
+            
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
     </style>
 </head>
@@ -169,7 +180,7 @@
             </div>
             
             <button class="btn btn-primary w-100 mb-2 fw-bold" onclick="generateReport()"><i class="fa-solid fa-file-invoice"></i> Detaylı Raporu Oluştur</button>
-            <button class="btn btn-outline-secondary w-100 fw-bold" id="btnCopy" style="display:none;" onclick="copyReport()"><i class="fa-solid fa-copy"></i> Rapor Metnini Kopyala</button>
+            <button class="btn btn-outline-secondary w-100 fw-bold mt-2" id="btnCopy" style="display:none;" onclick="copyReport()"><i class="fa-solid fa-copy"></i> Rapor Metnini Kopyala</button>
 
         </div>
 
@@ -416,7 +427,6 @@
         let maxTaban = state.arsaNet * taks;
         state.Z = state.arsaNet * emsal;
 
-        // Çap ve Çekme Sınırları
         let cephe = getStandardNum('fizCephe'), derinlik = getStandardNum('fizDerinlik');
         let cYan = getStandardNum('fizCekmeYan'), cOnArka = getStandardNum('fizCekmeOnArka');
         let fizikiOturum = maxTaban;
@@ -566,7 +576,7 @@
         
         outHtml += `<div style="font-size:11px; color:#7f8c8d; border-top:1px dashed #ccc; padding-top:10px;">⚠️ <b>YASAL UYARI:</b> Bu rapor, matematiksel bir öngörü ve fikir vermek amacıyla hazırlanmıştır. Kesin sonuçlar için yetkili bir mimar tarafından avan proje çizilmesi gerekmektedir.</div>`;
 
-        // TXT Versiyonu (Kopyalama için)
+        // TXT Versiyonu
         state.textReport = `📌 PROJE ÖN FİZİBİLİTE RAPORU\n\n--- MİMARİ SINIRLAR VE ANALİZ ---\n`;
         state.textReport += `Tapu Arsa: ${nf.format(state.arsaHam)} m² | Net İmar Parseli: ${nf.format(state.arsaNet)} m²\n`;
         state.textReport += `Emsal Alanı (Z): ${nf.format(state.Z)} m²\nTaban Alanı (TA): ${nf.format(state.TA)} m²\nTİA (Ruhsat Alanı): ${nf.format(state.TIA)} m²\n`;
