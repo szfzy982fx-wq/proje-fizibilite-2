@@ -33,7 +33,7 @@
         .info-btn { cursor: pointer; color: #f1c40f; margin-left: 5px; font-size: 14px; transition: 0.2s; vertical-align: middle; }
         .info-btn:hover { color: #f39c12; transform: scale(1.1); }
         .info-btn-dark { color: #3498db; }
-        
+
         .dukkan-nitelik { font-size: 0.70rem; color: #8e44ad; font-weight: bold; display: block; margin-top: 2px; font-style: italic; }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; overflow-y: hidden; }
@@ -143,7 +143,7 @@
                                 <option value="5.50">5.50m (Bodrumlu Showroom)</option>
                             </select>
                         </div>
-                        <div class="col-6"><label class="form-label">Verimlilik % <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('dagilim')"></i></label><input type="number" id="fizVerim" class="form-control form-control-sm" value="80" oninput="triggerAutoCalc();"></div>
+                        <div class="col-6"><label class="form-label">Hedeflenen Verimlilik % <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('dagilim')"></i></label><input type="number" id="fizVerim" class="form-control form-control-sm" value="80" oninput="triggerAutoCalc();"></div>
                     </div>
 
                     <div class="section-title mt-2">Çap ve Çekme Payları (Opsiyonel)</div>
@@ -165,8 +165,8 @@
                     
                     <div class="row g-2 mb-3 p-2 bg-light rounded border border-info align-items-center">
                         <div class="col-9">
-                            <label class="form-label m-0 text-primary" style="font-size:0.85rem;">Hesaplanan Ortak Alan / Kayıp (%) <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('brut')"></i></label>
-                            <div style="font-size: 0.70rem; color: #7f8c8d;">Sistem tarafından TİA dağılımına göre hesaplanır.</div>
+                            <label class="form-label m-0 text-primary" style="font-size:0.85rem;">Hesaplanan Ortak Alan (Şerefiye Kaybı) % <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('brut')"></i></label>
+                            <div style="font-size: 0.70rem; color: #7f8c8d;">Optimizasyon sonrası TİA ve İç Brütler arasındaki gerçek fark.</div>
                         </div>
                         <div class="col-3">
                             <input type="text" id="fizDaireOrtak" class="form-control form-control-sm text-center fw-bold border-primary bg-white text-danger" placeholder="%" readonly>
@@ -175,7 +175,7 @@
 
                     <div class="row mb-2 align-items-center">
                         <div class="col-3 text-secondary" style="font-size:0.75rem; font-weight:bold;">TİP</div>
-                        <div class="col-3 text-secondary" style="font-size:0.75rem; font-weight:bold;">PAY (%)</div>
+                        <div class="col-3 text-secondary" style="font-size:0.75rem; font-weight:bold;">TİA PAYI (%)</div>
                         <div class="col-3 text-secondary" style="font-size:0.75rem; font-weight:bold;">İÇ BRÜT</div>
                         <div class="col-3 text-secondary" style="font-size:0.75rem; font-weight:bold;">TAPU HAK BR.</div>
                     </div>
@@ -372,8 +372,8 @@
             title = "İnşaat Kapasite Analizi";
             body = `<p><b>Z (Emsal):</b> Net İmar Parseli x KAKS.</p><p><b>TA (Taban):</b> Z x TAKS (Yasal taban oturum hakkı).</p><p><b>TİA (Beton):</b> Seçilen subasman tipine göre zemin, asma kat ve bodrum haklarını içeren kaba inşaat toplamıdır.</p>`;
         } else if(type === 'dagilim') {
-            title = "Kapasite ve Adet Formülü";
-            body = `<p>Optimize Et butonuna bastığınızda, sistem İç Brütlerinizi TİA havuzuna tam sayılarla (sıfır fire) sığdırır. Artan küsurat alanlar otomatik olarak Tapu Hak Brütlerine pay edilir.</p>`;
+            title = "Kapalı Devre Mülkiyet Formülü";
+            body = `<p>Sistem, hedeflenen verim oranına göre önce kaç adet tam daire çıkacağını hesaplar. Daha sonra, <b>(İç Brüt / Toplam İç Brüt)</b> oranını kullanarak net TİA havuzunu milimetrik olarak bu dairelere paylaştırır. Hiçbir metrekare boşta kalmaz, Tapu Hak Brütlerinin toplamı her zaman TİA'ya eşit olur.</p>`;
         } else if(type === 'brut') {
             title = "Hesaplanan Ortak Alan (Şerefiye) Kaybı";
             body = `<p>Tüm dağılım bittikten sonra, "İç Brütlerin" (Daire İçi) toplamının "TİA'ya" (Toplam İnşaat Alanı) kıyasla ne kadar küçüldüğünü yüzde olarak gösteren gerçek sonuç verisidir. Manuel girilmez.</p>`;
@@ -564,7 +564,7 @@
     function getStandardNum(id) { let el = document.getElementById(id); return el && el.value ? parseFloat(el.value) || 0 : 0; }
     function setDisplay(id, show) { document.getElementById(id).style.display = show ? 'block' : 'none'; }
 
-    // --- SIFIR FİRE OPTİMİZASYON FONKSİYONU ---
+    // --- SAFHA 2: KAPALI DEVRE MÜLKİYET (SIFIR FİRE) OPTİMİZASYON FONKSİYONU ---
     function optimizeDaireler() {
         triggerAutoCalc();
         if(state.TIA <= 0) { 
@@ -575,24 +575,26 @@
         let subasman = document.getElementById('fizSubasman').value;
         let dukkanHakBrutu = (subasman === '5.50') ? (state.aktifTaban * 2) : state.aktifTaban;
         let pM = (dukkanHakBrutu / state.TIA) * 100;
-        let remainingTIA = state.TIA - dukkanHakBrutu;
+        let remainingTIA = state.TIA - dukkanHakBrutu; // Konutlara ayrılan saf TİA
 
         let types = ['11', '21', '31'];
         let data = [];
-        let totalIc = 0;
-        let verim = getStandardNum('fizVerim') / 100;
+        let totalIc = 0; // Sadece konutların toplam İç Brütü
 
-        // Adım 1: Hedeflenen TİA paylarına göre tahmini tam sayı adetleri (q) bul
+        let verimTahmini = getStandardNum('fizVerim') / 100;
+        if(verimTahmini <= 0) verimTahmini = 0.80; // Koruma
+
+        // Adım 1: Kullanıcının girdiği Pay(%) ve İç Brüt'e göre tahmini Adetleri (q) bul
         types.forEach(t => {
             let p = getStandardNum('pay' + t);
             let ic = getStandardNum('ic' + t);
             if(p > 0 && ic > 0) {
                 let pool = state.TIA * (p / 100);
-                let estimatedM2 = ic / verim;
-                let q = Math.floor(pool / estimatedM2);
+                let estimatedM2 = ic / verimTahmini; // Tahmini tapu hak brütü (kaba hesap)
+                let q = Math.floor(pool / estimatedM2); // Küsuratsız (tam) adet
                 if(q > 0) {
-                    data.push({ type: t, q: q, ic: ic, originalPool: pool });
-                    totalIc += (q * ic);
+                    data.push({ type: t, q: q, ic: ic });
+                    totalIc += (q * ic); // Konut içi süpürülebilir net brütlerin toplamı
                 }
             }
         });
@@ -602,30 +604,32 @@
             return;
         }
 
-        // Adım 2: Artan küsurat TİA'yı tam sayılara kusursuz dağıt (Tapu Hak Brütlerini eşitle)
+        // Adım 2: KAPALI DEVRE DAĞITIMI (Bağımsız Bölüm -> TİA)
+        // Denklem: Tapu Hak Brütü = remainingTIA * (ic / totalIc)
         let totalPayForRes = 0;
         let targetResPay = 100 - pM;
-        let sumOriginalPools = data.reduce((sum, d) => sum + d.originalPool, 0);
 
         data.forEach((item, index) => {
-            let normalizedPay = (item.originalPool / sumOriginalPools) * targetResPay;
+            // Dairenin "Kapalı Devre" Tapu Hak Brütü
+            let tapuHakBrutu = remainingTIA * (item.ic / totalIc); 
             
-            // Son döngüde yuvarlama milimlerini eşitle
+            // Tüm binadaki mülkiyet payı % karşılığı
+            let poolForThisType = tapuHakBrutu * item.q;
+            let normalizedPay = (poolForThisType / state.TIA) * 100;
+            
+            // Son döngüde yuvarlama milimlerini (0.01) eşitle
             if(index === data.length - 1) {
                 normalizedPay = targetResPay - totalPayForRes;
+                tapuHakBrutu = (state.TIA * (normalizedPay / 100)) / item.q;
             }
             totalPayForRes += normalizedPay;
 
-            let finalPool = state.TIA * (normalizedPay / 100);
-            let finalM2 = finalPool / item.q;
-
             document.getElementById('pay' + item.type).value = normalizedPay.toFixed(2);
-            document.getElementById('m2' + item.type).value = finalM2.toFixed(2);
+            document.getElementById('m2' + item.type).value = tapuHakBrutu.toFixed(2);
         });
 
-        // Adım 3: Ortaya çıkan gerçek "Ortak Alan / Kayıp %" sonucunu yaz
-        let totalHakBrutuRes = remainingTIA; 
-        let kayipOrani = ((totalHakBrutuRes - totalIc) / totalHakBrutuRes) * 100;
+        // Adım 3: Ortaya çıkan GERÇEK Şerefiye / Kayıp oranını hesapla
+        let kayipOrani = ((remainingTIA - totalIc) / remainingTIA) * 100;
         document.getElementById('fizDaireOrtak').value = "% " + Math.max(0, kayipOrani).toFixed(2);
 
         // Kullanılmayan tipleri temizle
@@ -636,11 +640,10 @@
             }
         });
 
-        triggerAutoCalc(true); // Optimize edilmiş verileri koruyarak güncellemeyi çalıştır
+        triggerAutoCalc(true); // Optimize edilmiş verileri koruyarak hesapla
 
         // Görsel Geri Bildirim
         let btn = document.getElementById('btnOptimize');
-        let origText = btn.innerHTML;
         btn.innerHTML = '<i class="fa-solid fa-check"></i> Tamamlandı';
         btn.classList.replace('btn-outline-light', 'btn-success');
         btn.classList.add('text-white', 'border-0');
@@ -664,7 +667,7 @@
 
         state.arsaNet = state.arsaHam * (1 - (terk / 100));
         
-        // YENİ KURAL: TA = Z * TAKS
+        // TA = Z * TAKS Mantığı
         state.Z = state.arsaNet * emsal;
         let maxTaban = state.Z * taks; 
 
@@ -685,7 +688,7 @@
         state.KA = Math.max(0, kullanilanZ - state.TA);
         state.TKA = state.KA * cks;
 
-        // YENİ KURAL: SUBASMANA GÖRE TİA VE NİTELİK
+        // SUBASMANA GÖRE TİA VE NİTELİK
         let nitelik = "";
         if(subasman === '0.50') {
             state.TIA = state.TKA + state.TA;
@@ -708,7 +711,7 @@
         document.getElementById('payMagaza').value = pM.toFixed(2);
         document.getElementById('m2Magaza').value = dukkanHakBrutu.toFixed(2);
 
-        // KULLANICI GİRİŞLERİNİN CANLI GÜNCELLENMESİ (Henüz optimize edilmediyse)
+        // Henüz optimize edilmediyse basit kaba tahmini m2 hesapla
         if (!isOptimized) {
             ['11', '21', '31'].forEach(t => {
                 let p = getStandardNum('pay' + t);
@@ -718,7 +721,6 @@
                     document.getElementById('m2' + t).value = m2.toFixed(2);
                 }
             });
-            // Optimizasyon öncesi genel tahmini kaybı yaz
             document.getElementById('fizDaireOrtak').value = "% " + (100 - verim).toFixed(2);
         }
 
@@ -747,8 +749,8 @@
         document.getElementById('lblKonutArsa').innerText = state.arsaKonutYuzde;
         document.getElementById('lblKonutMut').innerText = state.mutKonutYuzde;
 
-        state.ticariAlan = state.satilabilir * (pM / 100);
-        state.konutAlan = state.satilabilir * ((p1 + p2 + p3) / 100);
+        state.ticariAlan = state.TIA * (pM / 100);
+        state.konutAlan = state.TIA * ((p1 + p2 + p3) / 100); // Satılabilir değil, artık TİA üzerinden Ciro Hesabı
 
         let fm = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: document.getElementById('paraBirimi').value, maximumFractionDigits: 0 });
 
