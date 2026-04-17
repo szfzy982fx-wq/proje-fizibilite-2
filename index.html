@@ -20,6 +20,7 @@
         .alert-danger-custom { background-color: #fff5f5; border-left: 4px solid #c0392b; color: #c0392b; }
         .alert-success-custom { background-color: #eafaf1; border-left: 4px solid #27ae60; color: #27ae60; }
         .alert-info-custom { background-color: #ebf5fb; border-left: 4px solid #3498db; color: #34495e; }
+        .alert-warning-custom { background-color: #fffcf5; border-left: 4px solid #f39c12; color: #d35400; }
 
         .pay-slider { width: 100%; height: 8px; border-radius: 5px; background: #3498db; outline: none; margin: 10px 0 15px 0; -webkit-appearance: none; }
         .pay-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #2c3e50; cursor: pointer; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
@@ -35,7 +36,8 @@
         .info-btn-dark { color: #3498db; }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; overflow-y: hidden; }
-        .modal-content-custom { background: white; margin: 5% auto; padding: 0; width: 90%; max-width: 450px; border-radius: 8px; position: relative; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden; font-size:13px; line-height:1.6;}
+        .modal-content-custom { background: white; margin: 5% auto; padding: 0; width: 90%; max-width: 550px; border-radius: 8px; position: relative; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden; font-size:13px; line-height:1.6; max-height: 90vh;}
+        .modal-body-custom { padding: 20px; overflow-y: auto; background: #fdfdfd; }
         
         .side-panel { position: fixed; top: 0; right: -350px; width: 350px; height: 100%; background: #fff; box-shadow: -5px 0 15px rgba(0,0,0,0.1); transition: right 0.3s ease; z-index: 10000; overflow-y: auto; padding: 20px; }
         .side-panel.open { right: 0; }
@@ -67,10 +69,11 @@
     <div class="d-flex justify-content-between align-items-center mb-4 no-print flex-wrap gap-2">
         <h2 style="color: #2c3e50; font-weight: bold; margin:0; font-size:1.6rem;"><i class="fa-solid fa-building"></i> Portföy Fizibilite Asistanı</h2>
         <div class="d-flex gap-2 flex-wrap">
+            <button onclick="openInfo('kilavuz')" class="btn btn-info btn-sm fw-bold text-white shadow-sm"><i class="fa-solid fa-book"></i> Formül ve Mantık Kılavuzu</button>
             <button onclick="openProfileModal()" class="btn btn-outline-secondary btn-sm fw-bold"><i class="fa-solid fa-user-pen"></i> Profil/İmza</button>
-            <button onclick="clearForm()" class="btn btn-outline-danger btn-sm fw-bold"><i class="fa-solid fa-file-circle-plus"></i> Yeni Portföy</button>
-            <button onclick="savePortfolio()" class="btn btn-success btn-sm fw-bold"><i class="fa-solid fa-floppy-disk"></i> Portföyü Kaydet</button>
-            <button onclick="toggleSidePanel()" class="btn btn-primary btn-sm fw-bold"><i class="fa-solid fa-folder-open"></i> Portföylerim</button>
+            <button onclick="clearForm()" class="btn btn-outline-danger btn-sm fw-bold"><i class="fa-solid fa-file-circle-plus"></i> Yeni</button>
+            <button onclick="savePortfolio()" class="btn btn-success btn-sm fw-bold"><i class="fa-solid fa-floppy-disk"></i> Kaydet</button>
+            <button onclick="toggleSidePanel()" class="btn btn-primary btn-sm fw-bold"><i class="fa-solid fa-folder-open"></i> Portföyler</button>
             <button onclick="downloadSocialCard()" class="btn btn-warning btn-sm shadow-sm fw-bold" style="color: #fff;" id="btnSunum"><i class="fa-brands fa-instagram"></i> Sunum</button>
             <button onclick="window.print()" class="btn btn-dark btn-sm shadow-sm"><i class="fa-solid fa-print"></i> Yazdır</button>
         </div>
@@ -94,7 +97,6 @@
                         <div class="col-6"><label class="form-label">Mahalle</label><input type="text" id="pMahalle" class="form-control" placeholder="Örn: Güzeloba" oninput="autoGenerateTitle()"></div>
                         <div class="col-3"><label class="form-label">Ada</label><input type="text" id="pAda" class="form-control" placeholder="19287" oninput="autoGenerateTitle()"></div>
                         <div class="col-3"><label class="form-label">Parsel</label><input type="text" id="pParsel" class="form-control" placeholder="124" oninput="autoGenerateTitle()"></div>
-                        
                         <div class="col-12 mt-2">
                             <div class="d-flex justify-content-between align-items-end mb-1">
                                 <label class="form-label m-0">Mülk Sahibi</label>
@@ -105,7 +107,6 @@
                             </div>
                             <input type="text" id="pSahibi" class="form-control form-control-sm" placeholder="Örn: Ahmet Yılmaz">
                         </div>
-                        
                         <div class="col-12 mt-1">
                             <div class="d-flex justify-content-between align-items-end mb-1">
                                 <label class="form-label m-0">Özel Notlar</label>
@@ -121,27 +122,26 @@
             </div>
 
             <div class="card">
-                <div class="card-header"><i class="fa-solid fa-map"></i> 1. İmar ve Kütle Verileri <i class="fa-solid fa-circle-info info-btn" onclick="openInfo('ruhsat')"></i></div>
+                <div class="card-header"><i class="fa-solid fa-map"></i> 1. İmar ve Kütle Verileri</div>
                 <div class="card-body pb-2">
                     <div class="row g-2 mb-2">
                         <div class="col-6"><label class="form-label">Tapu Arsa (m²)</label><input type="text" id="fizArsa" class="form-control" oninput="formatCurrency(this); triggerAutoCalc();" placeholder="Örn: 1.000"></div>
-                        <div class="col-6"><label class="form-label">Terk/DOP (%) <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('netparsel')"></i></label><input type="number" step="0.1" id="fizTerk" class="form-control" placeholder="0" oninput="triggerAutoCalc();"></div>
+                        <div class="col-6"><label class="form-label">Terk/DOP (%)</label><input type="number" step="0.1" id="fizTerk" class="form-control" placeholder="0" oninput="triggerAutoCalc();"></div>
                         <div class="col-6"><label class="form-label">Emsal (KAKS)</label><input type="number" step="0.01" id="fizEmsal" class="form-control" placeholder="1.2" oninput="triggerAutoCalc();"></div>
                         <div class="col-6"><label class="form-label">TAKS</label><input type="number" step="0.01" id="fizTaks" class="form-control" placeholder="0.30" oninput="triggerAutoCalc();"></div>
-                        
                         <div class="col-6"><label class="form-label">Gabari (Kat)</label><input type="number" id="fizKat" class="form-control" placeholder="5" oninput="triggerAutoCalc();"></div>
-                        <div class="col-6"><label class="form-label">ÇKS / Emsal Artış <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('cks')"></i></label><input type="number" step="0.01" id="fizCks" class="form-control" placeholder="Örn: 1.30" oninput="triggerAutoCalc();"></div>
+                        <div class="col-6"><label class="form-label">ÇKS (Emsal Artış) <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('cks')"></i></label><input type="number" step="0.01" id="fizCks" class="form-control" placeholder="Örn: 1.30" oninput="triggerAutoCalc();"></div>
                     </div>
                     
-                    <div class="row g-2 p-2 bg-light rounded border mb-2 mt-2">
-                        <div class="col-6"><label class="form-label">Subasman</label>
+                    <div class="row g-2 p-2 bg-light rounded border mb-2 mt-2 align-items-end">
+                        <div class="col-8"><label class="form-label">Subasman</label>
                             <select id="fizSubasman" class="form-select form-select-sm" onchange="triggerAutoCalc();">
                                 <option value="0.50">0.50m (Standart)</option>
-                                <option value="2.50">2.50m (Ticari)</option>
-                                <option value="5.50">5.50m (Bodrumlu)</option>
+                                <option value="2.50">2.50m (Asmakatlı)</option>
+                                <option value="5.50">5.50m (Bodrumlu Asmakatlı)</option>
                             </select>
                         </div>
-                        <div class="col-6"><label class="form-label">Verimlilik % <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('dagilim')"></i></label><input type="number" id="fizVerim" class="form-control form-control-sm" value="80" oninput="triggerAutoCalc();"></div>
+                        <div class="col-4"><label class="form-label text-primary">Verimlilik % <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('verimlilik')"></i></label><input type="number" id="fizVerim" class="form-control form-control-sm border-primary fw-bold" value="80" oninput="updateAllBrut(); triggerAutoCalc();"></div>
                     </div>
 
                     <div class="section-title mt-2">Çap ve Çekme Payları (Opsiyonel)</div>
@@ -156,25 +156,15 @@
 
             <div class="card">
                 <div class="card-header" style="background-color: #8e44ad !important;">
-                    <div><i class="fa-solid fa-layer-group"></i> 2. Bağımsız Bölüm Dağılımı <i class="fa-solid fa-circle-info info-btn" onclick="openInfo('dagilim')"></i></div>
+                    <div><i class="fa-solid fa-layer-group"></i> 2. Bağımsız Bölüm Dağılımı</div>
                     <button id="btnOptimize" onclick="optimizeDaireler()" class="btn btn-sm btn-outline-light" style="font-size: 0.75rem; font-weight: bold; padding: 2px 10px;">Optimize Et</button>
                 </div>
                 <div class="card-body pb-2">
-                    
-                    <div class="row g-2 mb-3 p-2 bg-light rounded border border-info align-items-center">
-                        <div class="col-9">
-                            <label class="form-label m-0 text-primary" style="font-size:0.85rem;">Tapu Hak Brütüne Eklenecek Ortak Alan Payı (%) <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('brut')"></i></label>
-                        </div>
-                        <div class="col-3">
-                            <input type="number" id="fizDaireOrtak" class="form-control form-control-sm text-center fw-bold border-primary" value="20" oninput="updateAllBrut(); triggerAutoCalc();">
-                        </div>
-                    </div>
-
                     <div class="row mb-2 align-items-center">
                         <div class="col-3 text-secondary" style="font-size:0.75rem; font-weight:bold;">TİP</div>
                         <div class="col-3 text-secondary" style="font-size:0.75rem; font-weight:bold;">PAY (%)</div>
                         <div class="col-3 text-secondary" style="font-size:0.75rem; font-weight:bold;">İÇ BRÜT</div>
-                        <div class="col-3 text-secondary" style="font-size:0.75rem; font-weight:bold;">TAPU HAK BRÜTÜ</div>
+                        <div class="col-3 text-secondary" style="font-size:0.75rem; font-weight:bold;">TAPU BRÜTÜ</div>
                     </div>
                     
                     <div class="row g-2 mb-2 align-items-center">
@@ -182,7 +172,7 @@
                             <div class="plan-group"><div class="plan-box plan-dukkan"></div></div> <small>Dükkan</small>
                             <div id="lblDukkanNitelik" style="font-size: 0.65rem; color: #8e44ad; font-weight: bold; margin-top: 2px; line-height: 1.1;"></div>
                         </div>
-                        <div class="col-3"><input type="number" id="payMagaza" class="form-control form-control-sm bg-light" placeholder="%" readonly title="Ticari Pay subasman oranlarına göre otomatik hesaplanır."></div>
+                        <div class="col-3"><input type="number" id="payMagaza" class="form-control form-control-sm bg-light" placeholder="%" readonly title="Ticari Pay taban izine göre otomatik hesaplanır."></div>
                         <div class="col-3"><input type="number" id="icMagaza" class="form-control form-control-sm" placeholder="İç m²" oninput="calcBrutFromIc('icMagaza', 'm2Magaza'); triggerAutoCalc();"></div>
                         <div class="col-3"><input type="number" id="m2Magaza" class="form-control form-control-sm" placeholder="Dış m²" oninput="calcIcFromBrut('m2Magaza', 'icMagaza'); triggerAutoCalc();"></div>
                     </div>
@@ -211,7 +201,7 @@
 
             <div class="card">
                 <div class="card-header" style="background-color: #27ae60 !important;">
-                    <div><i class="fa-solid fa-coins"></i> 3. Finans ve Paylaşım</div>
+                    <div><i class="fa-solid fa-coins"></i> 3. Finans ve Otopark</div>
                     <select id="paraBirimi" class="form-select form-select-sm w-auto d-inline-block" style="background:transparent; color:white; border:1px solid rgba(255,255,255,0.3);" onchange="triggerAutoCalc()">
                         <option value="TRY" style="color:black">TL (₺)</option>
                         <option value="USD" style="color:black">USD ($)</option>
@@ -219,9 +209,37 @@
                     </select>
                 </div>
                 <div class="card-body">
+                    
+                    <div class="row g-2 mb-3 p-2 rounded" style="background-color: #f8f9fa; border: 1px solid #ced4da;">
+                        <div class="col-12 d-flex justify-content-between align-items-center">
+                            <label class="form-label m-0 text-dark"><i class="fa-solid fa-square-parking"></i> Otopark Stratejisi <i class="fa-solid fa-circle-info info-btn" onclick="openInfo('otopark')"></i></label>
+                            <div class="form-check form-switch m-0 d-flex align-items-center gap-1">
+                                <input class="form-check-input" type="checkbox" id="chkKapaliOtopark" style="cursor:pointer;" onchange="triggerAutoCalc()">
+                                <label class="form-check-label fw-bold text-dark" style="font-size:0.8rem; cursor:pointer;" for="chkKapaliOtopark">Kapalı Otopark Yap</label>
+                            </div>
+                        </div>
+                        <div id="otoparkGirdiUI" class="col-12 mt-2" style="display:none;">
+                            <div class="d-flex align-items-center gap-2">
+                                <label style="font-size:0.75rem; color:#34495e; font-weight:bold; white-space:nowrap;">Şerefiye Artışı (%)</label>
+                                <input type="number" id="otoparkSerefiye" class="form-control form-control-sm" placeholder="Örn: 10" oninput="triggerAutoCalc()">
+                            </div>
+                        </div>
+                        <div id="otoparkOzetUI" class="col-12 mt-2" style="display:none; font-size:0.8rem;">
+                            <div class="d-flex justify-content-between text-secondary mb-1"><span>İhtiyaç:</span> <span id="uiOtoIhtiyac" class="fw-bold text-dark">0 Araç</span></div>
+                            <div class="d-flex justify-content-between text-secondary mb-1"><span>Gerekli Alan:</span> <span id="uiOtoAlan" class="fw-bold text-dark">0 m²</span></div>
+                            <div class="d-flex justify-content-between text-secondary"><span>Kazı Derinliği:</span> <span id="uiOtoKat" class="fw-bold text-primary">0 Kat Bodrum</span></div>
+                            <div id="uyariOtopark" class="alert-box alert-warning-custom mt-2 mb-0" style="font-size:0.75rem;">⚠️ <strong>YETERSİZ ALAN:</strong> Çekme payları (fiziki oturum) aşıldı. Derin kazı ve ekstra maliyet çarpanı uygulandı.</div>
+                        </div>
+                    </div>
+
                     <div class="row g-2 mb-3">
-                        <div class="col-6"><label class="form-label">Ticari m² Birim Fiyatı</label><input type="text" id="fiyatTicari" class="form-control" oninput="formatCurrency(this); triggerAutoCalc();" placeholder="Örn: 150.000"></div>
-                        <div class="col-6"><label class="form-label">Konut m² Birim Fiyatı</label><input type="text" id="fiyatKonut" class="form-control" oninput="formatCurrency(this); triggerAutoCalc();" placeholder="Örn: 50.000"></div>
+                        <div class="col-6"><label class="form-label text-success">Ticari Satış m² Fiyatı</label><input type="text" id="fiyatTicari" class="form-control border-success" oninput="formatCurrency(this); triggerAutoCalc();" placeholder="Örn: 150.000"></div>
+                        <div class="col-6"><label class="form-label text-success">Konut Satış m² Fiyatı</label><input type="text" id="fiyatKonut" class="form-control border-success" oninput="formatCurrency(this); triggerAutoCalc();" placeholder="Örn: 50.000"></div>
+                    </div>
+                    
+                    <div class="row g-2 mb-3 p-2 rounded" style="background-color: #fdfbf7; border: 1px dashed #f39c12;">
+                        <div class="col-12 text-center" style="font-size:0.75rem; font-weight:bold; color:#d35400; margin-bottom:2px;"><i class="fa-solid fa-chart-line"></i> ARSA MEVCUT DEĞERİ (OPSİYONEL)</div>
+                        <div class="col-12"><input type="text" id="mevcutArsaDegeri" class="form-control form-control-sm border-warning text-center" oninput="formatCurrency(this); triggerAutoCalc();" placeholder="Örn: 50.000.000 (Arsanın Boş Değeri)"></div>
                     </div>
 
                     <div class="section-title mt-0">🏢 Ticari Alan Paylaşımı (%)</div>
@@ -236,6 +254,32 @@
                     <div class="row g-2 text-center" style="font-size:0.95rem;">
                         <div class="col-6 text-success fw-bold">Arsa Sahibi: %<span id="lblKonutArsa">50</span></div>
                         <div class="col-6 text-danger fw-bold">Müteahhit: %<span id="lblKonutMut">50</span></div>
+                    </div>
+
+                    <div class="mt-3 mb-3 p-2 rounded text-center" style="background-color: #e8f4f8; border: 1px solid #3498db;">
+                        <div style="font-size: 0.75rem; font-weight: bold; color: #2980b9; margin-bottom: 4px;"><i class="fa-solid fa-scale-balanced"></i> AĞIRLIKLI KARMA ORAN (GERÇEK PAY)</div>
+                        <div class="row g-2 text-center" style="font-size:0.95rem;">
+                            <div class="col-6 text-success fw-bold">Arsa: %<span id="uiKarmaArsa">0</span></div>
+                            <div class="col-6 text-danger fw-bold">Müteahhit: %<span id="uiKarmaMut">0</span></div>
+                        </div>
+                    </div>
+                    
+                    <div id="arsaOzetUI" class="mb-3 p-2 rounded border border-warning" style="background-color: #fffcf5; display:none;">
+                        <div class="d-flex justify-content-between text-warning text-darken-2 mb-1" style="font-size:0.85rem; font-weight:600;"><span>Arsanın Boş Değeri:</span> <span id="uiMevcutArsa">0</span></div>
+                        <div class="d-flex justify-content-between text-success mb-1" style="font-size:1rem; font-weight:800;"><span>Projeden Arsa Payı Değeri:</span> <span id="uiArsaProjeDegeri">0</span></div>
+                        <div class="d-flex justify-content-between text-danger" style="font-size:0.85rem; font-weight:600;"><span>Değer Artış Çarpanı:</span> <span id="uiArsaCarpan">0x</span></div>
+                    </div>
+
+                    <div class="row g-2 mb-3 p-2 rounded" style="background-color: #fff5f5; border: 1px dashed #e74c3c;">
+                        <div class="col-12 text-center" style="font-size:0.75rem; font-weight:bold; color:#c0392b; margin-bottom:2px;"><i class="fa-solid fa-helmet-safety"></i> MÜTEAHHİT İNŞAAT MALİYETİ (TİA ÜZERİNDEN)</div>
+                        <div class="col-6"><label class="form-label text-danger" style="font-size:0.7rem;">Ticari Maliyet m²</label><input type="text" id="maliyetTicari" class="form-control form-control-sm border-danger" oninput="formatCurrency(this); triggerAutoCalc();" placeholder="Örn: 25.000"></div>
+                        <div class="col-6"><label class="form-label text-danger" style="font-size:0.7rem;">Konut Maliyet m²</label><input type="text" id="maliyetKonut" class="form-control form-control-sm border-danger" oninput="formatCurrency(this); triggerAutoCalc();" placeholder="Örn: 18.000"></div>
+                    </div>
+
+                    <div id="maliyetOzetUI" class="mt-3 p-2 rounded border border-secondary" style="background-color: #f8f9fa; display:none;">
+                        <div class="d-flex justify-content-between text-danger mb-1" style="font-size:0.85rem; font-weight:600;"><span>Toplam İnşaat Maliyeti:</span> <span id="uiToplamMaliyet">0</span></div>
+                        <div class="d-flex justify-content-between text-success mb-1" style="font-size:1rem; font-weight:800;"><span>Müteahhit Net Karı:</span> <span id="uiNetKar">0</span></div>
+                        <div class="d-flex justify-content-between text-primary" style="font-size:0.85rem; font-weight:600;"><span>Maliyet Üzerinden Kar Marjı:</span> <span id="uiKarMarji">%0</span></div>
                     </div>
                 </div>
             </div>
@@ -281,7 +325,7 @@
             <h3 id="infoModalTitle" style="color:white; margin:0; font-size:16px;"></h3>
             <span onclick="closeModal('infoModal')" style="cursor:pointer; font-size:24px; color:white;">&times;</span>
         </div>
-        <div id="infoModalBody" style="padding:20px; color:#333; background:#fdfdfd;"></div>
+        <div id="infoModalBody" class="modal-body-custom"></div>
     </div>
 </div>
 
@@ -291,7 +335,7 @@
             <h3 style="color:white; margin:0; font-size:16px;"><i class="fa-solid fa-address-card"></i> Profil ve İmza Ayarları</h3>
             <span onclick="closeModal('profileModal')" style="cursor:pointer; font-size:24px; color:white;">&times;</span>
         </div>
-        <div style="padding:20px; color:#333; background:#fdfdfd;">
+        <div class="modal-body-custom">
             <p style="font-size:11px; color:#7f8c8d; margin-bottom:15px;">İşaretlediğiniz bilgiler A4 raporlarına otomatik eklenir.</p>
             <div class="mb-2"><label class="form-check-label fw-bold" style="font-size:0.8rem;"><input type="checkbox" id="chkAd"> AD SOYAD</label><input type="text" id="txtAd" class="form-control form-control-sm"></div>
             <div class="mb-2"><label class="form-check-label fw-bold" style="font-size:0.8rem;"><input type="checkbox" id="chkUnvan"> UNVAN / MESLEK</label><input type="text" id="txtUnvan" class="form-control form-control-sm"></div>
@@ -304,7 +348,7 @@
     </div>
 </div>
 
-<div id="sideOverlay" class="side-overlay" onclick="toggleSidePanel()"></div>
+<div id="sideOverlay" class="side-overlay" onclick="toggleSidePanel()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9998;"></div>
 <div id="sidePanel" class="side-panel">
     <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
         <h5 style="color:#2c3e50; font-weight:bold; margin:0;"><i class="fa-solid fa-folder-open"></i> Kayıtlı Portföyler</h5>
@@ -336,16 +380,20 @@
 
 <script>
     let state = {
-        arsaHam:0, arsaNet:0, TA: 0, Z: 0, KA: 0, TKA: 0, TIA: 0, satilabilir: 0, kayip: 0,
-        aktifTaban: 0, ticariAlan: 0, konutAlan: 0, ciroArsaT: 0, ciroMutT: 0, ciroArsaK: 0, ciroMutK: 0, toplamCiro: 0, textReport: ""
+        arsaHam:0, arsaNet:0, TA: 0, Z: 0, KA: 0, TKA: 0, TIA: 0, satilabilir: 0, kayip: 0, ticariTIA: 0, konutTIA: 0,
+        aktifTaban: 0, ticariAlan: 0, konutAlan: 0, ciroArsaT: 0, ciroMutT: 0, ciroArsaK: 0, ciroMutK: 0, toplamCiro: 0, 
+        toplamMaliyet: 0, mutNetKar: 0, mutKarMarji: 0, karmaArsaYuzde: 0, karmaMutYuzde: 0,
+        mevcutArsa: 0, arsaDegerArtisi: 0, textReport: "", 
+        otoparkArac: 0, otoparkAlan: 0, otoparkKat: 0, otoparkEkMaliyet: 0, magazaAdedi: 0, yasalMaxTaban: 0
     };
 
     const formIds = [
         'pBaslik', 'pIl', 'pIlce', 'pMahalle', 'pAda', 'pParsel', 'pSahibi', 'pNotlar', 'chkGizleSahibi', 'chkGizleNotlar',
-        'fizArsa', 'fizTerk', 'fizEmsal', 'fizTaks', 'fizKat', 'fizCks', 'fizSubasman', 'fizVerim', 'fizDaireOrtak',
+        'fizArsa', 'fizTerk', 'fizEmsal', 'fizTaks', 'fizKat', 'fizCks', 'fizSubasman', 'fizVerim',
         'fizCephe', 'fizDerinlik', 'fizCekmeYan', 'fizCekmeOnArka',
         'payMagaza', 'icMagaza', 'm2Magaza', 'pay11', 'ic11', 'm211', 'pay21', 'ic21', 'm221', 'pay31', 'ic31', 'm231',
-        'fiyatTicari', 'fiyatKonut', 'ticariSlider', 'konutSlider', 'paraBirimi'
+        'fiyatTicari', 'fiyatKonut', 'mevcutArsaDegeri', 'maliyetTicari', 'maliyetKonut', 'ticariSlider', 'konutSlider', 
+        'paraBirimi', 'chkKapaliOtopark', 'otoparkSerefiye'
     ];
 
     function autoGenerateTitle() {
@@ -360,28 +408,84 @@
         if(finalTitle) document.getElementById('pBaslik').value = finalTitle;
     }
 
-    // --- BİLGİ PENCERELERİ ---
     function openModal(id){ document.getElementById(id).style.display='block'; }
     function closeModal(id){ document.getElementById(id).style.display='none'; }
-    function closeModalOutside(e, id){ if(e.target === document.getElementById(id)) closeModal(id); }
+    function closeModalOutside(e, id){ if(e.target === document.getElementById(id) || e.target.classList.contains('modal-overlay')) closeModal(id); }
 
     function openInfo(type) {
         let title = "", body = "";
-        if(type === 'ruhsat') {
-            title = "Mimari Hesaplama Altyapısı";
-            body = `<div style="margin-bottom:15px;"><h4 style="color:#2980b9;">Temel Değerler:</h4><ul style="margin:0; padding-left:20px;"><li><b>Z (Emsal Alanı):</b> Net Arsa x KAKS</li><li><b>TA (Taban Alanı):</b> Z x TAKS</li><li><b>KA (Kat Alanı):</b> Z - TA</li><li><b>TKA:</b> KA x Çarpan</li></ul></div><div><h4 style="color:#2980b9;">TİA Formülleri:</h4><ul style="margin:0; padding-left:20px;"><li><b>0.50m:</b> TİA = TKA + TA</li><li><b>2.50m:</b> TİA = (Z x Çarpan) + TA</li><li><b>5.50m:</b> TİA = (Z x Çarpan) + (TA x 2)</li></ul></div>`;
-        } else if(type === 'dagilim') {
-            title = "Satılabilir Alan";
-            body = `<ul style="margin:0; padding-left:20px; margin-bottom:15px;"><li><b>TİA:</b> Otopark, şaft vb. dahil tüm beton alandır.</li><li><b>Satılabilir Alan:</b> TİA x Verimlilik Oranı (Örn: %80) x (1 - Ortak Alan Payı)</li></ul><div style="background:#e8f4f8; padding:10px; border-radius:4px; font-weight:bold; color:#2c3e50;">Aşağıdaki daire hesapları TİA üzerinden değil, sadece Satılabilir Alan üzerinden yapılır.</div>`;
-        } else if(type === 'brut') {
-            title = "Tapu Hak Brütüne Eklenecek Ortak Alan";
-            body = `<p>Bu yüzde, dairenin Emsal Harici veya ÇKS hakkından değil; <b>satış ofisinde pazarlanırken</b> üzerine eklenecek olan gerçekçi koridor, lobi, asansör şaftı payını ifade eder.</p><p>Siz sadece <b>İç Brüt</b> (Dış kapıdan içeri tüm alan) veya <b>Tapu Hak Brütü</b> yazdığınızda, sistem buradaki yüzdeye göre otomatik dönüştürme yapar.</p>`;
-        } else if(type === 'netparsel') {
-            title = "Tapu Arsa vs Net İmar Parseli";
-            body = `<p><b>Tapu Arsa:</b> Tapu senedinde yazan ham arazinin metrekare büyüklüğüdür.</p><p><b>Net İmar Parseli:</b> Tapu alanından Belediye/Kamu adına yapılan yol veya yeşil alan terkleri (DOP Kesintisi) düşüldükten sonra geriye kalan, inşaat hakkınızın (Emsal/Taks) hesaplandığı gerçek ve net metrekaredir.</p>`;
-        } else if(type === 'cks') {
+        if(type === 'cks') {
             title = "ÇKS / Emsal Artış Çarpanı";
-            body = `<p>Toplam İnşaat (TİA) betonunu hesaplarken kullanılır.</p><p>Eğer imar çap belgesinde <b>"Emsal harici alanlar %30'u geçemez"</b> yazıyorsa, bu alana çarpan olarak <b>1.30</b> girmelisiniz.</p><p>Daire metrekarelerine eklenecek olan "Ortak Alanı"ndan (Örn: %15) tamamen bağımsızdır.</p>`;
+            body = `<p>Toplam İnşaat (TİA) betonunu hesaplarken kullanılır.</p><p>Eğer imar çap belgesinde <b>"Emsal harici alanlar %30'u geçemez"</b> yazıyorsa, bu alana çarpan olarak <b>1.30</b> girmelisiniz.</p>`;
+        } else if (type === 'verimlilik') {
+            title = "Verimlilik % (Saha Standartları)";
+            body = `<ul style="margin:0; padding-left:20px;">
+                <li><b>1. Cadde Mağazası / Dükkanlar:</b> %85 - %95</li>
+                <li><b>2. Standart Apartman (Şehir İçi):</b> %75 - %85</li>
+                <li><b>3. Markalı Lüks Konutlar / Siteler:</b> %65 - %75</li>
+                <li><b>4. Ofis ve Plazalar:</b> %70 - %80</li>
+                <li><b>5. AVM (Alışveriş Merkezleri):</b> %45 - %60</li>
+            </ul>
+            <div class="mt-2 text-muted" style="font-size:0.8rem;">Dökülen betonun (TİA) yüzde kaçının "Satılabilir Net (İç Brüt) Havuza" dönüştüğünü ifade eder. Kalanı ortak alandır.</div>`;
+        } else if (type === 'otopark') {
+            title = "🏛️ MEVZUAT (Güncel Otopark Yönetmeliği)";
+            body = `<p>Binalarda zorunlu otopark ihtiyacı, dairelerin brüt alanlarına göre yasal olarak şu şekilde belirlenir:</p>
+            <ul style="margin:0; padding-left:20px;">
+                <li><b>80 m²'den küçük:</b> Her 3 daire için en az 1 otopark (1+1 ve küçük 2+1'ler).</li>
+                <li><b>80 m² - 120 m²:</b> Her 2 daire için en az 1 otopark (Standart 2+1'ler).</li>
+                <li><b>120 m² - 180 m²:</b> Her 1 daire için en az 1 otopark (Standart 3+1 ve 4+1'ler).</li>
+                <li><b>180 m²'den büyük:</b> Her 1 daire için en az 2 otopark.</li>
+                <li><b>Ticari Alanlar:</b> Ortalama her 40 m² alan için 1 otopark.</li>
+            </ul>`;
+        } else if (type === 'kilavuz') {
+            title = "❓ Formül ve Mantık Kılavuzu";
+            body = `
+            <div style="font-weight:bold; color:#2c3e50; border-bottom:2px solid #bdc3c7; padding-bottom:4px; margin-bottom:8px;">BÖLÜM 1: Mimari Kütle ve Taban Optimizasyonu</div>
+            <ul style="margin-bottom:15px; padding-left:20px;">
+                <li><b>Net İmar Parseli:</b> Tapu Arsa m² x (1 - DOP/Terk Oranı)</li>
+                <li><b>Z (Emsal Alanı):</b> Net İmar Parseli x KAKS (Emsal)</li>
+                <li><b>Yasal Maksimum Taban (TAKS Sınırı):</b> Net İmar Parseli x TAKS <i>(Aşılamaz yasal sınır)</i>.</li>
+                <li><b>Gabari İçin Optimum Taban:</b> Z / Gabari (Kat Sayısı)</li>
+                <li><b>EFEKTİF (KULLANILAN) TABAN ALANI (TA):</b> Min(Yasal Maksimum Taban, Gabari İçin Optimum Taban) <i>(Sistem en güvenli/optimum tabanı kendi seçer)</i>.</li>
+                <li><b>KA (Kat Alanları Toplamı):</b> Z - Efektif TA</li>
+                <li><b>TKA (Toplam Kat Alanı):</b> KA x ÇKS (Emsal Artış Çarpanı)</li>
+                <li><b>TİA (Ruhsat Alanı):</b> Seçilen subasman kotuna göre yasal beton alanı hesaplanır:
+                    <ul>
+                        <li><i>0.50m (Standart):</i> TİA = TKA + Efektif TA</li>
+                        <li><i>2.50m (Asmakatlı):</i> TİA = (Net Parsel x KAKS x ÇKS) + Efektif TA</li>
+                        <li><i>5.50m (Bodrumlu Asmakatlı):</i> TİA = (Net Parsel x KAKS x ÇKS) + (Efektif TA x 2)</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <div style="font-weight:bold; color:#2c3e50; border-bottom:2px solid #bdc3c7; padding-bottom:4px; margin-bottom:8px;">BÖLÜM 2: Satılabilir Havuz ve Kapalı Döngü Dağılım</div>
+            <ul style="margin-bottom:15px; padding-left:20px;">
+                <li><b>Satılabilir (İç Brüt) Havuz:</b> TİA x Verimlilik (%)</li>
+                <li><b>Ticari Zemin Havuzu:</b> Her zaman Efektif TA kadardır.</li>
+                <li><b>Dükkan Taban İzi Tüketimi:</b> Girilen Tapu Brüt m²'sinin kotlara göre zemin tüketimi: <i>(0.50m için /1) | (2.50m için /1.5) | (5.50m için /2.5)</i>.</li>
+                <li><b>Mağaza Adedi:</b> Ticari Zemin Havuzu / Dükkan Taban İzi Tüketimi</li>
+                <li><b>İç Brüt - Tapu Brüt (TİA Payı) Dönüşümü:</b> Tapu Brüt = İç Brüt / Verimlilik (%) <i>(Dairenin otopark dahil binadaki TİA payı)</i>.</li>
+                <li><b>Konut Adetleri:</b> (Satılabilir Havuz x İlgili Konut Payı %) / İç Brüt</li>
+            </ul>
+
+            <div style="font-weight:bold; color:#2c3e50; border-bottom:2px solid #bdc3c7; padding-bottom:4px; margin-bottom:8px;">BÖLÜM 3: Otopark, Zemin Sınırı ve Hafriyat Maliyeti</div>
+            <ul style="margin-bottom:15px; padding-left:20px;">
+                <li><b>Zorunlu Otopark İhtiyacı:</b> (3 adet 1+1=1 Araç), (2 adet 2+1=1 Araç), (1 adet 3+1=1 Araç), (Ticari Alan/40m²=1 Araç).</li>
+                <li><b>Toplam Otopark İnşaat Alanı:</b> Araç Sayısı x 25 m²</li>
+                <li><b>Fiziki Bodrum (Kazı) Sınırı:</b> (Cephe - Yan Çekmeler) x (Derinlik - Ön/Arka Çekmeler) <i>(Güvenli hafriyat sınırıdır)</i>.</li>
+                <li><b>Kat Sayısı (Derinlik):</b> Toplam Otopark Alanı / Fiziki Bodrum Sınırı <i>(Yukarı yuvarlanır)</i>.</li>
+                <li><b>Otopark İnşaat Maliyeti:</b> 1. Bodrum kat standart maliyetle hesaplanır. Derine inilmesi (2. ve altı bodrum katlar) gerekirse; artan hafriyat zorluğu ve iksa maliyetlerini simüle etmek için otomatik <b>"Derinlik Maliyet Çarpanı (Her ekstra bodrum katı için +%20)"</b> uygulanır.</li>
+            </ul>
+
+            <div style="font-weight:bold; color:#2c3e50; border-bottom:2px solid #bdc3c7; padding-bottom:4px; margin-bottom:8px;">BÖLÜM 4: Finans, Ciro ve Karar Destek</div>
+            <ul style="margin-bottom:0; padding-left:20px;">
+                <li><b>Toplam Ciro:</b> (Ticari Havuz x Ticari Fiyat) + (Konut Havuzu x Konut Fiyat)</li>
+                <li><b>Ağırlıklı Karma Oran (Gerçek Pay):</b> (Tarafın Ciro Payı / Toplam Ciro) x 100</li>
+                <li><b>Toplam İnşaat Maliyeti:</b> (Ticari TİA x Maliyet) + (Konut TİA x Maliyet) + (Otopark Kat Maliyeti)</li>
+                <li><b>Müteahhit Net Kar:</b> Müteahhidin Ciro Payı - Toplam İnşaat Maliyeti</li>
+                <li><b>Maliyet Üzerinden Kar Marjı (ROI):</b> (Müteahhit Net Kar / Toplam İnşaat Maliyeti) x 100</li>
+                <li><b>Arsa Sahibi Değer Artış Çarpanı:</b> Arsa Sahibinin Ciro Payı / Arsanın Mevcut Boş Değeri</li>
+            </ul>`;
         }
         document.getElementById('infoModalTitle').innerHTML = `<i class="fa-solid fa-circle-info"></i> ${title}`;
         document.getElementById('infoModalBody').innerHTML = body;
@@ -453,7 +557,6 @@
         return { html: sigHtml, txt: sigTxt };
     }
 
-    // --- CRM ---
     function savePortfolio() {
         let baslik = document.getElementById('pBaslik').value;
         if(!baslik) { alert("Lütfen kaydetmeden önce İl, İlçe vb. girerek Portföy Başlığı oluşturun."); return; }
@@ -542,7 +645,6 @@
                 }
             });
             document.getElementById('fizVerim').value = "80";
-            document.getElementById('fizDaireOrtak').value = "20";
             document.getElementById('ticariSlider').value = "50";
             document.getElementById('konutSlider').value = "50";
             triggerAutoCalc();
@@ -551,101 +653,77 @@
         }
     }
 
-    // --- YARDIMCILAR VE HESAPLAMA ---
     function formatCurrency(input) { let v = input.value.replace(/\D/g, ''); input.value = v ? parseFloat(v).toLocaleString('tr-TR') : ''; }
     function getFormattedNum(id) { let el = document.getElementById(id); return el && el.value ? parseFloat(el.value.replace(/\./g, '').replace(',', '.')) || 0 : 0; }
     function getStandardNum(id) { let el = document.getElementById(id); return el && el.value ? parseFloat(el.value) || 0 : 0; }
     function setDisplay(id, show) { document.getElementById(id).style.display = show ? 'block' : 'none'; }
 
+    // Kapalı Döngü Verimlilik Formülleri
     function calcBrutFromIc(icId, brutId) {
-        let icVal = getStandardNum(icId), daireOrtak = getStandardNum('fizDaireOrtak') || 0;
-        document.getElementById(brutId).value = icVal > 0 ? parseFloat((icVal * (1 + (daireOrtak / 100))).toFixed(2)) : '';
+        let icVal = getStandardNum(icId), verim = getStandardNum('fizVerim') || 80;
+        document.getElementById(brutId).value = icVal > 0 ? parseFloat((icVal / (verim / 100)).toFixed(2)) : '';
     }
 
     function calcIcFromBrut(brutId, icId) {
-        let brutVal = getStandardNum(brutId), daireOrtak = getStandardNum('fizDaireOrtak') || 0;
-        document.getElementById(icId).value = brutVal > 0 ? parseFloat((brutVal / (1 + (daireOrtak / 100))).toFixed(2)) : '';
+        let brutVal = getStandardNum(brutId), verim = getStandardNum('fizVerim') || 80;
+        document.getElementById(icId).value = brutVal > 0 ? parseFloat((brutVal * (verim / 100)).toFixed(2)) : '';
     }
 
     function updateAllBrut() {
         ['Magaza', '11', '21', '31'].forEach(suffix => { if(document.getElementById('ic'+suffix).value) calcBrutFromIc('ic'+suffix, 'm2'+suffix); });
     }
 
-    // --- OPTİMİZASYON ---
     function optimizeDaireler() {
         triggerAutoCalc();
-        if(state.satilabilir <= 0) { 
-            alert("Lütfen önce imar verilerini girerek satılabilir alanı hesaplatın."); 
-            return; 
-        }
+        if(state.satilabilir <= 0) { alert("Lütfen önce imar verilerini girerek satılabilir alanı hesaplatın."); return; }
 
         let pM = getStandardNum('payMagaza');
         let availableResArea = state.satilabilir;
-        if (pM > 0) {
-            // Ticari Havuz payı satılabilir alandan düşülür
-            availableResArea -= (state.satilabilir * (pM / 100));
-        }
+        if (pM > 0) { availableResArea -= (state.satilabilir * (pM / 100)); }
 
-        let types = ['11', '21', '31']; // SADECE KONUTLAR OPTİMİZE EDİLİR (Dükkan kilidi çözüldü, serbest bırakıldı)
-        let data = [];
-        let totalUsedResArea = 0;
+        let types = ['11', '21', '31']; 
+        let data = []; let totalUsedResArea = 0;
 
         types.forEach(type => {
             let p = getStandardNum('pay' + type);
-            let m2 = getStandardNum('m2' + type);
-            if(p > 0 && m2 > 0) {
-                let exactQty = (state.satilabilir * (p / 100)) / m2;
+            let ic = getStandardNum('ic' + type);
+            if(p > 0 && ic > 0) {
+                let exactQty = (state.satilabilir * (p / 100)) / ic;
                 let q = Math.floor(exactQty); 
                 if(q > 0) {
-                    let baseArea = q * m2;
-                    totalUsedResArea += baseArea;
-                    data.push({ type: type, q: q, m2: m2 });
+                    totalUsedResArea += (q * ic);
+                    data.push({ type: type, q: q, ic: ic });
                 }
             }
         });
 
-        if(data.length === 0) {
-            alert("Optimize edilecek geçerli bir konut bulunamadı. Lütfen konut Pay(%) ve Dış m² değerlerini girin.");
-            return;
-        }
+        if(data.length === 0) { alert("Optimize edilecek geçerli bir konut bulunamadı. Lütfen konut Pay(%) ve İç Brüt m² girin."); return; }
 
         let k = availableResArea / totalUsedResArea; 
-        let totalPayForRes = 0;
-        let targetResPay = 100 - (pM > 0 ? pM : 0); 
+        let totalPayForRes = 0; let targetResPay = 100 - (pM > 0 ? pM : 0); 
 
         data.forEach((item, index) => {
-            let newM2 = parseFloat((item.m2 * k).toFixed(2));
-            let newPay = parseFloat((( (item.q * newM2) / state.satilabilir ) * 100).toFixed(2));
+            let newIc = parseFloat((item.ic * k).toFixed(2));
+            let newPay = parseFloat((( (item.q * newIc) / state.satilabilir ) * 100).toFixed(2));
 
             if(index === data.length - 1) {
                 newPay = parseFloat((targetResPay - totalPayForRes).toFixed(2)); 
-                newM2 = parseFloat(((newPay / 100) * state.satilabilir / item.q).toFixed(2)); 
+                newIc = parseFloat(((newPay / 100) * state.satilabilir / item.q).toFixed(2)); 
             }
             totalPayForRes += newPay;
 
-            document.getElementById('m2' + item.type).value = newM2;
+            document.getElementById('ic' + item.type).value = newIc;
             document.getElementById('pay' + item.type).value = newPay;
-            calcIcFromBrut('m2' + item.type, 'ic' + item.type); 
+            calcBrutFromIc('ic' + item.type, 'm2' + item.type); 
         });
 
-        types.forEach(type => {
-            if(!data.find(d => d.type === type)) {
-                document.getElementById('pay' + type).value = '';
-            }
-        });
+        types.forEach(type => { if(!data.find(d => d.type === type)) document.getElementById('pay' + type).value = ''; });
 
         triggerAutoCalc();
-
         let btn = document.getElementById('btnOptimize');
-        let origText = btn.innerHTML;
         btn.innerHTML = '<i class="fa-solid fa-check"></i> Tamamlandı';
-        btn.classList.replace('btn-outline-light', 'btn-success');
-        btn.classList.add('text-white', 'border-0');
-        setTimeout(() => {
-            btn.innerHTML = 'Optimize Et';
-            btn.classList.replace('btn-success', 'btn-outline-light');
-            btn.classList.remove('text-white', 'border-0');
-        }, 1500);
+        btn.classList.replace('btn-outline-light', 'btn-success'); btn.classList.add('text-white', 'border-0');
+        setTimeout(() => { btn.innerHTML = 'Optimize Et'; btn.classList.replace('btn-success', 'btn-outline-light'); btn.classList.remove('text-white', 'border-0'); }, 1500);
     }
 
     function triggerAutoCalc() {
@@ -661,20 +739,26 @@
 
         if(!state.arsaHam || !emsal || !taks || !kat) return;
 
+        // BÖLÜM 1: Mimari Kütle ve Taban Optimizasyonu
         state.arsaNet = state.arsaHam * (1 - (terk / 100));
-        
-        // TA = Z * TAKS Mantığı
         state.Z = state.arsaNet * emsal;
-        let maxTaban = state.Z * taks; 
+        state.yasalMaxTaban = state.arsaNet * taks; 
+        let optimumTaban = kat > 0 ? state.Z / kat : state.Z;
+        
+        // Efektif TA
+        state.aktifTaban = Math.min(state.yasalMaxTaban, optimumTaban);
 
         let cephe = getStandardNum('fizCephe'), derinlik = getStandardNum('fizDerinlik');
         let cYan = getStandardNum('fizCekmeYan'), cOnArka = getStandardNum('fizCekmeOnArka');
-        let fizikiOturum = maxTaban;
-
-        if(cephe > 0 && derinlik > 0) fizikiOturum = Math.max(0, cephe - cYan) * Math.max(0, derinlik - cOnArka);
-
-        state.aktifTaban = Math.min(maxTaban, fizikiOturum);
-        setDisplay('uyariGeometri', fizikiOturum < maxTaban && cephe > 0);
+        let fizikiOturum = 0;
+        
+        if(cephe > 0 && derinlik > 0) {
+            fizikiOturum = Math.max(0, cephe - cYan) * Math.max(0, derinlik - cOnArka);
+            state.aktifTaban = Math.min(state.aktifTaban, fizikiOturum);
+            setDisplay('uyariGeometri', fizikiOturum < state.yasalMaxTaban);
+        } else {
+            setDisplay('uyariGeometri', false);
+        }
 
         let gabariKapasitesi = state.aktifTaban * kat;
         let kullanilanZ = Math.min(state.Z, gabariKapasitesi);
@@ -684,25 +768,34 @@
         state.KA = Math.max(0, kullanilanZ - state.TA);
         state.TKA = state.KA * cks;
 
-        // SUBASMANA GÖRE NİTELİK VE TİA
-        let subasmanNitelik = "";
-        if(subasman === '0.50') { state.TIA = state.TKA + state.TA; subasmanNitelik = "Tek Katlı Mağaza"; }
-        else if(subasman === '2.50') { state.TIA = (kullanilanZ * cks) + state.TA; subasmanNitelik = "Asma Katlı Mağaza"; }
-        else { state.TIA = (kullanilanZ * cks) + (state.TA * 2); subasmanNitelik = "Asma Katlı ve Bodrumlu Mağaza"; }
-        
+        let subasmanNitelik = "", subasmanCarpan = 1;
+        if(subasman === '0.50') { 
+            state.TIA = state.TKA + state.TA; subasmanNitelik = "Standart"; subasmanCarpan = 1;
+        } else if(subasman === '2.50') { 
+            state.TIA = (kullanilanZ * cks) + state.TA; subasmanNitelik = "Asmakatlı"; subasmanCarpan = 1.5;
+        } else { 
+            state.TIA = (kullanilanZ * cks) + (state.TA * 2); subasmanNitelik = "Bodrumlu Asmakatlı"; subasmanCarpan = 2.5;
+        }
         document.getElementById('lblDukkanNitelik').innerText = subasmanNitelik;
 
-        // KAPASİTE FORMÜLÜ (Satılabilir Toplam Havuz)
-        let ortakAlanYuzde = getStandardNum('fizDaireOrtak') || 20;
-        state.satilabilir = (state.TIA * (verim / 100)) * (1 - (ortakAlanYuzde / 100));
+        // BÖLÜM 2: Satılabilir Havuz (Kapalı Döngü)
+        state.satilabilir = state.TIA * (verim / 100);
         state.kayip = state.TIA - state.satilabilir;
 
-        // TİCARİ HAVUZ VE DİNAMİK ORANLAMA (KİLİDİ ÇÖZÜLEN KISIM)
-        let ticariHavuz = (subasman === '5.50') ? (state.aktifTaban * 2) : state.aktifTaban;
-        let pM = state.satilabilir > 0 ? (ticariHavuz / state.satilabilir) * 100 : 0;
-        if(pM > 100) pM = 100; // Koruma
+        let ticariZeminHavuzu = state.TA;
+        let dukkanTapuBrut = getStandardNum('m2Magaza');
+        let dukkanTabanIzi = dukkanTapuBrut > 0 ? dukkanTapuBrut / subasmanCarpan : 0;
         
+        state.magazaAdedi = dukkanTabanIzi > 0 ? ticariZeminHavuzu / dukkanTabanIzi : 0;
+        let ticariTapuToplam = state.magazaAdedi * dukkanTapuBrut;
+        let ticariIcToplam = ticariTapuToplam * (verim / 100);
+        
+        let pM = state.satilabilir > 0 ? (ticariIcToplam / state.satilabilir) * 100 : 0;
+        if(pM > 100) pM = 100;
         document.getElementById('payMagaza').value = pM.toFixed(2);
+
+        state.ticariTIA = ticariTapuToplam;
+        state.konutTIA = Math.max(0, state.TIA - state.ticariTIA);
 
         let fmt = { maximumFractionDigits: 0 };
         document.getElementById('outZ').innerText = state.Z.toLocaleString('tr-TR', fmt) + " m²";
@@ -716,9 +809,7 @@
         else if(kalanPay < -0.05) { kalanKutu.innerHTML = "❌ Dağılım Hatası!"; kalanKutu.style.color = "#c0392b"; }
         else { kalanKutu.innerHTML = `Kalan Pay: %${kalanPay.toFixed(2)}`; kalanKutu.style.color = "#7f8c8d"; }
 
-        // Uyarı: Dükkanın Tapu Hak Brütü devasa ticari havuzu aşarsa kullanıcıyı uyar
-        let dukkanTapuBrut = getStandardNum('m2Magaza');
-        setDisplay('uyariDukkan', pM > 0 && dukkanTapuBrut > ticariHavuz);
+        setDisplay('uyariDukkan', pM > 0 && dukkanTabanIzi > ticariZeminHavuzu);
 
         state.arsaTicariYuzde = parseFloat(document.getElementById('ticariSlider').value) || 0;
         state.mutTicariYuzde = 100 - state.arsaTicariYuzde;
@@ -733,22 +824,108 @@
         state.ticariAlan = state.satilabilir * (pM / 100);
         state.konutAlan = state.satilabilir * ((p1 + p2 + p3) / 100);
 
-        let fm = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: document.getElementById('paraBirimi').value, maximumFractionDigits: 0 });
+        let paraBirimi = document.getElementById('paraBirimi').value;
+        let fm = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: paraBirimi, maximumFractionDigits: 0 });
 
         let topTic = state.ticariAlan * getFormattedNum('fiyatTicari');
         let topKon = state.konutAlan * getFormattedNum('fiyatKonut');
 
+        // BÖLÜM 3: Otopark Stratejisi
+        let ic1 = getStandardNum('ic11'), ic2 = getStandardNum('ic21'), ic3 = getStandardNum('ic31');
+        let adet11 = ic1 > 0 ? (state.satilabilir * (p1 / 100)) / ic1 : 0;
+        let adet21 = ic2 > 0 ? (state.satilabilir * (p2 / 100)) / ic2 : 0;
+        let adet31 = ic3 > 0 ? (state.satilabilir * (p3 / 100)) / ic3 : 0;
+        
+        let arac11 = adet11 / 3, arac21 = adet21 / 2, arac31 = adet31 / 1;
+        let aracTic = ticariTapuToplam / 40;
+        state.otoparkArac = Math.ceil(arac11 + arac21 + arac31 + aracTic);
+        state.otoparkAlan = state.otoparkArac * 25;
+        
+        let fizikiBodrumSiniri = fizikiOturum > 0 ? fizikiOturum : state.yasalMaxTaban;
+        if(fizikiBodrumSiniri <= 0) fizikiBodrumSiniri = 1;
+        state.otoparkKat = Math.ceil(state.otoparkAlan / fizikiBodrumSiniri);
+
+        let isKapaliOtopark = document.getElementById('chkKapaliOtopark').checked;
+        state.otoparkEkMaliyet = 0;
+        let malKonutM2 = getFormattedNum('maliyetKonut') || 0;
+
+        if (isKapaliOtopark) {
+            document.getElementById('otoparkGirdiUI').style.display = 'block';
+            document.getElementById('otoparkOzetUI').style.display = 'block';
+            document.getElementById('uiOtoIhtiyac').innerText = state.otoparkArac + " Araç";
+            document.getElementById('uiOtoAlan').innerText = state.otoparkAlan.toLocaleString('tr-TR', fmt) + " m²";
+            document.getElementById('uiOtoKat').innerText = state.otoparkKat + " Kat Bodrum";
+            
+            setDisplay('uyariOtopark', state.otoparkKat > 1);
+
+            let kalanAlan = state.otoparkAlan;
+            let baseOtoMaliyet = malKonutM2 * 0.5; // Otopark base maliyeti konutun %50'si varsayımı
+            for(let i = 1; i <= state.otoparkKat; i++) {
+                let katAlan = Math.min(kalanAlan, fizikiBodrumSiniri);
+                let carpan = 1 + ((i - 1) * 0.20); // Her kat için %20 artış
+                state.otoparkEkMaliyet += katAlan * baseOtoMaliyet * carpan;
+                kalanAlan -= katAlan;
+                if(kalanAlan <= 0) break;
+            }
+
+            let serefiye = getStandardNum('otoparkSerefiye') || 0;
+            if(serefiye > 0) topKon = topKon * (1 + (serefiye / 100));
+
+        } else {
+            document.getElementById('otoparkGirdiUI').style.display = 'none';
+            document.getElementById('otoparkOzetUI').style.display = 'none';
+        }
+
+        // BÖLÜM 4: Finans ve Ciro
         state.ciroArsaT = topTic * (state.arsaTicariYuzde / 100);
         state.ciroMutT = topTic * (state.mutTicariYuzde / 100);
         state.ciroArsaK = topKon * (state.arsaKonutYuzde / 100);
         state.ciroMutK = topKon * (state.mutKonutYuzde / 100);
         state.toplamCiro = topTic + topKon;
 
+        state.karmaArsaYuzde = state.toplamCiro > 0 ? ((state.ciroArsaT + state.ciroArsaK) / state.toplamCiro) * 100 : 0;
+        state.karmaMutYuzde = state.toplamCiro > 0 ? ((state.ciroMutT + state.ciroMutK) / state.toplamCiro) * 100 : 0;
+
+        document.getElementById('uiKarmaArsa').innerText = state.karmaArsaYuzde.toFixed(1);
+        document.getElementById('uiKarmaMut').innerText = state.karmaMutYuzde.toFixed(1);
+
+        state.mevcutArsa = getFormattedNum('mevcutArsaDegeri');
+        let arsaCiroToplam = state.ciroArsaT + state.ciroArsaK;
+        if(state.mevcutArsa > 0 && arsaCiroToplam > 0) {
+            state.arsaDegerArtisi = arsaCiroToplam / state.mevcutArsa;
+            document.getElementById('arsaOzetUI').style.display = 'block';
+            document.getElementById('uiMevcutArsa').innerText = fm.format(state.mevcutArsa);
+            document.getElementById('uiArsaProjeDegeri').innerText = fm.format(arsaCiroToplam);
+            document.getElementById('uiArsaCarpan').innerText = state.arsaDegerArtisi.toFixed(2) + "x Kat";
+        } else {
+            document.getElementById('arsaOzetUI').style.display = 'none';
+            state.arsaDegerArtisi = 0;
+        }
+
+        let malTicariM2 = getFormattedNum('maliyetTicari');
+        state.toplamMaliyet = (state.ticariTIA * malTicariM2) + (state.konutTIA * malKonutM2) + state.otoparkEkMaliyet;
+        state.mutNetKar = (state.ciroMutT + state.ciroMutK) - state.toplamMaliyet;
+        state.mutKarMarji = state.toplamMaliyet > 0 ? (state.mutNetKar / state.toplamMaliyet) * 100 : 0;
+
         document.getElementById('finansBody').innerHTML = `
             <tr><td>Ticari</td><td>${fm.format(state.ciroArsaT)}</td><td>${fm.format(state.ciroMutT)}</td><td class="fw-bold">${fm.format(topTic)}</td></tr>
             <tr><td>Konut</td><td>${fm.format(state.ciroArsaK)}</td><td>${fm.format(state.ciroMutK)}</td><td class="fw-bold">${fm.format(topKon)}</td></tr>
-            <tr class="table-warning fw-bold" style="font-size:1.05rem;"><td>TOPLAM</td><td class="text-success">${fm.format(state.ciroArsaT + state.ciroArsaK)}</td><td class="text-danger">${fm.format(state.ciroMutT + state.ciroMutK)}</td><td style="font-size:1.15rem; color:#2c3e50;">${fm.format(state.toplamCiro)}</td></tr>
+            <tr class="table-warning fw-bold" style="font-size:1.05rem;">
+                <td>TOPLAM</td>
+                <td class="text-success">${fm.format(state.ciroArsaT + state.ciroArsaK)}<br><span style="font-size:0.75rem;">(%${state.karmaArsaYuzde.toFixed(1)})</span></td>
+                <td class="text-danger">${fm.format(state.ciroMutT + state.ciroMutK)}<br><span style="font-size:0.75rem;">(%${state.karmaMutYuzde.toFixed(1)})</span></td>
+                <td style="font-size:1.15rem; color:#2c3e50;">${fm.format(state.toplamCiro)}</td>
+            </tr>
         `;
+
+        if(malTicariM2 > 0 || malKonutM2 > 0) {
+            document.getElementById('maliyetOzetUI').style.display = 'block';
+            document.getElementById('uiToplamMaliyet').innerText = "- " + fm.format(state.toplamMaliyet);
+            document.getElementById('uiNetKar').innerText = "+ " + fm.format(state.mutNetKar);
+            document.getElementById('uiKarMarji').innerText = "% " + state.mutKarMarji.toFixed(1);
+        } else {
+            document.getElementById('maliyetOzetUI').style.display = 'none';
+        }
     }
 
     function generateReport() {
@@ -809,10 +986,10 @@
         outHtml += `<div style="font-weight:bold; font-size:14px; margin-bottom:5px; color:#2c3e50; border-bottom:2px solid #bdc3c7; padding-bottom:4px;">MİMARİ SINIRLAR VE ANALİZ</div>`;
         outHtml += `<table style="width:100%; font-size:13px; margin-bottom:20px; border-collapse: collapse;">
             <tr style="${trStyle}"><td style="${tdLeft}">Tapu Arsa</td><td style="${tdRight}">${nf.format(state.arsaHam)} m²</td></tr>
-            <tr style="${trStyle} background-color:#f8fdfa;"><td style="${tdLeft}">Net İmar Parseli <span style="font-size:10px; color:#7f8c8d; font-weight:normal;">(Terk Sonrası İnşaat Alanı)</span></td><td style="${tdRight} color:#27ae60;">${nf.format(state.arsaNet)} m²</td></tr>
-            <tr style="${trStyle}"><td style="${tdLeft}">Taban Alanı (TA)</td><td style="${tdRight}">${nf.format(state.TA)} m²</td></tr>
+            <tr style="${trStyle} background-color:#f8fdfa;"><td style="${tdLeft}">Net İmar Parseli</td><td style="${tdRight} color:#27ae60;">${nf.format(state.arsaNet)} m²</td></tr>
+            <tr style="${trStyle}"><td style="${tdLeft}">Yasal Max Taban (TAKS)</td><td style="${tdRight} color:#7f8c8d;">${nf.format(state.yasalMaxTaban)} m²</td></tr>
+            <tr style="${trStyle}"><td style="${tdLeft}">Efektif Taban Alanı (TA)</td><td style="${tdRight}">${nf.format(state.TA)} m²</td></tr>
             <tr style="${trStyle}"><td style="${tdLeft}">Kat Alanı (KA)</td><td style="${tdRight}">${nf.format(state.KA)} m²</td></tr>
-            <tr style="${trStyle}"><td style="${tdLeft}">Toplam Kat Alanı (TKA)</td><td style="${tdRight}">${nf.format(state.TKA)} m²</td></tr>
             <tr style="${trStyle}"><td style="${tdLeft}">TİA (Ruhsat Alanı)</td><td style="${tdRight} color:#2980b9;">${nf.format(state.TIA)} m²</td></tr>
             <tr style="${trStyle}"><td style="${tdLeft}">Satılabilir Brüt Alan (Verim)</td><td style="${tdRight} color:#27ae60;">${nf.format(state.satilabilir)} m²</td></tr>
             <tr style="${trStyle}"><td style="${tdLeft}">Kayıp / Ortak Alan</td><td style="${tdRight} color:#c0392b;">${nf.format(state.kayip)} m²</td></tr>
@@ -830,30 +1007,56 @@
         const formatAdet = (val) => Math.abs(Math.round(val) - val) < 0.05 ? Math.round(val) : '~' + val.toFixed(1);
         let nitelik = document.getElementById('lblDukkanNitelik').innerText;
 
-        // ADET KİLİDİ ÇÖZÜLDÜ: (Satılabilir Alan * Dükkan Payı) / Dükkan Tapu Hak Brütü
-        if(pM > 0 && m2M > 0) { 
-            let a = (state.satilabilir * (pM/100)) / m2M; 
-            totalAdet += a; 
-            outHtml += `<tr style="${trStyle}"><td style="${tdLeft}">Dükkan/Mağaza <span style="font-size:10px; color:#8e44ad; font-weight:bold;">(${nitelik})</span><br><span style="font-size:10px; color:#7f8c8d;">${m2M} m² Tapu Brüt / ${icM} m² İç Net</span></td><td style="${tdRight}">${formatAdet(a)} Adet</td></tr>`; 
+        if(state.magazaAdedi > 0) { 
+            totalAdet += state.magazaAdedi; 
+            outHtml += `<tr style="${trStyle}"><td style="${tdLeft}">Dükkan/Mağaza <span style="font-size:10px; color:#8e44ad; font-weight:bold;">(${nitelik})</span><br><span style="font-size:10px; color:#7f8c8d;">${m2M} m² Tapu Brüt / ${icM} m² İç Net</span></td><td style="${tdRight}">${formatAdet(state.magazaAdedi)} Adet</td></tr>`; 
         }
-        if(p1 > 0 && m21 > 0) { let a = (state.satilabilir * (p1/100)) / m21; totalAdet += a; outHtml += `<tr style="${trStyle}"><td style="${tdLeft}">1+1 Daire<br><span style="font-size:10px; color:#7f8c8d;">${m21} m² Tapu Brüt / ${ic1} m² İç Net</span></td><td style="${tdRight}">${formatAdet(a)} Adet</td></tr>`; }
-        if(p2 > 0 && m22 > 0) { let a = (state.satilabilir * (p2/100)) / m22; totalAdet += a; outHtml += `<tr style="${trStyle}"><td style="${tdLeft}">2+1 Daire<br><span style="font-size:10px; color:#7f8c8d;">${m22} m² Tapu Brüt / ${ic2} m² İç Net</span></td><td style="${tdRight}">${formatAdet(a)} Adet</td></tr>`; }
-        if(p3 > 0 && m23 > 0) { let a = (state.satilabilir * (p3/100)) / m23; totalAdet += a; outHtml += `<tr style="${trStyle}"><td style="${tdLeft}">3+1 Daire<br><span style="font-size:10px; color:#7f8c8d;">${m23} m² Tapu Brüt / ${ic3} m² İç Net</span></td><td style="${tdRight}">${formatAdet(a)} Adet</td></tr>`; }
+        if(p1 > 0 && ic1 > 0) { let a = (state.satilabilir * (p1/100)) / ic1; totalAdet += a; outHtml += `<tr style="${trStyle}"><td style="${tdLeft}">1+1 Daire<br><span style="font-size:10px; color:#7f8c8d;">${m21} m² Tapu Brüt / ${ic1} m² İç Net</span></td><td style="${tdRight}">${formatAdet(a)} Adet</td></tr>`; }
+        if(p2 > 0 && ic2 > 0) { let a = (state.satilabilir * (p2/100)) / ic2; totalAdet += a; outHtml += `<tr style="${trStyle}"><td style="${tdLeft}">2+1 Daire<br><span style="font-size:10px; color:#7f8c8d;">${m22} m² Tapu Brüt / ${ic2} m² İç Net</span></td><td style="${tdRight}">${formatAdet(a)} Adet</td></tr>`; }
+        if(p3 > 0 && ic3 > 0) { let a = (state.satilabilir * (p3/100)) / ic3; totalAdet += a; outHtml += `<tr style="${trStyle}"><td style="${tdLeft}">3+1 Daire<br><span style="font-size:10px; color:#7f8c8d;">${m23} m² Tapu Brüt / ${ic3} m² İç Net</span></td><td style="${tdRight}">${formatAdet(a)} Adet</td></tr>`; }
         
         outHtml += `</table>`;
         outHtml += `<div style="font-weight:bold; font-size:13px; margin-bottom:20px; background:#e8f4f8; padding:8px; border-radius:4px; text-align:right; border:1px solid #3498db;">Öngörülen Toplam: <span style="font-size:15px; color:#2c3e50;">${Math.round(totalAdet)} Bağımsız Bölüm</span></div>`;
 
+        // Otopark Stratejisi
+        let isKapali = document.getElementById('chkKapaliOtopark').checked;
+        outHtml += `<div style="font-weight:bold; font-size:14px; margin-bottom:5px; color:#2c3e50; border-bottom:2px solid #bdc3c7; padding-bottom:4px;">OTOPARK VE ZEMİN STRATEJİSİ</div>`;
+        outHtml += `<table style="width:100%; font-size:13px; margin-bottom:20px; border-collapse: collapse;">
+            <tr style="${trStyle}"><td style="${tdLeft}">Yasal Otopark İhtiyacı</td><td style="${tdRight}">${state.otoparkArac} Araç (${nf.format(state.otoparkAlan)} m²)</td></tr>
+            <tr style="${trStyle}"><td style="${tdLeft}">Otopark Tipi</td><td style="${tdRight}">${isKapali ? '<span style="color:#2980b9;">Kapalı Otopark Planlandı</span>' : '<span style="color:#7f8c8d;">Açık Otopark Planlandı</span>'}</td></tr>`;
+        if(isKapali) {
+            outHtml += `<tr style="${trStyle}"><td style="${tdLeft}">Kazı Derinliği (Fiziki Sınıra Göre)</td><td style="${tdRight} color:#c0392b;">${state.otoparkKat} Kat Bodrum</td></tr>`;
+        }
+        outHtml += `</table>`;
+
         outHtml += `<div style="font-weight:bold; font-size:14px; margin-bottom:5px; color:#2c3e50; border-bottom:2px solid #bdc3c7; padding-bottom:4px;">FİNANS VE CİRO PAYLAŞIMI</div>`;
         outHtml += `<table style="width:100%; font-size:13px; margin-bottom:20px; border-collapse: collapse;">
-            <tr style="${trStyle}"><td style="${tdLeft}">Arsa Sahibi Toplam Ciro Payı</td><td style="${tdRight} color:#27ae60;">${fm.format(state.ciroArsaT + state.ciroArsaK)}</td></tr>
-            <tr style="${trStyle}"><td style="${tdLeft}">Müteahhit Toplam Ciro Payı</td><td style="${tdRight} color:#c0392b;">${fm.format(state.ciroMutT + state.ciroMutK)}</td></tr>
+            <tr style="${trStyle}"><td style="${tdLeft}">Arsa Sahibi Ciro Payı <span style="font-size:10px; color:#27ae60; font-weight:bold;">(Karma Oran: %${state.karmaArsaYuzde.toFixed(1)})</span></td><td style="${tdRight} color:#27ae60;">${fm.format(state.ciroArsaT + state.ciroArsaK)}</td></tr>
+            <tr style="${trStyle}"><td style="${tdLeft}">Müteahhit Ciro Payı <span style="font-size:10px; color:#c0392b; font-weight:bold;">(Karma Oran: %${state.karmaMutYuzde.toFixed(1)})</span></td><td style="${tdRight} color:#2980b9;">${fm.format(state.ciroMutT + state.ciroMutK)}</td></tr>
             <tr style="${trStyle} background-color:#fef9e7;"><td style="${tdLeft} font-weight:bold;">TOPLAM PROJE CİROSU</td><td style="${tdRight} font-size:16px; color:#8e44ad;">${fm.format(state.toplamCiro)}</td></tr>
         </table>`;
 
-        outHtml += `<div style="font-weight:bold; font-size:14px; margin-top:15px; margin-bottom:8px; color:#8e44ad;"><i class="fa-regular fa-gem"></i> GİZLİ EMSAL POTANSİYELİ</div>`;
-        outHtml += `<p style="margin-bottom:8px; font-size:12px; line-height:1.5; color:#555;"><b>1. Kot Farkı Avantajı:</b> Arazinin topografik yapısından doğabilecek kot farkları bu hesaba katılmamıştır. Kot müsaitliğini kontrol ediniz.</p>`;
-        outHtml += `<p style="margin-bottom:15px; font-size:12px; line-height:1.5; color:#555;"><b>2. Çatı Dubleks Potansiyeli:</b> Bu hesaplama normal katlar üzerinden yapılmıştır. En üst katların Çatı Dubleks olarak planlanması durumunda bağımsız bölüm hacmi ve sayısı artacaktır.</p>`;
-        outHtml += `<div style="font-size:10px; color:#95a5a6; border-top:1px dashed #ccc; padding-top:10px; text-align:justify;">⚠️ <b>YASAL UYARI:</b> Bu rapor, matematiksel bir öngörü ve fikir vermek amacıyla hazırlanmıştır. Kesin sonuçlar için yetkili bir mimar tarafından avan proje çizilmesi gerekmektedir.</div>`;
+        let arsaCiroToplam = state.ciroArsaT + state.ciroArsaK;
+        if(state.mevcutArsa > 0 && arsaCiroToplam > 0) {
+            outHtml += `<div style="font-weight:bold; font-size:14px; margin-top:15px; margin-bottom:5px; color:#d35400; border-bottom:2px solid #f39c12; padding-bottom:4px;">ARSA SAHİBİ DEĞER GELİŞTİRME ANALİZİ</div>`;
+            outHtml += `<table style="width:100%; font-size:13px; margin-bottom:20px; border-collapse: collapse;">
+                <tr style="${trStyle}"><td style="${tdLeft}">Arsanın Mevcut Boş Değeri</td><td style="${tdRight} color:#7f8c8d;">${fm.format(state.mevcutArsa)}</td></tr>
+                <tr style="${trStyle}"><td style="${tdLeft}">Projeden Sağlanacak Ciro Payı</td><td style="${tdRight} color:#27ae60;">${fm.format(arsaCiroToplam)}</td></tr>
+                <tr style="${trStyle} background-color:#fffcf5;"><td style="${tdLeft} font-weight:bold; color:#d35400;">DEĞER ARTIŞ ÇARPANI</td><td style="${tdRight} font-size:15px; color:#e67e22;">${state.arsaDegerArtisi.toFixed(2)}x Kat</td></tr>
+            </table>`;
+        }
+
+        let malTicariM2 = getFormattedNum('maliyetTicari');
+        let malKonutM2 = getFormattedNum('maliyetKonut');
+        if(malTicariM2 > 0 || malKonutM2 > 0) {
+            outHtml += `<div style="font-weight:bold; font-size:14px; margin-top:15px; margin-bottom:5px; color:#2c3e50; border-bottom:2px solid #bdc3c7; padding-bottom:4px;">MÜTEAHHİT NET KAR SİMÜLASYONU</div>`;
+            outHtml += `<table style="width:100%; font-size:13px; margin-bottom:20px; border-collapse: collapse;">
+                <tr style="${trStyle}"><td style="${tdLeft}">Toplam İnşaat Maliyeti <span style="font-size:10px; color:#7f8c8d;">(Ticari+Konut+Otopark)</span></td><td style="${tdRight} color:#c0392b;">- ${fm.format(state.toplamMaliyet)}</td></tr>
+                <tr style="${trStyle}"><td style="${tdLeft}">Müteahhit Ciro Payı</td><td style="${tdRight} color:#2980b9;">+ ${fm.format(state.ciroMutT + state.ciroMutK)}</td></tr>
+                <tr style="${trStyle} background-color:#eafaf1;"><td style="${tdLeft} font-weight:bold;">ÖNGÖRÜLEN NET KAR</td><td style="${tdRight} font-size:15px; color:#27ae60;">${fm.format(state.mutNetKar)}</td></tr>
+                <tr style="${trStyle}"><td style="${tdLeft}">Maliyet Üzerinden Kar Marjı (ROI)</td><td style="${tdRight} color:#8e44ad;">% ${state.mutKarMarji.toFixed(1)}</td></tr>
+            </table>`;
+        }
 
         let signatureData = getSignatureData();
         outHtml += signatureData.html;
@@ -863,8 +1066,24 @@
         if(!document.getElementById('chkGizleNotlar').checked && pNotlar) txtSahibiNot += `Not: ${pNotlar}\n`;
 
         state.textReport = `📌 PROJE FİZİBİLİTE RAPORU\nBaşlık: ${pBaslik}\nKonum: ${pIl} / ${pIlce} / ${pMahalle}\nAda/Parsel: ${pAda} / ${pParsel}\n${txtSahibiNot}\n`;
-        state.textReport += `--- MİMARİ ANALİZ ---\nTapu Arsa: ${nf.format(state.arsaHam)} m² | Net Parsel: ${nf.format(state.arsaNet)} m²\nEmsal (Z): ${nf.format(state.Z)} m²\nTİA (Ruhsat): ${nf.format(state.TIA)} m²\nSatılabilir: ${nf.format(state.satilabilir)} m²\nToplam: ~${Math.round(totalAdet)} Adet Bölüm\n\n`;
-        state.textReport += `--- FİNANS ---\nArsa Ciro Payı: ${fm.format(state.ciroArsaT + state.ciroArsaK)}\nMüteahhit Payı: ${fm.format(state.ciroMutT + state.ciroMutK)}\nTOPLAM CİRO: ${fm.format(state.toplamCiro)}\n`;
+        state.textReport += `--- MİMARİ ANALİZ ---\nNet Parsel: ${nf.format(state.arsaNet)} m²\nEmsal (Z): ${nf.format(state.Z)} m²\nEfektif Taban Alanı: ${nf.format(state.TA)} m²\nTİA (Ruhsat): ${nf.format(state.TIA)} m²\nSatılabilir: ${nf.format(state.satilabilir)} m²\nToplam: ~${Math.round(totalAdet)} Adet Bölüm\nOtopark: ${state.otoparkArac} Araç ${isKapali ? '('+state.otoparkKat+' Kat Kapalı)' : '(Açık)'}\n\n`;
+        
+        state.textReport += `--- FİNANS ---\nArsa Ciro Payı: ${fm.format(state.ciroArsaT + state.ciroArsaK)} (%${state.karmaArsaYuzde.toFixed(1)})\nMüteahhit Payı: ${fm.format(state.ciroMutT + state.ciroMutK)} (%${state.karmaMutYuzde.toFixed(1)})\nTOPLAM CİRO: ${fm.format(state.toplamCiro)}\n`;
+        
+        if(state.mevcutArsa > 0 && arsaCiroToplam > 0) {
+            state.textReport += `\n--- ARSA SAHİBİ DEĞER ANALİZİ ---\n`;
+            state.textReport += `Mevcut Arsa Değeri: ${fm.format(state.mevcutArsa)}\n`;
+            state.textReport += `Projeden Pay Değeri: ${fm.format(arsaCiroToplam)}\n`;
+            state.textReport += `Değer Artış Çarpanı: ${state.arsaDegerArtisi.toFixed(2)}x Kat\n`;
+        }
+
+        if(malTicariM2 > 0 || malKonutM2 > 0) {
+            state.textReport += `\n--- MÜTEAHHİT KAR SİMÜLASYONU ---\n`;
+            state.textReport += `İnşaat Maliyeti: -${fm.format(state.toplamMaliyet)}\n`;
+            state.textReport += `Müteahhit Net Kar: +${fm.format(state.mutNetKar)}\n`;
+            state.textReport += `Kar Marjı (ROI): %${state.mutKarMarji.toFixed(1)}\n`;
+        }
+
         state.textReport += signatureData.txt;
 
         document.getElementById('resFizibilite').innerHTML = outHtml;
