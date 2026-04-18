@@ -712,16 +712,16 @@
         ['Magaza', '11', '21', '31'].forEach(suffix => { if(document.getElementById('ic'+suffix).value) calcBrutFromIc('ic'+suffix, 'm2'+suffix); });
     }
 
-    // YENİ EKLENEN OTOMATİK OPTİMİZASYON TETİKLEYİCİSİ
     function toggleSadeceKonut() {
-        triggerAutoCalc(); // Önce şalterin durumuna göre ticari alanı sıfırlar ve havuzu büyütür
+        triggerAutoCalc(); 
         let p1 = getStandardNum('pay11'), p2 = getStandardNum('pay21'), p3 = getStandardNum('pay31');
-        // Eğer tabloda en az 1 tane konut verisi (pay) varsa, boşa çıkan alanı otomatik dağıt
+        // Eğer tabloda en az 1 tane konut verisi varsa, boşa çıkan alanı otomatik dağıt
         if(p1 > 0 || p2 > 0 || p3 > 0) {
             optimizeDaireler();
         }
     }
 
+    // YENİ GÜNCELLENEN: ŞANTİYE MATEMATİĞİNE UYGUN (DAİRE BÜYÜKLÜKLERİNİ KORUYAN) OPTİMİZASYON
     function optimizeDaireler() {
         triggerAutoCalc();
         if(state.satilabilir <= 0) { alert("Lütfen önce imar verilerini girerek satılabilir alanı hesaplatın."); return; }
@@ -737,12 +737,10 @@
             let p = getStandardNum('pay' + type);
             let ic = getStandardNum('ic' + type);
             if(p > 0 && ic > 0) {
-                let exactQty = (state.satilabilir * (p / 100)) / ic;
-                let q = Math.round(exactQty); 
-                if(q > 0) {
-                    totalUsedResArea += (q * ic);
-                    data.push({ type: type, q: q, ic: ic });
-                }
+                // SADECE PAY ÜZERİNDEN ALAN HESABI (m² leri şişirmemek için)
+                let currentArea = state.satilabilir * (p / 100);
+                totalUsedResArea += currentArea;
+                data.push({ type: type, currentArea: currentArea, ic: ic });
             }
         });
 
@@ -752,18 +750,17 @@
         let totalPayForRes = 0; let targetResPay = 100 - (pM > 0 ? pM : 0); 
 
         data.forEach((item, index) => {
-            let newIc = parseFloat((item.ic * k).toFixed(2));
-            let newPay = parseFloat((( (item.q * newIc) / state.satilabilir ) * 100).toFixed(2));
+            // Dairenin iç m²'sini (ic) esnetmiyoruz! Sadece o daireye ayrılan havuzu (currentArea) esnetiyoruz.
+            let newArea = item.currentArea * k; 
+            let newPay = parseFloat((newArea / state.satilabilir * 100).toFixed(2));
 
             if(index === data.length - 1) {
                 newPay = parseFloat((targetResPay - totalPayForRes).toFixed(2)); 
-                newIc = parseFloat(((newPay / 100) * state.satilabilir / item.q).toFixed(2)); 
             }
             totalPayForRes += newPay;
 
-            document.getElementById('ic' + item.type).value = newIc;
+            // ic ve m2 kutularına DOKUNMUYORUZ. Sadece Pay (%) kutusunu güncelliyoruz.
             document.getElementById('pay' + item.type).value = newPay;
-            calcBrutFromIc('ic' + item.type, 'm2' + item.type); 
         });
 
         types.forEach(type => { if(!data.find(d => d.type === type)) document.getElementById('pay' + type).value = ''; });
@@ -991,6 +988,7 @@
         }
 
         let malTicariM2 = getFormattedNum('maliyetTicari');
+        let malKonutM2 = getFormattedNum('maliyetKonut');
         state.toplamMaliyet = (state.ticariTIA * malTicariM2) + (state.konutTIA * malKonutM2) + state.otoparkEkMaliyet;
         state.mutNetKar = (state.ciroMutT + state.ciroMutK) - state.toplamMaliyet;
         state.mutKarMarji = state.toplamMaliyet > 0 ? (state.mutNetKar / state.toplamMaliyet) * 100 : 0;
