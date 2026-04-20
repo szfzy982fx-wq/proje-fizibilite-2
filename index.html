@@ -414,7 +414,7 @@
         toplamMaliyet: 0, mutNetKar: 0, mutKarMarji: 0, karmaArsaYuzde: 0, karmaMutYuzde: 0,
         mevcutArsa: 0, arsaDegerArtisi: 0, textReport: "", 
         otoparkArac: 0, otoparkAlan: 0, otoparkKat: 0, otoparkEkMaliyet: 0, magazaAdedi: 0, yasalMaxTaban: 0, kat: 0,
-        adet11: 0, adet21: 0, adet31: 0, toplamBolum: 0
+        adet11: 0, adet21: 0, adet31: 0, toplamBolum: 0, siginakZorunlu: false, siginakSebep: ""
     };
 
     const formIds = [
@@ -474,6 +474,14 @@
                 <b>Formül:</b> (Net Kar / Toplam İnşaat Maliyeti) x 100
             </div>
             <p>Örneğin %105 ROI demek; projeye yatırılan her 1 Liranın, 1 Lira 5 Kuruş <b>temiz kar</b> olarak geri dönmesi (1 koyup 2 almak) demektir. Bu oran enflasyon ve şantiye risklerine karşı müteahhidin en büyük güvenlik kalkanıdır.</p>`;
+        } else if (type === 'siginak') {
+            title = "🛡️ Yeni Sığınak Yönetmeliği (7 Kasım 2025)";
+            body = `<p>Resmî Gazete'de yayımlanan güncel Madde-7'ye göre sığınak yapma zorunluluğu sınırları:</p>
+            <ul style="margin:0; padding-left:20px;">
+                <li><b>Sadece Konut (Madde 7-a):</b> Toplam emsal (m²) ne olursa olsun, konut sayısı <b>10 bağımsız bölümü</b> aşarsa sığınak zorunludur.</li>
+                <li><b>Sadece Ticari (Madde 7-b):</b> Bağımsız bölüm sayısına bakılmaz, Emsal (Z) alanı <b>1.500 m²'yi</b> aşarsa sığınak zorunludur.</li>
+                <li><b>Karma Proje (Madde 7-c):</b> Konut sayısı <b>10'u aşarsa</b> VEYA toplam Emsal alanı <b>1.500 m²'yi aşarsa</b> sığınak zorunludur.</li>
+            </ul>`;
         } else if (type === 'kilavuz') {
             title = "❓ Formül ve Mantık Kılavuzu";
             body = `
@@ -720,7 +728,6 @@
         }
     }
 
-    // YENİ GÜNCELLENEN: MELEZ (EŞİT YEDİRME) OPTİMİZASYON MANTIĞI
     function optimizeDaireler() {
         triggerAutoCalc();
         if(state.satilabilir <= 0) { alert("Lütfen önce imar verilerini girerek satılabilir alanı hesaplatın."); return; }
@@ -729,7 +736,7 @@
         let availableResArea = state.satilabilir;
         if (pM > 0) { availableResArea -= (state.satilabilir * (pM / 100)); }
 
-        let types = ['31', '21', '11']; // Büyükten küçüğe doğru (sepet doldurmak için)
+        let types = ['31', '21', '11']; 
         let data = []; 
         let totalWeight = 0;
 
@@ -744,10 +751,8 @@
 
         if(data.length === 0) { alert("Optimize edilecek geçerli bir konut bulunamadı. Lütfen konut Pay(%) ve İç Brüt m² girin."); return; }
 
-        // Metrekareye göre büyükten küçüğe sırala (Sepet doldurma kuralı)
         data.sort((a, b) => b.ic - a.ic);
 
-        // 1. ADIM: KESİN AŞAĞI YUVARLAMA (Mevcut paylara göre)
         let pool = availableResArea;
         data.forEach(item => {
             let allocatedArea = availableResArea * (item.originalPay / totalWeight);
@@ -756,7 +761,6 @@
             pool -= (exactQty * item.originalIc);
         });
 
-        // 2. ADIM: SEPET DOLDURMA (Havuzda kalan alanlara sığabildiği kadar büyükten küçüğe tam daire ekle)
         data.forEach(item => {
             if (pool >= item.originalIc) {
                 let extraQty = Math.floor(pool / item.originalIc);
@@ -765,34 +769,26 @@
             }
         });
 
-        // 3. ADIM: EŞİT YEDİRME (Kalan son ufacık 15-20m2'yi üretilen tüm dairelerin iç brütüne paylaştır)
         let totalUnits = data.reduce((sum, item) => sum + item.qty, 0);
         if(totalUnits > 0 && pool > 0) {
             let extraIcPerUnit = pool / totalUnits;
             data.forEach(item => {
-                item.ic += extraIcPerUnit; // Kalan çöp alan dairelere yedirildi!
+                item.ic += extraIcPerUnit; 
             });
         } else if (totalUnits === 0 && data.length > 0) {
-            // Hiç daire sığmayacak kadar küçük bir arsa ise, en küçük tipten 1 tane zorla üret
             let smallest = data[data.length - 1];
             smallest.qty = 1;
             smallest.ic = availableResArea; 
         }
 
-        // Değerleri Ekrana (DOM) Geri Yazdırma İşlemi (Oranlar %0 fire için yeniden hesaplanıyor)
         let targetResPay = 100 - (pM > 0 ? pM : 0);
         let accumulatedPay = 0;
 
-        // Ekrana yazdırırken UI sırasına sadık kalması için eski sırasına diziyoruz
         data.sort((a, b) => parseInt(b.type) - parseInt(a.type));
 
         data.forEach((item, index) => {
             let newPay = (item.qty * item.ic) / state.satilabilir * 100;
-            
-            // Küsurat kayıplarını sıfırlamak için son kaleme tam hedefi dayat
-            if (index === data.length - 1) {
-                newPay = targetResPay - accumulatedPay;
-            }
+            if (index === data.length - 1) newPay = targetResPay - accumulatedPay;
             accumulatedPay += newPay;
 
             document.getElementById('ic' + item.type).value = item.ic.toFixed(2);
@@ -800,12 +796,7 @@
             document.getElementById('pay' + item.type).value = newPay.toFixed(2);
         });
 
-        // Kullanılmayan tipleri sıfırla
-        ['11', '21', '31'].forEach(type => {
-            if(!data.find(d => d.type === type)) {
-                document.getElementById('pay' + type).value = '';
-            }
-        });
+        ['11', '21', '31'].forEach(type => { if(!data.find(d => d.type === type)) document.getElementById('pay' + type).value = ''; });
 
         triggerAutoCalc();
         let btn = document.getElementById('btnOptimize');
@@ -932,7 +923,6 @@
         document.getElementById('uiLiveAdet31').innerHTML = formatUI(state.adet31);
         document.getElementById('uiLiveAdetToplam').innerHTML = Math.round(state.toplamBolum);
 
-        // Kalan Pay Gösterimi Artık Eşit Dağıldığı İçin Hep Sıfır Çıkacak
         let kalanPay = 100 - (pM + p1 + p2 + p3);
         let kalanKutu = document.getElementById('kalanPayUyari');
         if(Math.abs(kalanPay) < 0.1) { 
@@ -947,6 +937,36 @@
             kalanKutu.innerHTML = `⚠️ Eksik Pay Dağılımı: %${kalanPay.toFixed(2)}`; 
             kalanKutu.style.color = "#f39c12"; 
         }
+
+        // YENİ GÜNCELLENEN: YENİ SIĞINAK ALGORİTMASI (7 KASIM 2025)
+        let toplamKonutAdedi = Math.round(state.adet11 + state.adet21 + state.adet31);
+        let siginakZorunlu = false;
+        let siginakSebep = "";
+
+        if (isSadeceKonut) {
+            // Madde 7-a: Sadece konutsa TİA'ya bakılmaz, 10 daire sınırı
+            if (toplamKonutAdedi >= 10) {
+                siginakZorunlu = true;
+                siginakSebep = "Konut bağımsız bölüm sayısı 10 ve üzeri olduğu için";
+            }
+        } else if (toplamKonutAdedi === 0 && state.magazaAdedi > 0) {
+            // Madde 7-b: Sadece ticari ise konut sayısına bakılmaz, Emsal sınırı
+            if (state.Z >= 1500) {
+                siginakZorunlu = true;
+                siginakSebep = "Sadece ticari yapıda emsal alanı 1.500 m²'yi aştığı için";
+            }
+        } else {
+            // Madde 7-c: Karma proje ise her iki kritere de takılabilir
+            if (toplamKonutAdedi >= 10) {
+                siginakZorunlu = true;
+                siginakSebep = "Karma yapıda konut bağımsız bölüm sayısı 10 ve üzeri olduğu için";
+            } else if (state.Z >= 1500) {
+                siginakZorunlu = true;
+                siginakSebep = "Karma yapıda toplam emsal alanı 1.500 m²'yi aştığı için";
+            }
+        }
+        state.siginakZorunlu = siginakZorunlu;
+        state.siginakSebep = siginakSebep;
 
         state.arsaTicariYuzde = parseFloat(document.getElementById('ticariSlider').value) || 0;
         state.mutTicariYuzde = 100 - state.arsaTicariYuzde;
@@ -1206,19 +1226,27 @@
             </table>`;
         }
 
-        if(state.toplamBolum >= 12 || state.TIA >= 1500) {
-            if(subasman === '5.50') {
-                outHtml += `<div style="margin-top:15px; padding:12px; background-color:#eafaf1; border-left:4px solid #27ae60; border-radius:4px; font-size:12px; color:#2c3e50; line-height:1.5;">
-                    <b style="color:#27ae60;">💡 SIĞINAK OPTİMİZASYON AVANTAJI:</b> Projeniz yasal sığınak sınırını (12 Bağımsız Bölüm veya 1.500 m² TİA) aşmaktadır. Ancak seçtiğiniz (5.50m Bodrumlu) zemin kotu sayesinde, mimari planlamada mecburi sığınak alanı ticari bodrum hacmi içerisinde çözülebilir ve ekstra derin hafriyat maliyetlerinden büyük ölçüde tasarruf sağlanabilir.
-                </div>`;
-            } else {
-                outHtml += `<div style="margin-top:15px; padding:12px; background-color:#fffcf5; border-left:4px solid #f39c12; border-radius:4px; font-size:12px; color:#2c3e50; line-height:1.5;">
-                    <b style="color:#d35400;">⚠️ SIĞINAK VE HAFRİYAT UYARISI:</b> Projeniz yasal sığınak sınırını (12 Bağımsız Bölüm veya 1.500 m² TİA) aşmaktadır. Seçtiğiniz zemin kotu (0.50m / 2.50m) standart olduğu için, yasal zorunluluk olan sığınak (ve varsa kapalı otopark) ihtiyacını karşılamak adına projede mecburi hafriyat ve bodrum inşası gerekecek, bu durum inşaat maliyet tablosuna ek yük olarak yansıyabilecektir.
-                </div>`;
-            }
+        // YENİ GÜNCELLENEN: YENİ SIĞINAK RAPOR ÇIKTISI
+        let siginakBaslik = `<b style="color:#2c3e50; font-size:13px;"><i class="fa-solid fa-shield-halved"></i> SIĞINAK ANALİZİ <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('siginak')"></i></b><br>`;
+        if (state.siginakZorunlu) {
+             if(subasman === '5.50') {
+                 outHtml += `<div style="margin-top:15px; padding:12px; background-color:#eafaf1; border-left:4px solid #27ae60; border-radius:4px; font-size:12px; color:#2c3e50; line-height:1.5;">
+                    ${siginakBaslik}
+                    <b style="color:#27ae60;">💡 OPTİMİZASYON AVANTAJI:</b> Projeniz yeni yönetmeliğe göre <b>(${state.siginakSebep})</b> mecburi sığınak kapsamına girmektedir. Ancak seçtiğiniz (5.50m Bodrumlu) zemin kotu sayesinde, bu sığınak alanı ticari bodrum hacmi içerisinde çözülebilir ve ekstra derin hafriyat maliyetlerinden büyük ölçüde tasarruf sağlanabilir.
+                 </div>`;
+             } else {
+                 outHtml += `<div style="margin-top:15px; padding:12px; background-color:#fffcf5; border-left:4px solid #f39c12; border-radius:4px; font-size:12px; color:#2c3e50; line-height:1.5;">
+                    ${siginakBaslik}
+                    <b style="color:#d35400;">⚠️ HAFRİYAT UYARISI:</b> Projeniz yeni yönetmeliğe göre <b>(${state.siginakSebep})</b> mecburi sığınak kapsamına girmektedir. Seçtiğiniz zemin kotu standart olduğu için, bu yasal zorunluluğu karşılamak adına projede mecburi hafriyat ve bodrum inşası gerekecek, bu durum inşaat maliyet tablosuna ek yük olarak yansıyabilecektir.
+                 </div>`;
+             }
+        } else {
+             outHtml += `<div style="margin-top:15px; padding:12px; background-color:#ebf5fb; border-left:4px solid #3498db; border-radius:4px; font-size:12px; color:#2c3e50; line-height:1.5;">
+                ${siginakBaslik}
+                <b style="color:#2980b9;">✅ MUAFİYET:</b> Projeniz güncel Sığınak Yönetmeliği Madde-7 muafiyet sınırları içerisinde kaldığı için <b>sığınak yapma zorunluluğu aranmaz</b>. Bu durum müteahhidi gereksiz bodrum hafriyatı ve yalıtım maliyetlerinden kurtarmaktadır.
+             </div>`;
         }
 
-        // YENİ GÜNCELLENEN: İKİYE BÖLÜNMÜŞ UYARI VE EMSAL ALANI
         outHtml += `<div style="margin-top:20px; padding:15px; background-color:#eafaf1; border-left:4px solid #27ae60; border-radius:6px; font-size:11.5px; color:#2c3e50; text-align:justify; line-height:1.5;">
             <b style="color:#27ae60; font-size:13px;"><i class="fa-solid fa-chart-line"></i> GİZLİ EMSAL POTANSİYELİ</b><br>
             Arsanın topografik yapısına (kot farkı) ve mimari çözümlere bağlı olarak raporda görünmeyen <b>gizli emsaller (Açığa çıkan bodrum katlar, çatı dubleksleri, galeri boşlukları vb.)</b> projeye ciddi oranda ekstra alan ve finansal değer katabilir.
