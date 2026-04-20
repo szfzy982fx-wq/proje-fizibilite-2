@@ -269,7 +269,7 @@
                         <div id="donatiGirdiUI" class="col-12 mt-2" style="display:none;">
                             <div class="row g-2">
                                 <div class="col-4">
-                                    <label style="font-size:0.7rem; color:#34495e; font-weight:bold;">Havuz/Donatı (m²)</label>
+                                    <label style="font-size:0.7rem; color:#34495e; font-weight:bold;" id="lblDonatiMax">Havuz/Donatı (m²)</label>
                                     <input type="number" id="donatiM2" class="form-control form-control-sm" placeholder="Maks: 0" oninput="triggerAutoCalc()">
                                 </div>
                                 <div class="col-4">
@@ -324,8 +324,9 @@
 
                     <div class="row g-2 mb-3 p-2 rounded" style="background-color: #fff5f5; border: 1px dashed #e74c3c;">
                         <div class="col-12 text-center" style="font-size:0.75rem; font-weight:bold; color:#c0392b; margin-bottom:2px;"><i class="fa-solid fa-helmet-safety"></i> MÜTEAHHİT İNŞAAT MALİYETİ (TİA ÜZERİNDEN)</div>
-                        <div class="col-6"><label class="form-label text-danger" style="font-size:0.7rem;">Ticari Maliyet m²</label><input type="text" id="maliyetTicari" class="form-control form-control-sm border-danger" oninput="formatCurrency(this); triggerAutoCalc();" placeholder="Örn: 25.000"></div>
-                        <div class="col-6"><label class="form-label text-danger" style="font-size:0.7rem;">Konut Maliyet m²</label><input type="text" id="maliyetKonut" class="form-control form-control-sm border-danger" oninput="formatCurrency(this); triggerAutoCalc();" placeholder="Örn: 18.000"></div>
+                        <div class="col-4"><label class="form-label text-danger" style="font-size:0.7rem;">Ticari Mal. m²</label><input type="text" id="maliyetTicari" class="form-control form-control-sm border-danger" oninput="formatCurrency(this); triggerAutoCalc();" placeholder="25.000"></div>
+                        <div class="col-4"><label class="form-label text-danger" style="font-size:0.7rem;">Konut Mal. m²</label><input type="text" id="maliyetKonut" class="form-control form-control-sm border-danger" oninput="formatCurrency(this); triggerAutoCalc();" placeholder="18.000"></div>
+                        <div class="col-4"><label class="form-label text-danger" style="font-size:0.7rem;">Otopark Mal. m² <i class="fa-solid fa-circle-info info-btn" onclick="openInfo('otoMaliyet')"></i></label><input type="text" id="maliyetOtopark" class="form-control form-control-sm border-secondary" oninput="formatCurrency(this); triggerAutoCalc();" placeholder="Manuel"></div>
                     </div>
 
                     <div id="maliyetOzetUI" class="mt-3 p-2 rounded border border-secondary" style="background-color: #f8f9fa; display:none;">
@@ -445,7 +446,8 @@
         mevcutArsa: 0, arsaDegerArtisi: 0, textReport: "", 
         otoparkArac: 0, otoparkAlan: 0, otoparkKat: 0, otoparkEkMaliyet: 0, magazaAdedi: 0, yasalMaxTaban: 0, kat: 0,
         adet11: 0, adet21: 0, adet31: 0, toplamBolum: 0, siginakZorunlu: false, siginakSebep: "",
-        peyzajAlan: 0, maxHavuzAlan: 0, donatiAktif: false, donatiM2: 0, donatiEkMaliyet: 0, donatiSerefiyeOran: 0, donatiCiroArtisi: 0
+        peyzajAlan: 0, maxHavuzAlan: 0, donatiAktif: false, donatiM2: 0, donatiEkMaliyet: 0, donatiSerefiyeOran: 0, donatiCiroArtisi: 0,
+        yananEmsal: 0
     };
 
     const formIds = [
@@ -453,7 +455,7 @@
         'fizArsa', 'fizTerk', 'fizEmsal', 'fizTaks', 'fizKat', 'fizCks', 'fizSubasman', 'fizVerim',
         'fizCephe', 'fizDerinlik', 'fizCekmeYan', 'fizCekmeOnArka',
         'chkSadeceKonut', 'payMagaza', 'icMagaza', 'm2Magaza', 'pay11', 'ic11', 'm211', 'pay21', 'ic21', 'm221', 'pay31', 'ic31', 'm231',
-        'fiyatTicari', 'fiyatKonut', 'mevcutArsaDegeri', 'maliyetTicari', 'maliyetKonut', 'ticariSlider', 'konutSlider', 
+        'fiyatTicari', 'fiyatKonut', 'mevcutArsaDegeri', 'maliyetTicari', 'maliyetKonut', 'maliyetOtopark', 'ticariSlider', 'konutSlider', 
         'paraBirimi', 'chkKapaliOtopark', 'otoparkSerefiye', 'chkDonati', 'donatiM2', 'donatiMaliyet', 'donatiSerefiye'
     ];
 
@@ -520,6 +522,9 @@
                 <li>Girilen donatı maliyeti direkt olarak müteahhidin <b>Toplam İnşaat Maliyetine</b> (eksi yönde) eklenir.</li>
                 <li>Buna karşılık girilen "Konut Şerefiye Oranı (%)", tüm konutların satış cirosunu (artı yönde) katlayarak <b>Değer Mühendisliği</b> sağlar.</li>
             </ul>`;
+        } else if (type === 'otoMaliyet') {
+            title = "Kapalı Otopark Maliyet m²";
+            body = `<p>İnşaat endüstrisi standartlarında kapalı otopark m² maliyeti, ince işçilik (seramik, vitrifiye, doğrama vb.) barındırmadığı için <b>Konut m² maliyetinin ortalama %50'si</b> olarak kabul edilir.</p><p>Hafriyat ve şantiye özel anlaşmalarınıza göre bu alanı manuel olarak belirleyebilirsiniz.</p>`;
         } else if (type === 'kilavuz') {
             title = "❓ Formül ve Mantık Kılavuzu";
             body = `
@@ -545,6 +550,8 @@
                 <li><b>Zorunlu Otopark İhtiyacı:</b> (3 adet 1+1=1 Araç), (2 adet 2+1=1 Araç), (1 adet 3+1=1 Araç), (Ticari Alan/40m²=1 Araç).</li>
                 <li><b>Toplam Otopark İnşaat Alanı:</b> Araç Sayısı x 25 m²</li>
                 <li><b>Kat Sayısı (Derinlik):</b> Toplam Otopark Alanı / Fiziki Bodrum Sınırı</li>
+                <li><b>Otopark İnşaat Maliyeti:</b> Kapalı otoparkın m² inşaat maliyeti manuel olarak girilir (Endüstri standardı konut maliyetinin %50'sidir).</li>
+                <li><b>Derinlik Çarpanı (Ekstra Maliyet):</b> Sistem, fiziki sınırlardan dolayı otoparkı 1. bodruma sığdıramayıp 2. veya 3. bodruma inmek zorunda kalırsa; her ekstra kat için maliyeti otomatik olarak <b>+%20 artırır</b>.</li>
             </ul>
 
             <div style="font-weight:bold; color:#2c3e50; border-bottom:2px solid #bdc3c7; padding-bottom:4px; margin-bottom:8px;">BÖLÜM 4: Finans ve Karar Destek</div>
@@ -555,10 +562,10 @@
                 <li><b>Maliyet Üzerinden Kar Marjı (ROI):</b> (Müteahhit Net Kar / Toplam İnşaat Maliyeti) x 100</li>
             </ul>
             
-            <div style="font-weight:bold; color:#2c3e50; border-bottom:2px solid #bdc3c7; padding-bottom:4px; margin-bottom:8px;">BÖLÜM 5: Peyzaj ve Değer Mühendisliği (Yeni)</div>
+            <div style="font-weight:bold; color:#2c3e50; border-bottom:2px solid #bdc3c7; padding-bottom:4px; margin-bottom:8px;">BÖLÜM 5: Peyzaj ve Değer Mühendisliği</div>
             <ul style="margin-bottom:0; padding-left:20px;">
                 <li><b>Boş Peyzaj Alanı:</b> Tapu Arsa - Efektif Taban Alanı (TA) - Açık Otopark Alanı</li>
-                <li><b>Maksimum Su Yüzeyi (Havuz):</b> Boş Peyzaj Alanı x %30 <i>(Emsal haricidir)</i></li>
+                <li><b>Maksimum Su Yüzeyi (Havuz):</b> Boş Peyzaj Alanı x %30 <i>(Emsal haricidir)</i>. Sistem bu sınırı hesaplar ve girişi bu maksimum değerle otomatik olarak kısıtlar.</li>
                 <li><b>Donatı Maliyeti:</b> Girilen Donatı m² x Birim Maliyet <i>(Toplam inşaat maliyetine eklenir)</i></li>
                 <li><b>Şerefiye Getirisi:</b> Konut Cirosu x Şerefiye (%) <i>(Satış değerini artırarak net kara yansır)</i></li>
             </ul>`;
@@ -759,20 +766,17 @@
         }
     }
 
-    // YENİ EKLENEN: MAĞAZA DAHİL MELEZ OPTİMİZASYON
     function optimizeDaireler() {
-        triggerAutoCalc(); // Güncel verileri state'e al
+        triggerAutoCalc(); 
         
         let isSadeceKonut = document.getElementById('chkSadeceKonut').checked;
         
-        // 1. DÜKKAN/MAĞAZA KÜSURAT SIFIRLAMA (Melez Mantık)
         if (!isSadeceKonut) {
             let m2Magaza = getStandardNum('m2Magaza');
             if (m2Magaza > 0 && state.ticariTIA > 0) {
                 let rawShopCount = state.ticariTIA / m2Magaza;
-                let finalShopCount = Math.floor(rawShopCount); // Kesin aşağı yuvarla
+                let finalShopCount = Math.floor(rawShopCount);
                 if (finalShopCount > 0) {
-                    // Kalan betonu bu tam dükkan sayısına bölerek İç/Dış m2'yi büyüt
                     let newM2Magaza = state.ticariTIA / finalShopCount;
                     document.getElementById('m2Magaza').value = newM2Magaza.toFixed(2);
                     calcIcFromBrut('m2Magaza', 'icMagaza');
@@ -786,7 +790,6 @@
         let availableResArea = state.satilabilir;
         if (pM > 0) { availableResArea -= (state.satilabilir * (pM / 100)); }
 
-        // 2. KONUT KÜSURAT SIFIRLAMA (Sepet Doldurma)
         let types = ['31', '21', '11']; 
         let data = []; 
         let totalWeight = 0;
@@ -801,7 +804,7 @@
         });
 
         if(data.length === 0) { 
-            triggerAutoCalc(); // Dükkan optimize edilmişse yansıması için
+            triggerAutoCalc(); 
             return; 
         }
 
@@ -910,7 +913,14 @@
 
         let gabariKapasitesi = state.aktifTaban * kat;
         let kullanilanZ = Math.min(state.Z, gabariKapasitesi);
-        setDisplay('uyariEmsal', gabariKapasitesi < state.Z);
+        
+        state.yananEmsal = Math.max(0, state.Z - gabariKapasitesi);
+        if(state.yananEmsal > 0) {
+            document.getElementById('uyariEmsal').innerHTML = `⚠️ <strong>UYARI:</strong> Gabari ve taban sınırları nedeniyle <strong>${state.yananEmsal.toLocaleString('tr-TR', {maximumFractionDigits:0})} m²</strong> emsal hakkınız boşa gidiyor (yanıyor). Çıkma yapılması gereklidir.`;
+            setDisplay('uyariEmsal', true);
+        } else {
+            setDisplay('uyariEmsal', false);
+        }
 
         state.TA = state.aktifTaban;
         state.KA = Math.max(0, kullanilanZ - state.TA);
@@ -992,7 +1002,6 @@
             kalanKutu.style.color = "#f39c12"; 
         }
 
-        // SIĞINAK ALGORİTMASI
         let toplamKonutAdedi = Math.round(state.adet11 + state.adet21 + state.adet31);
         let siginakZorunlu = false;
         let siginakSebep = "";
@@ -1032,7 +1041,6 @@
 
         let isKapaliOtopark = document.getElementById('chkKapaliOtopark').checked;
         state.otoparkEkMaliyet = 0;
-        let malKonutM2 = getFormattedNum('maliyetKonut') || 0;
 
         if (isKapaliOtopark) {
             document.getElementById('otoparkGirdiUI').style.display = 'block';
@@ -1043,7 +1051,7 @@
             setDisplay('uyariOtopark', state.otoparkKat > 1);
 
             let kalanAlan = state.otoparkAlan;
-            let baseOtoMaliyet = malKonutM2 * 0.5;
+            let baseOtoMaliyet = getFormattedNum('maliyetOtopark') || 0; 
             for(let i = 1; i <= state.otoparkKat; i++) {
                 let katAlan = Math.min(kalanAlan, fizikiBodrumSiniri);
                 let carpan = 1 + ((i - 1) * 0.20); 
@@ -1056,11 +1064,16 @@
             document.getElementById('otoparkOzetUI').style.display = 'none';
         }
 
-        // YENİ EKLENEN: PEYZAJ, MAKSİMUM HAVUZ VE DEĞER MÜHENDİSLİĞİ
         let acikOtoparkAlan = isKapaliOtopark ? 0 : state.otoparkAlan;
         state.peyzajAlan = Math.max(0, state.arsaHam - state.TA - acikOtoparkAlan);
         state.maxHavuzAlan = state.peyzajAlan * 0.30;
         
+        let lblMax = document.getElementById('lblDonatiMax');
+        if(state.maxHavuzAlan > 0) {
+            lblMax.innerHTML = `Havuz/Donatı <span style="color:#c0392b;">(Max: ${Math.floor(state.maxHavuzAlan)} m²)</span>`;
+        } else {
+            lblMax.innerHTML = `Havuz/Donatı (m²)`;
+        }
         document.getElementById('donatiM2').placeholder = "Maks: " + Math.floor(state.maxHavuzAlan);
 
         let isDonati = document.getElementById('chkDonati').checked;
@@ -1072,7 +1085,15 @@
 
         if (isDonati) {
             document.getElementById('donatiGirdiUI').style.display = 'flex';
-            state.donatiM2 = getStandardNum('donatiM2');
+            
+            // DİNAMİK ALAN KISITLAMASI (MAX AŞILAMAZ)
+            let dval = getStandardNum('donatiM2');
+            if(dval > state.maxHavuzAlan) {
+                dval = Math.floor(state.maxHavuzAlan);
+                document.getElementById('donatiM2').value = dval;
+            }
+            state.donatiM2 = dval;
+            
             let donatiBirim = getFormattedNum('donatiMaliyet');
             state.donatiSerefiyeOran = getStandardNum('donatiSerefiye');
             state.donatiEkMaliyet = state.donatiM2 * donatiBirim;
@@ -1080,14 +1101,12 @@
             document.getElementById('donatiGirdiUI').style.display = 'none';
         }
 
-        // Finans ve Ciro Hesaplamaları
         let paraBirimi = document.getElementById('paraBirimi').value;
         let fm = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: paraBirimi, maximumFractionDigits: 0 });
 
         let topTic = state.ticariAlan * getFormattedNum('fiyatTicari');
         let baseTopKon = state.konutAlan * getFormattedNum('fiyatKonut');
 
-        // Şerefiye Toplamı (Otopark + Donatı)
         let serefiyeOto = isKapaliOtopark ? (getStandardNum('otoparkSerefiye') || 0) : 0;
         let serefiyeDonati = isDonati ? state.donatiSerefiyeOran : 0;
         let topKon = baseTopKon * (1 + ((serefiyeOto + serefiyeDonati) / 100));
@@ -1120,7 +1139,7 @@
         }
 
         let malTicariM2 = getFormattedNum('maliyetTicari');
-        // İnşaat Maliyeti: Ticari + Konut + Otopark Ekstra + Havuz/Donatı Ekstra
+        let malKonutM2 = getFormattedNum('maliyetKonut');
         state.toplamMaliyet = (state.ticariTIA * malTicariM2) + (state.konutTIA * malKonutM2) + state.otoparkEkMaliyet + state.donatiEkMaliyet;
         state.mutNetKar = (state.ciroMutT + state.ciroMutK) - state.toplamMaliyet;
         state.mutKarMarji = state.toplamMaliyet > 0 ? (state.mutNetKar / state.toplamMaliyet) * 100 : 0;
@@ -1206,16 +1225,24 @@
         </div>`;
 
         outHtml += `<div style="font-weight:bold; font-size:14px; margin-bottom:5px; color:#2c3e50; border-bottom:2px solid #bdc3c7; padding-bottom:4px;">MİMARİ SINIRLAR VE ANALİZ</div>`;
-        outHtml += `<table style="width:100%; font-size:13px; margin-bottom:20px; border-collapse: collapse;">
+        outHtml += `<table style="width:100%; font-size:13px; margin-bottom:5px; border-collapse: collapse;">
             <tr style="${trStyle}"><td style="${tdLeft}">Tapu Arsa</td><td style="${tdRight}">${nf.format(state.arsaHam)} m²</td></tr>
             <tr style="${trStyle} background-color:#f8fdfa;"><td style="${tdLeft}">Net İmar Parseli</td><td style="${tdRight} color:#27ae60;">${nf.format(state.arsaNet)} m²</td></tr>
             <tr style="${trStyle}"><td style="${tdLeft}">Yasal Max Taban (TAKS)</td><td style="${tdRight} color:#7f8c8d;">${nf.format(state.yasalMaxTaban)} m²</td></tr>
             <tr style="${trStyle}"><td style="${tdLeft}">Efektif Taban Alanı (TA)</td><td style="${tdRight}">${nf.format(state.TA)} m²</td></tr>
-            <tr style="${trStyle}"><td style="${tdLeft}">Kat Alanı (KA)</td><td style="${tdRight}">${nf.format(state.KA)} m²</td></tr>
+            <tr style="${trStyle}"><td style="${tdLeft}">Toplam Kat Alanı (TKA)</td><td style="${tdRight}">${nf.format(state.TKA)} m²</td></tr>
             <tr style="${trStyle}"><td style="${tdLeft}">TİA (Ruhsat Alanı)</td><td style="${tdRight} color:#2980b9;">${nf.format(state.TIA)} m²</td></tr>
             <tr style="${trStyle}"><td style="${tdLeft}">Satılabilir Brüt Alan (Verim)</td><td style="${tdRight} color:#27ae60;">${nf.format(state.satilabilir)} m²</td></tr>
             <tr style="${trStyle}"><td style="${tdLeft}">Kayıp / Ortak Alan</td><td style="${tdRight} color:#c0392b;">${nf.format(state.kayip)} m²</td></tr>
         </table>`;
+
+        if(state.yananEmsal > 0) {
+            outHtml += `<div style="padding:6px; background-color:#fffcf5; border-left:3px solid #f39c12; margin-bottom:20px; font-size:11px; color:#d35400;">
+                ⚠️ <b>UYARI:</b> Gabari sınırları nedeniyle <b>${nf.format(state.yananEmsal)} m²</b> emsal hakkınız boşa gitmektedir. Çıkma gereklidir.
+            </div>`;
+        } else {
+            outHtml += `<div style="margin-bottom:20px;"></div>`;
+        }
 
         outHtml += `<div style="font-weight:bold; font-size:14px; margin-bottom:5px; color:#2c3e50; border-bottom:2px solid #bdc3c7; padding-bottom:4px;">BAĞIMSIZ BÖLÜM DAĞILIMI</div>`;
         outHtml += `<table style="width:100%; font-size:13px; margin-bottom:10px; border-collapse: collapse;">`;
@@ -1294,7 +1321,6 @@
             </table>`;
         }
 
-        // SIĞINAK RAPOR ÇIKTISI
         let siginakBaslik = `<b style="color:#2c3e50; font-size:13px;"><i class="fa-solid fa-shield-halved"></i> SIĞINAK ANALİZİ <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('siginak')"></i></b><br>`;
         if (state.siginakZorunlu) {
              if(subasman === '5.50') {
@@ -1315,7 +1341,6 @@
              </div>`;
         }
 
-        // YENİ EKLENEN: A+ LÜKS DONATI VE PEYZAJ METİNLERİ
         if (state.donatiAktif) {
             outHtml += `<div style="margin-top:15px; padding:12px; background-color:#eafaf1; border-left:4px solid #27ae60; border-radius:4px; font-size:12px; color:#2c3e50; line-height:1.5;">
                 <b style="color:#27ae60; font-size:13px;"><i class="fa-solid fa-tree"></i> SOSYAL DONATI VE DEĞER MÜHENDİSLİĞİ</b><br>
@@ -1342,23 +1367,23 @@
         let signatureData = getSignatureData();
         outHtml += signatureData.html;
 
-        // METİN KOPYALAMA İÇERİĞİ GÜNCELLEMESİ
         let txtSahibiNot = "";
         if(!document.getElementById('chkGizleSahibi').checked && pSahibi) txtSahibiNot += `Sahibi: ${pSahibi}\n`;
         if(!document.getElementById('chkGizleNotlar').checked && pNotlar) txtSahibiNot += `Not: ${pNotlar}\n`;
 
         state.textReport = `📌 PROJE FİZİBİLİTE RAPORU\nBaşlık: ${pBaslik}\nKonum: ${pIl} / ${pIlce} / ${pMahalle}\nAda/Parsel: ${pAda} / ${pParsel}\n${txtSahibiNot}\n`;
-        state.textReport += `--- MİMARİ ANALİZ ---\nNet Parsel: ${nf.format(state.arsaNet)} m²\nEmsal (Z): ${nf.format(state.Z)} m²\nEfektif Taban Alanı: ${nf.format(state.TA)} m²\nTİA (Ruhsat): ${nf.format(state.TIA)} m²\nSatılabilir: ${nf.format(state.satilabilir)} m²\nToplam: ~${Math.round(state.toplamBolum)} Adet Bölüm\nOtopark: ${state.otoparkArac} Araç ${isKapali ? '('+state.otoparkKat+' Kat Kapalı)' : '(Açık)'}\n\n`;
+        
+        state.textReport += `--- MİMARİ ANALİZ ---\nNet Parsel: ${nf.format(state.arsaNet)} m²\nEmsal (Z): ${nf.format(state.Z)} m²\nEfektif Taban Alanı: ${nf.format(state.TA)} m²\nToplam Kat Alanı (TKA): ${nf.format(state.TKA)} m²\nTİA (Ruhsat): ${nf.format(state.TIA)} m²\nSatılabilir: ${nf.format(state.satilabilir)} m²\nToplam: ~${Math.round(state.toplamBolum)} Adet Bölüm\nOtopark: ${state.otoparkArac} Araç ${isKapali ? '('+state.otoparkKat+' Kat Kapalı)' : '(Açık)'}\n`;
+        if(state.yananEmsal > 0) state.textReport += `⚠️ UYARI: Gabari sınırları nedeniyle ${nf.format(state.yananEmsal)} m² emsal boşa gidiyor (Çıkma gereklidir).\n`;
+        state.textReport += `\n`;
         
         state.textReport += `--- KAT PLANI ÖNGÖRÜSÜ ---\nZemin: ${isSadeceKonut ? 'Konut' : formatAdet(state.magazaAdedi) + ' Adet Mağaza'}\nNormal Katlar: Her Katta -> ${normalKatMetin}\n\n`;
 
         state.textReport += `--- FİNANS ---\nArsa Ciro Payı: ${fm.format(state.ciroArsaT + state.ciroArsaK)} (%${state.karmaArsaYuzde.toFixed(1)})\nMüteahhit Payı: ${fm.format(state.ciroMutT + state.ciroMutK)} (%${state.karmaMutYuzde.toFixed(1)})\nTOPLAM CİRO: ${fm.format(state.toplamCiro)}\n`;
         
-        // YENİ EKLENEN: SIĞINAK KOPYA METNİ
         state.textReport += `\n--- SIĞINAK DURUMU ---\n`;
         state.textReport += state.siginakZorunlu ? `MECBURİ: ${state.siginakSebep}\n` : `MUAFİYET: Sınırlar altında kalındığı için sığınak aranmaz.\n`;
 
-        // YENİ EKLENEN: PEYZAJ / DONATI KOPYA METNİ
         state.textReport += `\n--- SOSYAL DONATI & PEYZAJ ---\n`;
         if (state.donatiAktif) {
             state.textReport += `Kalan ${nf.format(state.peyzajAlan)} m² alana; ${nf.format(state.donatiM2)} m² Havuz/Donatı planlandı.\nEk Maliyet: -${fm.format(state.donatiEkMaliyet)} | Ciroya Katkısı: +${fm.format(state.donatiCiroArtisi)}\n(Maliyet-Getiri Optimizasyonu Sağlandı)\n`;
@@ -1426,7 +1451,6 @@
         document.getElementById('scMutCiro').innerText = fm.format(state.ciroMutT + state.ciroMutK);
         document.getElementById('scToplamCiro').innerText = fm.format(state.toplamCiro);
 
-        // Şalter açıksa Sunum Kartına A+ Rozetini Bas!
         if(state.donatiAktif) {
             document.getElementById('scDonatiBadge').style.display = 'block';
         } else {
