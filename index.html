@@ -1207,9 +1207,7 @@
         let nf = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 });
 
         let isSadeceKonut = document.getElementById('chkSadeceKonut').checked;
-        let subasman = document.getElementById('fizSubasman').value;
-        let isKapali = document.getElementById('chkKapaliOtopark').checked;
-
+        
         let pBaslik = document.getElementById('pBaslik').value || "İsimsiz Portföy";
         let pIl = document.getElementById('pIl').value || "-";
         let pIlce = document.getElementById('pIlce').value || "-";
@@ -1229,6 +1227,17 @@
 
         let topTicRapor = state.ciroArsaT + state.ciroMutT;
         let topKonRapor = state.ciroArsaK + state.ciroMutK;
+
+        // VERİ ÇEKİMİ
+        let cksVal = getStandardNum('fizCks') || 1.30;
+        let subasmanVal = document.getElementById('fizSubasman').options[document.getElementById('fizSubasman').selectedIndex].text;
+        if(isSadeceKonut) subasmanVal = "0.50m (Standart)";
+        
+        let cepheVal = getStandardNum('fizCephe') ? getStandardNum('fizCephe') + ' m' : '-';
+        let derinlikVal = getStandardNum('fizDerinlik') ? getStandardNum('fizDerinlik') + ' m' : '-';
+        let cekmeYanVal = getStandardNum('fizCekmeYan') ? getStandardNum('fizCekmeYan') + ' m' : '-';
+        let cekmeOnArkaVal = getStandardNum('fizCekmeOnArka') ? getStandardNum('fizCekmeOnArka') + ' m' : '-';
+        let isKapali = document.getElementById('chkKapaliOtopark').checked;
 
         let outHtml = `
         <div style="text-align:center; padding-bottom:10px; margin-bottom:20px;">
@@ -1262,12 +1271,36 @@
         
         <div style="font-weight:bold; font-size:14px; margin-bottom:5px; color:var(--primary); border-bottom:2px solid #bdc3c7; padding-bottom:4px;">1. İMAR VE KÜTLE VERİLERİ</div>
         <table style="width:100%; font-size:13px; margin-bottom:20px; border-collapse: collapse;">
-            <tr style="${trStyle}"><td style="${tdLeft}">Tapu Arsa Alanı</td><td style="${tdRight}">${nf.format(state.arsaHam)} m²</td></tr>
-            <tr style="${trStyle}"><td style="${tdLeft}">Terk / DOP Oranı</td><td style="${tdRight}">%${getStandardNum('fizTerk') || 0}</td></tr>
-            <tr style="${trStyle}"><td style="${tdLeft}">Emsal (KAKS)</td><td style="${tdRight}">${getStandardNum('fizEmsal')}</td></tr>
-            <tr style="${trStyle}"><td style="${tdLeft}">TAKS Sınırı</td><td style="${tdRight}">${getStandardNum('fizTaks')}</td></tr>
-            <tr style="${trStyle}"><td style="${tdLeft}">Gabari (Kat)</td><td style="${tdRight}">${state.kat} Kat</td></tr>
-            <tr style="${trStyle}"><td style="${tdLeft}">Verimlilik Oranı</td><td style="${tdRight}">%${getStandardNum('fizVerim') || 80}</td></tr>
+            <thead>
+                <tr style="background-color:#f8f9fa; border-bottom:2px solid #ecf0f1;">
+                    <th style="padding:8px 4px; text-align:left; width:50%; color:var(--primary);"><i class="fa-solid fa-landmark"></i> Ana İmar Şartları</th>
+                    <th style="padding:8px 4px; text-align:left; width:50%; color:var(--primary);"><i class="fa-solid fa-ruler-combined"></i> Kütle ve Çap Sınırları</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding:4px; vertical-align:top;">
+                        <table style="width:100%; border-collapse: collapse;">
+                            <tr style="${trStyle}"><td style="${tdLeft}">Tapu Arsa</td><td style="${tdRight}">${nf.format(state.arsaHam)} m²</td></tr>
+                            <tr style="${trStyle}"><td style="${tdLeft}">Terk / DOP</td><td style="${tdRight}">%${getStandardNum('fizTerk') || 0}</td></tr>
+                            <tr style="${trStyle}"><td style="${tdLeft}">Emsal (KAKS)</td><td style="${tdRight}">${getStandardNum('fizEmsal')}</td></tr>
+                            <tr style="${trStyle}"><td style="${tdLeft}">TAKS Sınırı</td><td style="${tdRight}">${getStandardNum('fizTaks')}</td></tr>
+                            <tr style="${trStyle}"><td style="${tdLeft}">Gabari</td><td style="${tdRight}">${state.kat} Kat</td></tr>
+                            <tr style="${trStyle}"><td style="${tdLeft}">Verimlilik Oranı</td><td style="${tdRight}">%${getStandardNum('fizVerim') || 80}</td></tr>
+                        </table>
+                    </td>
+                    <td style="padding:4px; vertical-align:top; border-left:1px solid #ecf0f1;">
+                        <table style="width:100%; border-collapse: collapse;">
+                            <tr style="${trStyle}"><td style="${tdLeft}">ÇKS (Emsal Artış)</td><td style="${tdRight}">${cksVal}</td></tr>
+                            <tr style="${trStyle}"><td style="${tdLeft}">Subasman</td><td style="${tdRight}">${subasmanVal}</td></tr>
+                            <tr style="${trStyle}"><td style="${tdLeft}">Ort. Cephe</td><td style="${tdRight}">${cepheVal}</td></tr>
+                            <tr style="${trStyle}"><td style="${tdLeft}">Ort. Derinlik</td><td style="${tdRight}">${derinlikVal}</td></tr>
+                            <tr style="${trStyle}"><td style="${tdLeft}">Yan Çekme Toplamı</td><td style="${tdRight}">${cekmeYanVal}</td></tr>
+                            <tr style="${trStyle}"><td style="${tdLeft}">Ön/Arka Çekme Top.</td><td style="${tdRight}">${cekmeOnArkaVal}</td></tr>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
         </table>
 
         <div style="font-weight:bold; font-size:14px; margin-bottom:5px; color:var(--primary); border-bottom:2px solid #bdc3c7; padding-bottom:4px;">2. MİMARİ SINIRLAR VE ANALİZ</div>
@@ -1443,7 +1476,9 @@
         
         state.textReport += `--- STRATEJİK ÖZET ---\nEmsal (Z): ${nf.format(state.Z)} m²\nSatılabilir Alan: ${nf.format(state.satilabilir)} m²\nRuhsat TİA: ${nf.format(state.TIA)} m²\n\n`;
 
-        state.textReport += `--- 1. İMAR VE KÜTLE VERİLERİ ---\nTapu Arsa: ${nf.format(state.arsaHam)} m²\nTerk Oranı: %${getStandardNum('fizTerk') || 0}\nEmsal (KAKS): ${getStandardNum('fizEmsal')}\nTAKS Sınırı: ${getStandardNum('fizTaks')}\nGabari: ${state.kat} Kat\nVerimlilik Oranı: %${getStandardNum('fizVerim') || 80}\n\n`;
+        state.textReport += `--- 1. İMAR VE KÜTLE VERİLERİ ---\n`;
+        state.textReport += `🔹 İmar Şartları:\nTapu Arsa: ${nf.format(state.arsaHam)} m² | Terk: %${getStandardNum('fizTerk') || 0} | Emsal: ${getStandardNum('fizEmsal')} | TAKS: ${getStandardNum('fizTaks')} | Gabari: ${state.kat} Kat\n\n`;
+        state.textReport += `🔹 Kütle ve Çap Değerleri:\nÇKS: ${cksVal} | Subasman: ${subasmanVal} | Verimlilik: %${getStandardNum('fizVerim') || 80}\nCephe: ${cepheVal} | Derinlik: ${derinlikVal} | Yan Çekme: ${cekmeYanVal} | Ön/Arka Çekme: ${cekmeOnArkaVal}\n\n`;
 
         state.textReport += `--- 2. MİMARİ ANALİZ ---\nNet Parsel: ${nf.format(state.arsaNet)} m²\nEfektif Taban Alanı: ${nf.format(state.TA)} m²\nToplam Kat Alanı (TKA): ${nf.format(state.TKA)} m²\nKayıp Ortak Alan: ${nf.format(state.kayip)} m²\nToplam Bölüm: ~${Math.round(state.toplamBolum)} Adet\nOtopark: ${state.otoparkArac} Araç ${isKapali ? '('+state.otoparkKat+' Kat Kapalı)' : '(Açık)'}\n`;
         if(state.yananEmsal > 0) state.textReport += `⚠️ UYARI: Gabari sınırları nedeniyle ${nf.format(state.yananEmsal)} m² emsal boşa gidiyor (Çıkma gereklidir).\n`;
