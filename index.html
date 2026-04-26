@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KaracabayInvest - Akıllı Vitrin & Fizibilite</title>
+    <title>EPA - Emlak Portföy Asistanı</title>
     
     <link rel="icon" href="https://ykaracabay-source.github.io/emlakasistani/logo.jpg" type="image/jpeg">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -212,7 +213,7 @@
                             <input class="form-check-input m-0" type="checkbox" id="chkSadeceKonut" style="cursor:pointer;" onchange="toggleSadeceKonut()">
                             <label class="form-check-label text-white fw-bold" style="font-size:0.7rem; cursor:pointer;" for="chkSadeceKonut">Zemin Konut</label>
                         </div>
-                        <button type="button" id="btnOptimize" onclick="optimizeDaireler()" class="btn btn-sm btn-outline-light" style="font-size: 0.75rem; font-weight: bold; padding: 2px 10px;">Optimize Et</button>
+                        <button type="button" id="btnOptimize" onclick="optimizeDaireler()" class="btn btn-sm btn-outline-light" style="font-size: 0.75rem; font-weight: bold; padding: 2px 10px;" title="Küsuratlı daire adetlerini tam sayıya yuvarlar">Optimize Et</button>
                     </div>
                 </div>
                 <div class="card-body pb-2" style="padding-left: 10px; padding-right: 10px;">
@@ -222,8 +223,8 @@
                             <tr>
                                 <th style="text-align:left; width:22%;">TİP</th>
                                 <th style="width:14%;">PAY(%)</th>
-                                <th style="width:16%;">İÇ m²</th>
-                                <th style="width:16%;">DIŞ m²</th>
+                                <th style="width:16%;">İÇ BRÜT</th>
+                                <th style="width:16%;">TAPU BRÜT</th>
                                 <th style="width:14%;">ADET</th>
                                 <th style="width:18%;">CİRO(₺)</th>
                             </tr>
@@ -235,8 +236,8 @@
                                     <small style="font-weight:bold;">Dükkan</small>
                                 </td>
                                 <td><input type="text" id="payMagaza" class="form-control dist-input bg-light text-primary fw-bold" readonly placeholder="%"></td>
-                                <td><input type="text" id="icMagaza" class="form-control dist-input border-secondary" placeholder="İç" oninput="calcBrutFromIc('icMagaza', 'm2Magaza'); triggerAutoCalc();"></td>
-                                <td><input type="text" id="m2Magaza" class="form-control dist-input border-secondary" placeholder="Dış" oninput="calcIcFromBrut('m2Magaza', 'icMagaza'); triggerAutoCalc();"></td>
+                                <td><input type="text" id="icMagaza" class="form-control dist-input border-secondary" placeholder="İç Brüt" oninput="calcBrutFromIc('icMagaza', 'm2Magaza'); triggerAutoCalc();"></td>
+                                <td><input type="text" id="m2Magaza" class="form-control dist-input border-secondary" placeholder="Tapu Brüt" oninput="calcIcFromBrut('m2Magaza', 'icMagaza'); triggerAutoCalc();"></td>
                                 <td><div id="uiLiveAdetMagaza" class="fw-bold text-center">-</div></td>
                                 <td><div id="uiCiroMagaza" class="text-end fw-bold" style="font-size:0.7rem; color:#2c3e50;">0</div></td>
                             </tr>
@@ -246,8 +247,8 @@
                                     <small style="font-weight:bold;">1+1</small>
                                 </td>
                                 <td><input type="text" id="pay11" class="form-control dist-input" placeholder="%" oninput="triggerAutoCalc();"></td>
-                                <td><input type="text" id="ic11" class="form-control dist-input" placeholder="İç" oninput="calcBrutFromIc('ic11', 'm211'); triggerAutoCalc();"></td>
-                                <td><input type="text" id="m211" class="form-control dist-input" placeholder="Dış" oninput="calcIcFromBrut('m211', 'ic11'); triggerAutoCalc();"></td>
+                                <td><input type="text" id="ic11" class="form-control dist-input" placeholder="İç Brüt" oninput="calcBrutFromIc('ic11', 'm211'); triggerAutoCalc();"></td>
+                                <td><input type="text" id="m211" class="form-control dist-input" placeholder="Tapu Brüt" oninput="calcIcFromBrut('m211', 'ic11'); triggerAutoCalc();"></td>
                                 <td><div id="uiLiveAdet11" class="fw-bold text-center">-</div></td>
                                 <td><div id="uiCiro11" class="text-end fw-bold" style="font-size:0.7rem; color:#2c3e50;">0</div></td>
                             </tr>
@@ -257,8 +258,8 @@
                                     <small style="font-weight:bold;">2+1</small>
                                 </td>
                                 <td><input type="text" id="pay21" class="form-control dist-input" placeholder="%" oninput="triggerAutoCalc();"></td>
-                                <td><input type="text" id="ic21" class="form-control dist-input" placeholder="İç" oninput="calcBrutFromIc('ic21', 'm221'); triggerAutoCalc();"></td>
-                                <td><input type="text" id="m221" class="form-control dist-input" placeholder="Dış" oninput="calcIcFromBrut('m221', 'ic21'); triggerAutoCalc();"></td>
+                                <td><input type="text" id="ic21" class="form-control dist-input" placeholder="İç Brüt" oninput="calcBrutFromIc('ic21', 'm221'); triggerAutoCalc();"></td>
+                                <td><input type="text" id="m221" class="form-control dist-input" placeholder="Tapu Brüt" oninput="calcIcFromBrut('m221', 'ic21'); triggerAutoCalc();"></td>
                                 <td><div id="uiLiveAdet21" class="fw-bold text-center">-</div></td>
                                 <td><div id="uiCiro21" class="text-end fw-bold" style="font-size:0.7rem; color:#2c3e50;">0</div></td>
                             </tr>
@@ -268,8 +269,8 @@
                                     <small style="font-weight:bold;">3+1</small>
                                 </td>
                                 <td><input type="text" id="pay31" class="form-control dist-input" placeholder="%" oninput="triggerAutoCalc();"></td>
-                                <td><input type="text" id="ic31" class="form-control dist-input" placeholder="İç" oninput="calcBrutFromIc('ic31', 'm231'); triggerAutoCalc();"></td>
-                                <td><input type="text" id="m231" class="form-control dist-input" placeholder="Dış" oninput="calcIcFromBrut('m231', 'ic31'); triggerAutoCalc();"></td>
+                                <td><input type="text" id="ic31" class="form-control dist-input" placeholder="İç Brüt" oninput="calcBrutFromIc('ic31', 'm231'); triggerAutoCalc();"></td>
+                                <td><input type="text" id="m231" class="form-control dist-input" placeholder="Tapu Brüt" oninput="calcIcFromBrut('m231', 'ic31'); triggerAutoCalc();"></td>
                                 <td><div id="uiLiveAdet31" class="fw-bold text-center">-</div></td>
                                 <td><div id="uiCiro31" class="text-end fw-bold" style="font-size:0.7rem; color:#2c3e50;">0</div></td>
                             </tr>
@@ -452,7 +453,7 @@
                     </div>
                     <div id="uyariGeometri" class="alert-box alert-danger-custom">❌ <strong>MİMARİ UYARI:</strong> Çekme payları düşüldükten sonra kalan fiziki oturum alanı, yasal TAKS hakkınızdan küçük!</div>
                     <div id="uyariEmsal" class="alert-box alert-info-custom">⚠️ <strong>UYARI:</strong> Gabari ve taban sınırları nedeniyle emsal hakkınızın bir kısmı boşa gidiyor (yanıyor). Çıkma yapılması gereklidir.</div>
-                    <div id="uyariDukkan" class="alert-box alert-danger-custom">⚠️ <strong>UYARI:</strong> Zemin kata planladığınız Dükkan büyüklüğü, maksimum oturum alanını aşıyor. Lütfen "Dış m²" alanını düşürün.</div>
+                    <div id="uyariDukkan" class="alert-box alert-danger-custom">⚠️ <strong>UYARI:</strong> Zemin kata planladığınız Dükkan büyüklüğü, maksimum oturum alanını aşıyor. Lütfen "Tapu Brüt" alanını düşürün.</div>
                 </div>
             </div>
 
@@ -546,7 +547,8 @@
         peyzajAlan: 0, maxHavuzAlan: 0, donatiAktif: false, donatiM2: 0, donatiEkMaliyet: 0, donatiSerefiyeOran: 0, donatiCiroArtisi: 0,
         yananEmsal: 0,
         icDubleks: 0, m2Dubleks: 0, dubleksKapaliBonus: 0, dubleksTerasBonus: 0, totalNihaiHavuz: 0,
-        ciroMagaza: 0, ciro11: 0, ciro21: 0, ciro31: 0, ciroDubleks: 0 // Yeni ciro değişkenleri
+        ciroMagaza: 0, ciro11: 0, ciro21: 0, ciro31: 0, ciroDubleks: 0,
+        gercekTicariAlan: 0, dubleksAltAlan: 0
     };
 
     const formIds = [
@@ -890,16 +892,14 @@
         });
     }
 
+    // YENİ: DUBLEKS İLE UYUMLU OPTİMİZASYON MOTORU
     function optimizeDaireler() {
-        if(document.getElementById('chkDubleks').checked) {
-            alert("Lütfen önce dubleks (3+2) seçeneğini kapatın. Optimizasyon standart kat planları üzerinden yapılmalıdır.");
-            return;
-        }
-
         triggerAutoCalc(); 
         
         let isSadeceKonut = document.getElementById('chkSadeceKonut').checked;
+        let isDubleks = document.getElementById('chkDubleks').checked;
         
+        // Önce Dükkan Optimizasyonu
         if (!isSadeceKonut) {
             let m2Magaza = getStandardNum('m2Magaza');
             if (m2Magaza > 0 && state.ticariTIA > 0) {
@@ -912,12 +912,13 @@
                 }
             }
         }
-
+        
+        // Alt havuzun (Konut) hesaplanması
+        triggerAutoCalc();
         if(state.satilabilir <= 0) { alert("Lütfen önce imar verilerini girerek satılabilir alanı hesaplatın."); return; }
 
-        let pM = getStandardNum('payMagaza');
-        let availableResArea = state.satilabilir;
-        if (pM > 0) { availableResArea -= (state.satilabilir * (pM / 100)); }
+        let availableResArea = state.satilabilir - state.gercekTicariAlan - (isDubleks ? state.dubleksAltAlan : 0);
+        if (availableResArea <= 0) return;
 
         let types = ['31', '21', '11']; 
         let data = []; 
@@ -962,16 +963,11 @@
             smallest.ic = availableResArea; 
         }
 
-        let targetResPay = 100 - (pM > 0 ? pM : 0);
-        let accumulatedPay = 0;
-
         data.sort((a, b) => parseInt(b.type) - parseInt(a.type));
 
-        data.forEach((item, index) => {
+        data.forEach((item) => {
+            // Daireleri tam sayıya sabitleyip yeni oransal payları hesaplıyoruz
             let newPay = (item.qty * item.ic) / state.satilabilir * 100;
-            if (index === data.length - 1) newPay = targetResPay - accumulatedPay;
-            accumulatedPay += newPay;
-
             document.getElementById('ic' + item.type).value = item.ic.toFixed(2);
             calcBrutFromIc('ic' + item.type, 'm2' + item.type);
             document.getElementById('pay' + item.type).value = newPay.toFixed(2);
@@ -1085,7 +1081,7 @@
             state.ticariTIA = ticariTapuToplam;
             state.konutTIA = Math.max(0, state.TIA - state.ticariTIA);
             
-            let gercekTicariAlan = !isSadeceKonut ? state.magazaAdedi * getStandardNum('icMagaza') : 0;
+            state.gercekTicariAlan = !isSadeceKonut ? state.magazaAdedi * getStandardNum('icMagaza') : 0;
 
             // --- 2. DUBLEKS MANTIĞI VE HAVUZ İZOLASYONU ---
             setDisplay('rowTerasSerefiye', isDubleks);
@@ -1093,7 +1089,7 @@
             
             state.adetDubleks = 0; state.dubleksKapaliBonus = 0; state.dubleksTerasBonus = 0; 
             state.icDubleks = 0; state.m2Dubleks = 0;
-            let dubleksAltAlan = 0;
+            state.dubleksAltAlan = 0;
             let m2_21 = getStandardNum('m221');
             
             if(isDubleks && m2_21 > 0) {
@@ -1103,7 +1099,7 @@
                     
                     state.dubleksKapaliBonus = state.adetDubleks * ic_11; 
                     state.dubleksTerasBonus = Math.max(0, state.TA - (state.adetDubleks * m2_11)) / state.adetDubleks; 
-                    dubleksAltAlan = state.adetDubleks * ic_21; 
+                    state.dubleksAltAlan = state.adetDubleks * ic_21; 
                     
                     state.icDubleks = ic_21 + ic_11 + state.dubleksTerasBonus; 
                     state.m2Dubleks = m2_21 + m2_11 + state.dubleksTerasBonus; 
@@ -1114,7 +1110,7 @@
             document.getElementById('m2Dubleks').value = isDubleks && state.m2Dubleks > 0 ? state.m2Dubleks.toFixed(2) : "";
 
             // --- 3. STANDART DAİRE ADETLERİ (Kalan Havuz Üzerinden) ---
-            let availablePool = state.satilabilir - gercekTicariAlan - dubleksAltAlan;
+            let availablePool = state.satilabilir - state.gercekTicariAlan - state.dubleksAltAlan;
             if (availablePool < 0) availablePool = 0;
 
             let ic1 = getStandardNum('ic11'), ic2 = getStandardNum('ic21'), ic3 = getStandardNum('ic31');
@@ -1133,11 +1129,11 @@
             let alan21 = state.adet21 * ic2;
             let alan31 = state.adet31 * ic3;
             
-            state.totalNihaiHavuz = gercekTicariAlan + dubTotalAlan + alan11 + alan21 + alan31;
+            state.totalNihaiHavuz = state.gercekTicariAlan + dubTotalAlan + alan11 + alan21 + alan31;
             
             let nPM = 0, nPD = 0, nP1 = 0, nP2 = 0, nP3 = 0;
             if (state.totalNihaiHavuz > 0) {
-                nPM = (gercekTicariAlan / state.totalNihaiHavuz) * 100;
+                nPM = (state.gercekTicariAlan / state.totalNihaiHavuz) * 100;
                 nPD = (dubTotalAlan / state.totalNihaiHavuz) * 100;
                 nP1 = (alan11 / state.totalNihaiHavuz) * 100;
                 nP2 = (alan21 / state.totalNihaiHavuz) * 100;
@@ -1216,7 +1212,7 @@
 
             let isDonati = document.getElementById('chkDonati').checked;
             state.donatiAktif = isDonati;
-            state.donatiM2 = 0; state.donatiEkMaliyet = 0; state.donatiSerefiyeOran = 0;
+            state.donatiM2 = 0; state.donatiEkMaliyet = 0; state.donatiSerefiyeOran = 0; state.donatiCiroArtisi = 0;
             
             if (isDonati) {
                 document.getElementById('donatiGirdiUI').style.display = 'flex';
@@ -1228,7 +1224,6 @@
             } else {
                 document.getElementById('donatiGirdiUI').style.display = 'none';
             }
-
 
             // --- 6. AKILLI FİYATLANDIRMA MODÜLÜ (CİRO) ---
             let paraBirimi = document.getElementById('paraBirimi').value;
@@ -1244,14 +1239,12 @@
             let bfM = 0, bf1 = 0, bf2 = 0, bf3 = 0, bfD = 0;
 
             if(isManuelFiyat) {
-                // Manuel girilenleri oku
                 bfM = getFormattedNum('bfMagaza');
                 bf1 = getFormattedNum('bf11');
                 bf2 = getFormattedNum('bf21');
                 bf3 = getFormattedNum('bf31');
                 bfD = getFormattedNum('bfDubleks');
             } else {
-                // Otomatik hesapla ve kutulara yaz
                 bfM = getStandardNum('icMagaza') * genFiyatTic;
                 bf1 = getStandardNum('ic11') * genFiyatKon * topSerefiyeCarpan;
                 bf2 = getStandardNum('ic21') * genFiyatKon * topSerefiyeCarpan;
@@ -1264,7 +1257,6 @@
                     bfD = dubKapaliFiyat + dubTerasFiyat;
                 }
 
-                // Ekrana formatlı bas
                 document.getElementById('bfMagaza').value = bfM > 0 ? bfM.toLocaleString('tr-TR') : "";
                 document.getElementById('bf11').value = bf1 > 0 ? bf1.toLocaleString('tr-TR') : "";
                 document.getElementById('bf21').value = bf2 > 0 ? bf2.toLocaleString('tr-TR') : "";
@@ -1278,6 +1270,16 @@
             state.ciro21 = state.adet21 * bf2;
             state.ciro31 = state.adet31 * bf3;
             state.ciroDubleks = state.adetDubleks * bfD;
+
+            // DONATININ GETİRDİĞİ EKSTRA CİRONUN İZOLE EDİLMESİ (BUG FİX)
+            let base1 = getStandardNum('ic11') * genFiyatKon;
+            let base2 = getStandardNum('ic21') * genFiyatKon;
+            let base3 = getStandardNum('ic31') * genFiyatKon;
+            let baseD = isDubleks ? ((getStandardNum('ic21')||0) + (getStandardNum('ic11')||0)) * genFiyatKon : 0;
+            let baseKonutCiro = (state.adet11 * base1) + (state.adet21 * base2) + (state.adet31 * base3) + (state.adetDubleks * baseD);
+            if (state.donatiAktif) {
+                state.donatiCiroArtisi = baseKonutCiro * (state.donatiSerefiyeOran / 100);
+            }
 
             document.getElementById('uiCiroMagaza').innerText = state.ciroMagaza > 0 ? fm.format(state.ciroMagaza) : "-";
             document.getElementById('uiCiro11').innerText = state.ciro11 > 0 ? fm.format(state.ciro11) : "-";
@@ -1494,7 +1496,6 @@
                 outHtml += `<div style="margin-bottom:20px;"></div>`;
             }
 
-            // --- YENİ BAĞIMSIZ BÖLÜM DAĞILIM TABLOSU (RAPOR İÇİN) ---
             outHtml += `<div style="font-weight:bold; font-size:14px; margin-bottom:5px; color:var(--primary); border-bottom:2px solid #bdc3c7; padding-bottom:4px;">3. PROJE GELİR VE DAĞILIM TABLOSU</div>`;
             outHtml += `<table style="width:100%; font-size:12px; margin-bottom:10px; border-collapse: collapse;" border="1" bordercolor="#ddd" cellpadding="6">
                 <thead>
