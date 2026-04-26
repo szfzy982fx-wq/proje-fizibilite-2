@@ -56,7 +56,6 @@
         /* Modal Yapısı */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; overflow-y: hidden; }
         .modal-content-custom { background: white; margin: 5% auto; padding: 0; width: 90%; max-width: 550px; border-radius: 8px; position: relative; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden; font-size:13px; line-height:1.6; max-height: 90vh;}
-        /* DÜZELTME 1: Modal gövdesine max-height ve scroll özelliği eklendi */
         .modal-body-custom { padding: 20px; overflow-y: auto; background: #fdfdfd; max-height: 75vh; }
         
         /* Yan Panel */
@@ -791,6 +790,7 @@
         }
     }
 
+    // GÜNCELLENDİ: Daha Kapsamlı (Sert Format) Temizle Fonksiyonu
     function clearForm() {
         if(confirm("Form temizlenecek. Emin misiniz?")) {
             document.getElementById('currentPortfoyId').value = "";
@@ -801,10 +801,37 @@
                     else el.value = (el.tagName === 'SELECT') ? el.options[0].value : "";
                 }
             });
-            document.getElementById('fizVerim').value = "80";
+            
+            // Gizli panelleri ve uyarıları kapat
+            document.getElementById('uyariGeometri').style.display = 'none';
+            document.getElementById('uyariEmsal').style.display = 'none';
+            document.getElementById('uyariDukkan').style.display = 'none';
+            document.getElementById('uyariOtopark').style.display = 'none';
+            document.getElementById('otoparkGirdiUI').style.display = 'none';
+            document.getElementById('otoparkOzetUI').style.display = 'none';
+            document.getElementById('rowTerasSerefiye').style.display = 'none';
+            document.getElementById('divBfDubleks').style.display = 'none';
+            document.getElementById('donatiGirdiUI').style.display = 'none';
+            document.getElementById('arsaOzetUI').style.display = 'none';
+            document.getElementById('maliyetOzetUI').style.display = 'none';
+            document.getElementById('subasmanInfo').style.display = 'none';
+            
+            // Slider ve Yüzdelik oranları sıfırla
             document.getElementById('ticariSlider').value = "50";
             document.getElementById('konutSlider').value = "50";
+            document.getElementById('lblTicariArsa').innerText = "50";
+            document.getElementById('lblTicariMut').innerText = "50";
+            document.getElementById('lblKonutArsa').innerText = "50";
+            document.getElementById('lblKonutMut').innerText = "50";
+            document.getElementById('uiKarmaArsa').innerText = "0";
+            document.getElementById('uiKarmaMut').innerText = "0";
+            
+            // Subasman disabled durumunu düzelt
+            document.getElementById('fizSubasman').disabled = false;
+            
+            document.getElementById('fizVerim').value = "80";
             document.getElementById('terasSerefiye').value = "30";
+            
             toggleFiyatModu();
             triggerAutoCalc();
             document.getElementById('resFizibilite').style.display = 'none';
@@ -816,7 +843,6 @@
             });
             document.getElementById('uiLiveAdetToplam').innerHTML = '0';
 
-            // DÜZELTME 2: Sağ paneldeki özet kutularının ve finans tablosunun sıfırlanması
             document.getElementById('outZ').innerText = "0 m²";
             document.getElementById('outSatilabilir').innerText = "0 m²";
             document.getElementById('outTIA').innerText = "0 m²";
@@ -1110,7 +1136,16 @@
             state.adet21 = (totalOriginalKonutPay > 0 && ic2 > 0) ? (availablePool * (originalP2 / totalOriginalKonutPay)) / ic2 : 0;
             state.adet31 = (totalOriginalKonutPay > 0 && ic3 > 0) ? (availablePool * (originalP3 / totalOriginalKonutPay)) / ic3 : 0;
             
-            state.toplamBolum = state.magazaAdedi + state.adetDubleks + state.adet11 + state.adet21 + state.adet31;
+            // GÜNCELLEME: EKrandaki yuvarlanmış halini baz alarak hesap motorunu çalıştırma
+            const getMathCount = (v) => v === 0 ? 0 : (Math.abs(Math.round(v) - v) < 0.05 ? Math.round(v) : parseFloat(v.toFixed(1)));
+            
+            let d_mag = isSadeceKonut ? 0 : getMathCount(state.magazaAdedi);
+            let d_11 = getMathCount(state.adet11);
+            let d_21 = getMathCount(state.adet21);
+            let d_31 = getMathCount(state.adet31);
+            let d_dub = isDubleks ? getMathCount(state.adetDubleks) : 0;
+
+            state.toplamBolum = d_mag + d_11 + d_21 + d_31 + d_dub;
 
             let dubTotalAlan = isDubleks ? (state.adetDubleks * state.icDubleks) : 0;
             let alan11 = state.adet11 * ic1;
@@ -1248,17 +1283,18 @@
                 document.getElementById('bfDubleks').value = bfD > 0 ? bfD.toLocaleString('tr-TR') : "";
             }
 
-            state.ciroMagaza = state.magazaAdedi * bfM;
-            state.ciro11 = state.adet11 * bf1;
-            state.ciro21 = state.adet21 * bf2;
-            state.ciro31 = state.adet31 * bf3;
-            state.ciroDubleks = state.adetDubleks * bfD;
+            // GÜNCELLEME: Ciro hesabı ekrandaki görünen (d_11, d_21 vb.) değerlerle yapılır
+            state.ciroMagaza = d_mag * bfM;
+            state.ciro11 = d_11 * bf1;
+            state.ciro21 = d_21 * bf2;
+            state.ciro31 = d_31 * bf3;
+            state.ciroDubleks = d_dub * bfD;
 
             let base1 = getStandardNum('ic11') * genFiyatKon;
             let base2 = getStandardNum('ic21') * genFiyatKon;
             let base3 = getStandardNum('ic31') * genFiyatKon;
             let baseD = isDubleks ? ((getStandardNum('ic21')||0) + (getStandardNum('ic11')||0)) * genFiyatKon : 0;
-            let baseKonutCiro = (state.adet11 * base1) + (state.adet21 * base2) + (state.adet31 * base3) + (state.adetDubleks * baseD);
+            let baseKonutCiro = (d_11 * base1) + (d_21 * base2) + (d_31 * base3) + (d_dub * baseD);
             if (state.donatiAktif) {
                 state.donatiCiroArtisi = baseKonutCiro * (state.donatiSerefiyeOran / 100);
             }
@@ -1489,6 +1525,8 @@
                 </thead>
                 <tbody style="text-align:center;">`;
             
+            // GÜNCELLEME: Rapor ekranında da tam sayı olanların kusursuz yansıtılması
+            const getMathCount = (v) => v === 0 ? 0 : (Math.abs(Math.round(v) - v) < 0.05 ? Math.round(v) : parseFloat(v.toFixed(1)));
             const formatAdetRapor = (val) => Math.abs(Math.round(val) - val) < 0.05 ? Math.round(val) : '~' + val.toFixed(1);
 
             let isManuel = document.getElementById('chkManuelFiyat').checked;
@@ -1724,7 +1762,7 @@
         });
     }
 
-    // YENİ EKLENEN YATIRIM ÖZETİ (A4 PDF) MODÜLÜ
+    // GÜNCELLENDİ: Yatırım Özeti A4 Ekranı - Başlık Sadeleşti, Müteahhit Payı "Net Kar (₺)" Olarak Değişti.
     function printYatirimOzeti() {
         triggerAutoCalc();
         if(!state.satilabilir || state.satilabilir <= 0) { 
@@ -1736,17 +1774,21 @@
         let nf = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 });
         
         let pBaslik = document.getElementById('pBaslik').value || "İsimsiz Portföy";
-        let pIl = document.getElementById('pIl').value || "-";
-        let pIlce = document.getElementById('pIlce').value || "-";
-        let pAda = document.getElementById('pAda').value || "-";
-        let pParsel = document.getElementById('pParsel').value || "-";
+        let pIl = document.getElementById('pIl').value || "";
+        let pIlce = document.getElementById('pIlce').value || "";
+        let pAda = document.getElementById('pAda').value || "";
+        let pParsel = document.getElementById('pParsel').value || "";
         
         let html = `
             <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #2c3e50; padding: 20px;">
-                <div style="text-align: center; border-bottom: 3px solid #2c3e50; padding-bottom: 20px; margin-bottom: 30px;">
-                    <h1 style="font-size: 32px; font-weight: 900; letter-spacing: 2px; margin: 0; color: #2c3e50;">YATIRIM ÖZETİ</h1>
-                    <p style="font-size: 16px; color: #7f8c8d; font-weight: bold; margin: 10px 0 0 0;">${pBaslik.toUpperCase()}</p>
-                    <p style="font-size: 14px; color: #95a5a6; margin: 5px 0 0 0;">${pIl} / ${pIlce} | Ada/Parsel: ${pAda}/${pParsel} | Tarih: ${new Date().toLocaleDateString('tr-TR')}</p>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid #2c3e50; padding-bottom: 15px; margin-bottom: 30px;">
+                    <div style="text-align: left;">
+                        <h1 style="font-size: 32px; font-weight: 900; letter-spacing: 2px; margin: 0; color: #2c3e50;">YATIRIM ÖZETİ</h1>
+                        <div style="font-size: 16px; color: #34495e; font-weight: bold; margin-top: 8px;">${pBaslik.toUpperCase()}</div>
+                    </div>
+                    <div style="text-align: right; font-size: 13px; color: #7f8c8d; font-weight: bold;">
+                        Tarih: ${new Date().toLocaleDateString('tr-TR')}
+                    </div>
                 </div>
 
                 <div style="display: flex; justify-content: space-between; text-align: center; margin-bottom: 40px;">
@@ -1793,8 +1835,8 @@
                                 <span style="font-weight: bold; color: #2980b9;">+${fm.format(state.ciroMutT + state.ciroMutK)}</span>
                             </div>
                             <hr style="border-color: #ecf0f1; margin: 15px 0;">
-                            <div style="font-size: 12px; color: #95a5a6; margin-bottom: 5px;">Müteahhit ROI (Kar Marjı)</div>
-                            <div style="font-size: 24px; font-weight: bold; color: #2c3e50;">${state.toplamMaliyet > 0 ? '%' + state.mutKarMarji.toFixed(1) : '-'}</div>
+                            <div style="font-size: 12px; color: #95a5a6; margin-bottom: 5px;">Satışlardan Kalan Net Kar</div>
+                            <div style="font-size: 24px; font-weight: bold; color: #27ae60;">${state.toplamMaliyet > 0 ? '+' + fm.format(state.mutNetKar) : 'Girilmedi'}</div>
                         </div>
                     </div>
                 </div>
