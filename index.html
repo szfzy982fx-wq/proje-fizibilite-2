@@ -336,13 +336,23 @@
                             </div>
                         </div>
                         <div id="otoparkGirdiUI" class="col-12 mt-2" style="display:none;">
-                            <div class="d-flex align-items-center gap-2">
-                                <label style="font-size:0.75rem; color:#34495e; font-weight:bold; white-space:nowrap;">Şerefiye Artışı (%)</label>
-                                <input type="text" id="otoparkSerefiye" class="form-control form-control-sm" placeholder="Örn: 10" oninput="triggerAutoCalc()">
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <label style="font-size:0.7rem; color:#34495e; font-weight:bold;">Planlanan Araç</label>
+                                    <input type="text" id="otoManuelAdet" class="form-control form-control-sm" placeholder="Oto" oninput="triggerAutoCalc()">
+                                </div>
+                                <div class="col-4">
+                                    <label style="font-size:0.7rem; color:#34495e; font-weight:bold;">m²/Araç</label>
+                                    <input type="text" id="otoM2Arac" class="form-control form-control-sm" placeholder="25" oninput="triggerAutoCalc()">
+                                </div>
+                                <div class="col-4">
+                                    <label style="font-size:0.7rem; color:#34495e; font-weight:bold;">Şerefiye (%)</label>
+                                    <input type="text" id="otoparkSerefiye" class="form-control form-control-sm" placeholder="Örn: 10" oninput="triggerAutoCalc()">
+                                </div>
                             </div>
                         </div>
                         <div id="otoparkOzetUI" class="col-12 mt-2" style="display:none; font-size:0.8rem;">
-                            <div class="d-flex justify-content-between text-secondary mb-1"><span>İhtiyaç:</span> <span id="uiOtoIhtiyac" class="fw-bold text-dark">0 Araç</span></div>
+                            <div class="d-flex justify-content-between text-secondary mb-1"><span title="Yasal Minimum İhtiyaç">Yasal İhtiyaç:</span> <span id="uiOtoYasal" class="fw-bold text-dark">0 Araç</span></div>
                             <div class="d-flex justify-content-between text-secondary mb-1"><span>Gerekli Alan:</span> <span id="uiOtoAlan" class="fw-bold text-dark">0 m²</span></div>
                             <div class="d-flex justify-content-between text-secondary"><span>Kazı Derinliği:</span> <span id="uiOtoKat" class="fw-bold text-primary">0 Kat Bodrum</span></div>
                             <div id="uyariOtopark" class="alert-box alert-warning-custom mt-2 mb-0" style="font-size:0.75rem;">⚠️ <strong>YETERSİZ ALAN:</strong> Çekme payları (fiziki oturum) aşıldı. Derin kazı ve ekstra maliyet uygulandı.</div>
@@ -544,14 +554,14 @@
         aktifTaban: 0, ticariAlan: 0, konutAlan: 0, ciroArsaT: 0, ciroMutT: 0, ciroArsaK: 0, ciroMutK: 0, toplamCiro: 0, 
         insaatMaliyeti: 0, toplamMaliyet: 0, mutNetKar: 0, mutKarMarji: 0, karmaArsaYuzde: 0, karmaMutYuzde: 0,
         mevcutArsa: 0, arsaDegerArtisi: 0, textReport: "", 
-        otoparkArac: 0, otoparkAlan: 0, otoparkKat: 0, otoparkEkMaliyet: 0, magazaAdedi: 0, yasalMaxTaban: 0, kat: 0,
+        otoparkArac: 0, yasalOtoparkArac: 0, otoparkAlan: 0, otoparkKat: 0, otoparkEkMaliyet: 0, magazaAdedi: 0, yasalMaxTaban: 0, kat: 0,
         adet11: 0, adet21: 0, adet31: 0, adetDubleks: 0, toplamBolum: 0, siginakZorunlu: false, siginakSebep: "",
         peyzajAlan: 0, maxHavuzAlan: 0, donatiAktif: false, donatiM2: 0, donatiEkMaliyet: 0, donatiSerefiyeOran: 0, donatiCiroArtisi: 0,
         yananEmsal: 0,
         icDubleks: 0, m2Dubleks: 0, dubleksKapaliBonus: 0, dubleksTerasBonus: 0, totalNihaiHavuz: 0,
         ciroMagaza: 0, ciro11: 0, ciro21: 0, ciro31: 0, ciroDubleks: 0,
         gercekTicariAlan: 0, dubleksAltAlan: 0,
-        isGelistirici: false // YENİ: Müteahhit Öz Malı Modu Flag'i
+        isGelistirici: false 
     };
 
     const formIds = [
@@ -560,7 +570,7 @@
         'fizCephe', 'fizDerinlik', 'fizCekmeYan', 'fizCekmeOnArka',
         'chkSadeceKonut', 'chkDubleks', 'payMagaza', 'icMagaza', 'm2Magaza', 'pay11', 'ic11', 'm211', 'pay21', 'ic21', 'm221', 'pay31', 'ic31', 'm231',
         'fiyatTicari', 'fiyatKonut', 'mevcutArsaDegeri', 'maliyetTicari', 'maliyetKonut', 'maliyetOtopark', 'ticariSlider', 'konutSlider', 
-        'paraBirimi', 'chkKapaliOtopark', 'otoparkSerefiye', 'chkDonati', 'donatiM2', 'donatiMaliyet', 'donatiSerefiye', 'terasSerefiye',
+        'paraBirimi', 'chkKapaliOtopark', 'otoparkSerefiye', 'otoManuelAdet', 'otoM2Arac', 'chkDonati', 'donatiM2', 'donatiMaliyet', 'donatiSerefiye', 'terasSerefiye',
         'chkManuelFiyat', 'bfMagaza', 'bf11', 'bf21', 'bf31', 'bfDubleks', 'projeTipi'
     ];
 
@@ -596,15 +606,18 @@
             </ul>
             <div class="mt-2 text-muted" style="font-size:0.8rem;">Dökülen betonun (TİA) yüzde kaçının "Satılabilir Net (İç Brüt) Havuza" dönüştüğünü ifade eder. Kalanı ortak alandır.</div>`;
         } else if (type === 'otopark') {
-            title = "🏛️ MEVZUAT (Güncel Otopark Yönetmeliği)";
-            body = `<p>Binalarda zorunlu otopark ihtiyacı, dairelerin brüt alanlarına göre yasal olarak şu şekilde belirlenir:</p>
+            title = "🏛️ MEVZUAT VE PLANLAMA ESNEKLİĞİ";
+            body = `<p>Binalarda yasal otopark ihtiyacı, daire brüt alanlarına göre şu şekilde belirlenir:</p>
             <ul style="margin:0; padding-left:20px;">
-                <li><b>80 m²'den küçük:</b> Her 3 daire için en az 1 otopark (1+1 ve küçük 2+1'ler).</li>
-                <li><b>80 m² - 120 m²:</b> Her 2 daire için en az 1 otopark (Standart 2+1'ler).</li>
-                <li><b>120 m² - 180 m²:</b> Her 1 daire için en az 1 otopark (Standart 3+1 ve 4+1'ler).</li>
-                <li><b>180 m²'den büyük:</b> Her 1 daire için en az 2 otopark.</li>
+                <li><b>< 80 m²:</b> Her 3 daire için en az 1 otopark.</li>
+                <li><b>80 - 120 m²:</b> Her 2 daire için en az 1 otopark.</li>
+                <li><b>120 - 180 m²:</b> Her 1 daire için en az 1 otopark.</li>
+                <li><b>> 180 m²:</b> Her 1 daire için en az 2 otopark.</li>
                 <li><b>Ticari Alanlar:</b> Ortalama her 40 m² alan için 1 otopark.</li>
-            </ul>`;
+            </ul>
+            <div style="background:#fffcf5; padding:10px; border-radius:6px; border-left:4px solid #f39c12; margin-top:10px; font-size:12px;">
+                <b>Planlama Esnekliği:</b> Yönetmelik, manevra ve rampa alanları dahil bir araç için ortalama <b>20-25 m²</b> alan öngörür. Ancak kolon aksları, geniş rampa kayıpları veya lüks tasarımlarda bu değer <b>30-35 m²</b>'ye kadar çıkabilir. Mekanik (liftli) otopark sistemlerinde ise alan <b>15 m²</b>'ye düşürülebilir. Planlanan adet ve m² değerini arayüzden dilediğiniz gibi özelleştirebilirsiniz.
+            </div>`;
         } else if (type === 'roi') {
             title = "Kar Marjı (ROI) Nedir?";
             body = `<p><b>ROI (Yatırımın Geri Dönüş Oranı):</b> Müteahhidin cebinden çıkan (riske attığı) her 1 TL'ye karşılık, işin sonunda cebine net olarak kaç TL kar koyduğunu gösteren orandır.</p>
@@ -636,27 +649,39 @@
         } else if (type === 'kilavuz') {
             title = "❓ Formül ve Mantık Kılavuzu";
             body = `
-            <div style="font-weight:bold; color:#2c3e50; border-bottom:2px solid #bdc3c7; padding-bottom:4px; margin-bottom:8px;">BÖLÜM 1: Mimari Kütle ve Taban Optimizasyonu</div>
+            <div style="font-weight:bold; color:#2c3e50; border-bottom:2px solid #bdc3c7; padding-bottom:4px; margin-bottom:8px;">BÖLÜM 1: Mimari Kütle ve Ruhsat (TİA) Formülasyonu</div>
             <ul style="margin-bottom:15px; padding-left:20px;">
                 <li><b>Net İmar Parseli:</b> Tapu Arsa m² x (1 - DOP/Terk Oranı)</li>
                 <li><b>Z (Emsal Alanı):</b> Net İmar Parseli x KAKS (Emsal)</li>
-                <li><b>Yasal Maksimum Taban (TAKS Sınırı):</b> Net İmar Parseli x TAKS</li>
-                <li><b>Gabari İçin Optimum Taban:</b> Z / Gabari (Kat Sayısı)</li>
-                <li><b>EFEKTİF (KULLANILAN) TABAN ALANI (TA):</b> Min(Yasal Maksimum Taban, Gabari İçin Optimum Taban)</li>
+                <li><b>EFEKTİF TABAN ALANI (TA):</b> Min(Yasal Maksimum Taban, Gabari İçin Optimum Taban)</li>
                 <li><b>TKA (Toplam Kat Alanı):</b> (Z - Efektif TA) x ÇKS (Emsal Artış Çarpanı)</li>
+                <li><b style="color:#2980b9;">TİA (Ruhsat İnşaat Alanı):</b> TKA + (Efektif TA x Subasman Kot Çarpanı). <i>*Zemin kotu Standardı 1x, Asmakatlı 1.5x, Bodrumlu Asmakat 2.5x kütle tüketir.</i></li>
             </ul>
 
             <div style="font-weight:bold; color:#2c3e50; border-bottom:2px solid #bdc3c7; padding-bottom:4px; margin-bottom:8px;">BÖLÜM 2: Satılabilir Havuz ve Kapalı Döngü Dağılım</div>
             <ul style="margin-bottom:15px; padding-left:20px;">
                 <li><b>Satılabilir (İç Brüt) Havuz:</b> TİA x Verimlilik (%)</li>
-                <li><b>Dubleks:</b> 3+2 seçildiğinde son kat tabanına 2+1'ler sığdırılır, üzerlerine 1+1 ve teras eklenir. Alt havuzdaki normal daireler bu durumdan etkilenmeden yeniden oranlanır.</li>
-                <li><b>Dükkan Taban İzi Tüketimi:</b> Girilen Tapu Brüt m²'sinin kotlara göre zemin tüketimi: <i>(0.50m için /1) | (2.50m için /1.5) | (5.50m için /2.5)</i>.</li>
+                <li><b>Dubleks Optimizasyonu:</b> 3+2 seçildiğinde son kat tabanına 2+1'ler sığdırılır, üzerlerine 1+1 ve teras eklenir. Alt havuzdaki normal daireler bu durumdan etkilenmeden yeniden oranlanır.</li>
             </ul>
 
-            <div style="font-weight:bold; color:#2c3e50; border-bottom:2px solid #bdc3c7; padding-bottom:4px; margin-bottom:8px;">BÖLÜM 3: Fiyatlama ve Ciro Modeli</div>
+            <div style="font-weight:bold; color:#2c3e50; border-bottom:2px solid #bdc3c7; padding-bottom:4px; margin-bottom:8px;">BÖLÜM 3: Fiyatlama ve Satış Modeli</div>
             <ul style="margin-bottom:15px; padding-left:20px;">
-                <li><b>Otomatik Mod:</b> Genel m² fiyatları üzerinden dairelerin iç brütleri ile çarpılarak birim fiyatları bulunur. Otopark ve Donatı şerefiyeleri bu fiyata eklenir.</li>
-                <li><b>Manuel Mod (Kilidi Aç):</b> Birim fiyatlara kendiniz müdahale edersiniz. Sistem girdiğiniz rakamları daire adediyle çarparak direkt Toplam Ciroya bağlar.</li>
+                <li><b>Otomatik Mod:</b> Genel m² fiyatları, dairelerin iç brütleri ile çarpılarak baz fiyat bulunur. Alt kısımdan girdiğiniz Şerefiyeler bu fiyata otomatik yedirilir.</li>
+                <li><b>Manuel Mod (Kilidi Aç):</b> Birim fiyatlara kendiniz müdahale edersiniz. Sistem girdiğiniz rakamı direkt ciroya bağlar, çifte hesaplamayı önlemek için şerefiyeyi bu fiyata "dahil edilmiş" kabul eder.</li>
+            </ul>
+            
+            <div style="font-weight:bold; color:#2c3e50; border-bottom:2px solid #bdc3c7; padding-bottom:4px; margin-bottom:8px;">BÖLÜM 4: Yatırım Modelleri ve Finans</div>
+            <ul style="margin-bottom:15px; padding-left:20px;">
+                <li><b style="color:#27ae60;">Kat Karşılığı (Hasılat Paylaşımı):</b> Ciro üzerinden Arsa/Müteahhit yüzdesel paylaşımı yapılır. <i>Müteahhit Net Kar = Kendisine Düşen Ciro Payı - Toplam İnşaat Maliyeti.</i></li>
+                <li><b style="color:#c0392b;">Müteahhit Öz Malı (Geliştirici):</b> Arsa satın alma bedeli (mevcut arsa değeri) direkt olarak yatırım maliyetidir. <i>Geliştirici Net Kar = Toplam Proje Ciro - (Arsa Satın Alma Fırsatı + Toplam İnşaat Maliyeti).</i></li>
+                <li><b>Arsa Değer Artış Çarpanı:</b> Projeden Arsa Sahibine düşen Ciro / Arsanın Mevcut Boş Değeri.</li>
+                <li><b>ROI (%) Formülü:</b> (Öngörülen Net Kar / Toplam Yatırım Maliyeti) x 100.</li>
+            </ul>
+
+            <div style="font-weight:bold; color:#2c3e50; border-bottom:2px solid #bdc3c7; padding-bottom:4px; margin-bottom:8px;">BÖLÜM 5: Değer Mühendisliği (Fiyat Katlayıcılar)</div>
+            <ul style="margin-bottom:15px; padding-left:20px;">
+                <li>Otopark Şerefiyesi (%) ve Donatı Şerefiyesi (%), lüks algısını fiyatlayarak baz konut m² fiyatına direkt kaldıraç (çarpan) olarak uygulanır.</li>
+                <li>Açık Teras Şerefiyesi ise sadece çatı katlarındaki açık alan m²'sine uygulanarak dubleks fiyatına eklenir.</li>
             </ul>`;
         }
         document.getElementById('infoModalTitle').innerHTML = `<i class="fa-solid fa-circle-info"></i> ${title}`;
@@ -818,7 +843,6 @@
                 }
             });
             
-            // Gizli panelleri ve uyarıları kapat
             document.getElementById('uyariGeometri').style.display = 'none';
             document.getElementById('uyariEmsal').style.display = 'none';
             document.getElementById('uyariDukkan').style.display = 'none';
@@ -832,7 +856,6 @@
             document.getElementById('maliyetOzetUI').style.display = 'none';
             document.getElementById('subasmanInfo').style.display = 'none';
             
-            // Ayarlar ve Modlar sıfırlanıyor
             document.getElementById('projeTipi').value = 'kat_karsiligi';
             document.getElementById('ticariSlider').value = "50";
             document.getElementById('konutSlider').value = "50";
@@ -1017,7 +1040,6 @@
 
     function triggerAutoCalc() {
         try {
-            // YENİ: Müteahhit Öz Malı Modu Kontrolü ve Arayüz Güncellemesi
             state.isGelistirici = document.getElementById('projeTipi').value === 'gelistirici';
             
             document.getElementById('sliderTicariContainer').style.display = state.isGelistirici ? 'none' : 'block';
@@ -1214,13 +1236,21 @@
             document.getElementById('uiLiveAdetDubleks').innerHTML = isDubleks ? formatUI(state.adetDubleks) : "-";
             document.getElementById('uiLiveAdetToplam').innerHTML = Math.round(state.toplamBolum);
 
+            // YENİ: OTOPARK ESNEKLİĞİ (Yasal vs Planlanan)
             let isKapaliOtopark = document.getElementById('chkKapaliOtopark').checked;
             let serefiyeOto = isKapaliOtopark ? (getStandardNum('otoparkSerefiye') || 0) : 0;
             
             let arac11 = state.adet11 / 3, arac21 = state.adet21 / 2, arac31 = state.adet31 / 1, aracDub = state.adetDubleks / 1;
             let aracTic = state.magazaAdedi > 0 ? (state.magazaAdedi * getStandardNum('m2Magaza') / 40) : 0;
-            state.otoparkArac = Math.ceil(arac11 + arac21 + arac31 + aracDub + aracTic) || 0;
-            state.otoparkAlan = state.otoparkArac * 25;
+            state.yasalOtoparkArac = Math.ceil(arac11 + arac21 + arac31 + aracDub + aracTic) || 0;
+            
+            let otoManuelVal = document.getElementById('otoManuelAdet').value;
+            state.otoparkArac = otoManuelVal !== "" ? getStandardNum('otoManuelAdet') : state.yasalOtoparkArac;
+            
+            let otoM2Val = document.getElementById('otoM2Arac').value;
+            let birimOtoAlan = otoM2Val !== "" ? getStandardNum('otoM2Arac') : 25;
+            
+            state.otoparkAlan = state.otoparkArac * birimOtoAlan;
             
             let fizikiBodrumSiniri = fizikiOturum > 0 ? fizikiOturum : state.yasalMaxTaban;
             if(fizikiBodrumSiniri <= 0) fizikiBodrumSiniri = 1;
@@ -1230,8 +1260,8 @@
             if (isKapaliOtopark) {
                 document.getElementById('otoparkGirdiUI').style.display = 'block';
                 document.getElementById('otoparkOzetUI').style.display = 'block';
-                document.getElementById('uiOtoIhtiyac').innerText = state.otoparkArac + " Araç";
-                document.getElementById('uiOtoAlan').innerText = state.otoparkAlan.toLocaleString('tr-TR') + " m²";
+                document.getElementById('uiOtoYasal').innerText = state.yasalOtoparkArac + " Araç";
+                document.getElementById('uiOtoAlan').innerHTML = `<span style="color:#2980b9;">Planlanan: ${state.otoparkArac} Araç</span> (${state.otoparkAlan.toLocaleString('tr-TR')} m²)`;
                 document.getElementById('uiOtoKat').innerText = state.otoparkKat + " Kat Bodrum";
                 setDisplay('uyariOtopark', state.otoparkKat > 1);
 
@@ -1344,7 +1374,6 @@
             let topKon = state.ciro11 + state.ciro21 + state.ciro31 + state.ciroDubleks;
             state.toplamCiro = topTic + topKon;
 
-            // YENİ: Geliştirici ise paylaşım yok, tüm ciro müteahhidin
             if (state.isGelistirici) {
                 state.arsaTicariYuzde = 0;
                 state.mutTicariYuzde = 100;
@@ -1399,7 +1428,6 @@
             
             state.insaatMaliyeti = (state.ticariTIA * malTicariM2) + (state.konutTIA * malKonutM2) + state.otoparkEkMaliyet + state.donatiEkMaliyet;
             
-            // YENİ: Geliştirici ise arsa parasını yatırım maliyetine ekle
             state.toplamMaliyet = state.isGelistirici ? state.insaatMaliyeti + state.mevcutArsa : state.insaatMaliyeti;
             
             state.mutNetKar = (state.ciroMutT + state.ciroMutK) - state.toplamMaliyet;
@@ -1411,7 +1439,6 @@
             document.getElementById('outSatilabilir').innerText = outNihai.toLocaleString('tr-TR', fmtBase) + " m²";
             document.getElementById('outTIA').innerText = state.TIA.toLocaleString('tr-TR', fmtBase) + " m²";
 
-            // YENİ: Mod'a göre Finans tablosunu revize et
             if (state.isGelistirici) {
                 document.getElementById('finansHead').innerHTML = `<tr><th>Bölüm</th><th colspan="3" class="text-end">Müteahhit Beklenen Ciro (100%)</th></tr>`;
                 document.getElementById('finansBody').innerHTML = `
@@ -1494,7 +1521,8 @@
 
             let outHtml = `
             <div style="text-align:center; padding-bottom:10px; margin-bottom:20px;">
-                <h1 style="color:var(--primary); font-weight:900; margin:0; font-size:26px; text-transform:uppercase;">PROJE FİZİBİLİTE RAPORU ${state.isGelistirici ? '<span style="color:#e67e22;">(GELİŞTİRİCİ)</span>' : ''}</h1>
+                <h1 style="color:var(--primary); font-weight:900; margin:0; font-size:26px; text-transform:uppercase;">PROJE FİZİBİLİTE RAPORU</h1>
+                <div style="font-size: 13px; color: ${state.isGelistirici ? '#e67e22' : '#2980b9'}; font-weight: bold; margin-top: 6px; letter-spacing: 1px;">YATIRIM MODELİ: ${state.isGelistirici ? 'MÜTEAHHİT ÖZ MALI (GELİŞTİRİCİ)' : 'KAT KARŞILIĞI (HASILAT PAYLAŞIMI)'}</div>
                 <div style="color:#7f8c8d; font-size:12px; margin-top:5px;">Rapor Tarihi: ${new Date().toLocaleDateString('tr-TR')}</div>
             </div>
 
@@ -1637,14 +1665,13 @@
 
             outHtml += `<div style="font-weight:bold; font-size:14px; margin-bottom:5px; color:var(--primary); border-bottom:2px solid #bdc3c7; padding-bottom:4px;">OTOPARK VE ZEMİN STRATEJİSİ</div>`;
             outHtml += `<table style="width:100%; font-size:13px; margin-bottom:20px; border-collapse: collapse;">
-                <tr style="${trStyle}"><td style="${tdLeft}">Yasal Otopark İhtiyacı</td><td style="${tdRight}">${state.otoparkArac} Araç (${nf.format(state.otoparkAlan)} m²)</td></tr>
+                <tr style="${trStyle}"><td style="${tdLeft}">Otopark İhtiyacı ve Planlanan</td><td style="${tdRight}">Yasal İhtiyaç: ${state.yasalOtoparkArac} Araç &nbsp;|&nbsp; <span style="color:#2980b9;">Planlanan: ${state.otoparkArac} Araç (${nf.format(state.otoparkAlan)} m²)</span></td></tr>
                 <tr style="${trStyle}"><td style="${tdLeft}">Otopark Tipi</td><td style="${tdRight}">${isKapali ? '<span style="color:#2980b9;">Kapalı Otopark Planlandı</span>' : '<span style="color:#7f8c8d;">Açık Otopark Planlandı</span>'}</td></tr>`;
             if(isKapali) {
                 outHtml += `<tr style="${trStyle}"><td style="${tdLeft}">Kazı Derinliği (Fiziki Sınıra Göre)</td><td style="${tdRight} color:#c0392b;">${state.otoparkKat} Kat Bodrum</td></tr>`;
             }
             outHtml += `</table>`;
 
-            // YENİ: Raporda Geliştirici ise farklı Finans Tablosu
             outHtml += `<div style="font-weight:bold; font-size:14px; margin-bottom:5px; color:var(--primary); border-bottom:2px solid #bdc3c7; padding-bottom:4px;">${state.isGelistirici ? 'FİNANSAL BEKLENTİ VE CİRO HEDEFİ' : 'FİNANS VE CİRO PAYLAŞIMI'}</div>`;
             
             if (state.isGelistirici) {
@@ -1783,7 +1810,7 @@
             if(!document.getElementById('chkGizleSahibi').checked && pSahibi) txtSahibiNot += `Sahibi: ${pSahibi}\n`;
             if(!document.getElementById('chkGizleNotlar').checked && pNotlar) txtSahibiNot += `Not: ${pNotlar}\n`;
 
-            state.textReport = `📌 PROJE FİZİBİLİTE RAPORU ${state.isGelistirici ? '(GELİŞTİRİCİ)' : ''}\nBaşlık: ${pBaslik}\nKonum: ${pIl} / ${pIlce} / ${pMahalle}\nAda/Parsel: ${pAda} / ${pParsel}\n${txtSahibiNot}\n`;
+            state.textReport = `📌 PROJE FİZİBİLİTE RAPORU\n👉 YATIRIM MODELİ: ${state.isGelistirici ? 'MÜTEAHHİT ÖZ MALI (GELİŞTİRİCİ)' : 'KAT KARŞILIĞI (HASILAT PAYLAŞIMI)'}\nBaşlık: ${pBaslik}\nKonum: ${pIl} / ${pIlce} / ${pMahalle}\nAda/Parsel: ${pAda} / ${pParsel}\n${txtSahibiNot}\n`;
             
             state.textReport += `--- STRATEJİK ÖZET ---\nEmsal (Z): ${nf.format(state.Z)} m²\nNihai Satılabilir Alan: ${nf.format(state.totalNihaiHavuz > 0 ? state.totalNihaiHavuz : state.satilabilir)} m²\nRuhsat TİA: ${nf.format(state.TIA)} m²\n\n`;
 
@@ -1791,7 +1818,7 @@
             state.textReport += `🔹 İmar Şartları:\nTapu Arsa: ${nf.format(state.arsaHam)} m² | Terk: %${getStandardNum('fizTerk') || 0} | Emsal: ${getStandardNum('fizEmsal')} | TAKS: ${getStandardNum('fizTaks')} | Gabari: ${state.kat} Kat\n\n`;
             state.textReport += `🔹 Kütle ve Çap Değerleri:\nÇKS: ${cksVal} | Subasman: ${subasmanVal} | Verimlilik: %${getStandardNum('fizVerim') || 80}\nCephe: ${cepheVal} | Derinlik: ${derinlikVal} | Yan Çekme: ${cekmeYanVal} | Ön/Arka Çekme: ${cekmeOnArkaVal}\n\n`;
 
-            state.textReport += `--- 2. MİMARİ ANALİZ ---\nNet Parsel: ${nf.format(state.arsaNet)} m²\nEfektif Taban Alanı: ${nf.format(state.TA)} m²\nToplam Kat Alanı (TKA): ${nf.format(state.TKA)} m²\nKayıp Ortak Alan: ${nf.format(state.kayip)} m²\nToplam Bölüm: ~${Math.round(state.toplamBolum)} Adet\nOtopark: ${state.otoparkArac} Araç ${isKapali ? '('+state.otoparkKat+' Kat Kapalı)' : '(Açık)'}\n`;
+            state.textReport += `--- 2. MİMARİ ANALİZ ---\nNet Parsel: ${nf.format(state.arsaNet)} m²\nEfektif Taban Alanı: ${nf.format(state.TA)} m²\nToplam Kat Alanı (TKA): ${nf.format(state.TKA)} m²\nKayıp Ortak Alan: ${nf.format(state.kayip)} m²\nToplam Bölüm: ~${Math.round(state.toplamBolum)} Adet\nOtopark İhtiyacı: Yasal ${state.yasalOtoparkArac} Araç | Planlanan ${state.otoparkArac} Araç ${isKapali ? '('+state.otoparkKat+' Kat Kapalı)' : '(Açık)'}\n`;
             if(state.yananEmsal > 0) state.textReport += `⚠️ UYARI: Gabari sınırları nedeniyle ${nf.format(state.yananEmsal)} m² emsal boşa gidiyor (Çıkma gereklidir).\n`;
             state.textReport += `\n`;
             
@@ -1956,7 +1983,8 @@
             <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #2c3e50; padding: 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid #2c3e50; padding-bottom: 15px; margin-bottom: 30px;">
                     <div style="text-align: left;">
-                        <h1 style="font-size: 32px; font-weight: 900; letter-spacing: 2px; margin: 0; color: #2c3e50;">YATIRIM ÖZETİ ${state.isGelistirici ? '<span style="color:#e67e22; font-size:20px;">(GELİŞTİRİCİ)</span>' : ''}</h1>
+                        <h1 style="font-size: 32px; font-weight: 900; letter-spacing: 2px; margin: 0; color: #2c3e50;">YATIRIM ÖZETİ</h1>
+                        <div style="font-size: 13px; color: ${state.isGelistirici ? '#e67e22' : '#2980b9'}; font-weight: bold; margin-top: 6px; letter-spacing: 1px;">YATIRIM MODELİ: ${state.isGelistirici ? 'MÜTEAHHİT ÖZ MALI (GELİŞTİRİCİ)' : 'KAT KARŞILIĞI (HASILAT PAYLAŞIMI)'}</div>
                         <div style="font-size: 16px; color: #34495e; font-weight: bold; margin-top: 8px;">${pBaslik.toUpperCase()}</div>
                     </div>
                     <div style="text-align: right; font-size: 13px; color: #7f8c8d; font-weight: bold;">
@@ -1996,8 +2024,8 @@
                             <td style="padding: 10px 0; text-align: right; font-weight: bold;">${nf.format(state.TIA)} m²</td>
                         </tr>
                         <tr style="border-bottom: 1px solid #ecf0f1;">
-                            <td style="padding: 10px 0; color: #7f8c8d; font-weight: 600;">Otopark İhtiyacı</td>
-                            <td style="padding: 10px 0; text-align: right; font-weight: bold;">${state.otoparkArac} Araç ${document.getElementById('chkKapaliOtopark').checked ? '(Kapalı)' : '(Açık)'}</td>
+                            <td style="padding: 10px 0; color: #7f8c8d; font-weight: 600;">Otopark İhtiyacı ve Planlanan</td>
+                            <td style="padding: 10px 0; text-align: right; font-weight: bold;">Yasal: ${state.yasalOtoparkArac} Araç &nbsp;|&nbsp; <span style="color:#2980b9;">Planlanan: ${state.otoparkArac} Araç ${document.getElementById('chkKapaliOtopark').checked ? '(Kapalı)' : '(Açık)'}</span></td>
                         </tr>
                         <tr style="border-bottom: 1px solid #ecf0f1;">
                             <td style="padding: 10px 0; color: #7f8c8d; font-weight: 600;">Sosyal Donatı / Peyzaj</td>
