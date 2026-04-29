@@ -200,11 +200,23 @@
                     </div>
 
                     <div class="section-title mt-2">Çap ve Çekme Payları (Opsiyonel)</div>
-                    <div class="row g-2">
+                    <div class="row g-2 mb-2">
                         <div class="col-6"><input type="text" id="fizCephe" class="form-control form-control-sm" placeholder="Ort. Cephe (m)" oninput="triggerAutoCalc();"></div>
                         <div class="col-6"><input type="text" id="fizDerinlik" class="form-control form-control-sm" placeholder="Ort. Derinlik (m)" oninput="triggerAutoCalc();"></div>
                         <div class="col-6"><input type="text" id="fizCekmeYan" class="form-control form-control-sm" placeholder="Yan Çekme Top. (m)" oninput="triggerAutoCalc();"></div>
                         <div class="col-6"><input type="text" id="fizCekmeOnArka" class="form-control form-control-sm" placeholder="Ön/Arka Çekme Top. (m)" oninput="triggerAutoCalc();"></div>
+                    </div>
+
+                    <div id="kutuAnalizPanel" class="mt-3 p-2 rounded" style="background-color: #f8f9fa; border: 1px solid #ced4da; display:none; font-size: 0.8rem;">
+                        <div style="font-weight:bold; color:var(--primary); margin-bottom: 5px; border-bottom: 1px solid #ddd; padding-bottom: 3px;"><i class="fa-solid fa-calculator"></i> Hesaplanan Kütle Sınırları</div>
+                        <div class="d-flex justify-content-between mb-1"><span>Net İmar Parseli:</span> <span id="uiNetArsa" class="fw-bold">0 m²</span></div>
+                        <div class="d-flex justify-content-between mb-1"><span>Ham Emsal Alanı (Z):</span> <span id="uiHamZ" class="fw-bold">0 m²</span></div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Kullanılan Emsal Alanı <i class="fa-solid fa-circle-info info-btn info-btn-dark" style="font-size: 0.75rem;" onclick="openInfo('kullanilanZ')"></i>:</span> 
+                            <span id="uiKullanilanZ" class="fw-bold">0 m²</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1"><span>Yasal Max. Taban:</span> <span id="uiYasalTaban" class="fw-bold text-muted">0 m²</span></div>
+                        <div class="d-flex justify-content-between"><span>Efektif Taban (TA):</span> <span id="uiEfektifTA" class="fw-bold text-primary">0 m²</span></div>
                     </div>
                 </div>
             </div>
@@ -550,7 +562,7 @@
 
 <script>
     let state = {
-        arsaHam:0, arsaNet:0, TA: 0, Z: 0, KA: 0, TKA: 0, TIA: 0, satilabilir: 0, kayip: 0, ticariTIA: 0, konutTIA: 0,
+        arsaHam:0, arsaNet:0, TA: 0, Z: 0, kullanilanZ: 0, KA: 0, TKA: 0, TIA: 0, satilabilir: 0, kayip: 0, ticariTIA: 0, konutTIA: 0,
         aktifTaban: 0, ticariAlan: 0, konutAlan: 0, ciroArsaT: 0, ciroMutT: 0, ciroArsaK: 0, ciroMutK: 0, toplamCiro: 0, 
         insaatMaliyeti: 0, toplamMaliyet: 0, mutNetKar: 0, mutKarMarji: 0, karmaArsaYuzde: 0, karmaMutYuzde: 0,
         mevcutArsa: 0, arsaDegerArtisi: 0, textReport: "", 
@@ -646,16 +658,23 @@
         } else if (type === 'teras') { 
             title = "Teras Şerefiye Mantığı"; 
             body = "Açık teras m²'si, konut m² birim fiyatının buraya girdiğiniz yüzde oranıyla çarpılarak ciroya eklenir. (Örn: %30 girerseniz teras m²'si 1/3 fiyattan satılır.)"; 
+        } else if (type === 'kullanilanZ') {
+            title = "Kullanılan Emsal Alanı";
+            body = "<p>Çekme payları veya gabari kısıtlaması nedeniyle yasal emsal hakkının tamamı arsaya sığmadığında (emsal yandığında), hayali alanları maliyete katmamak adına tüm inşaat/beton hesaplamaları bu <b>Kullanılan Emsal</b> değeri üzerinden yapılır.</p>";
         } else if (type === 'kilavuz') {
             title = "❓ Formül ve Mantık Kılavuzu";
             body = `
             <div style="font-weight:bold; color:#2c3e50; border-bottom:2px solid #bdc3c7; padding-bottom:4px; margin-bottom:8px;">BÖLÜM 1: Mimari Kütle ve Ruhsat (TİA) Formülasyonu</div>
             <ul style="margin-bottom:15px; padding-left:20px;">
                 <li><b>Net İmar Parseli:</b> Tapu Arsa m² x (1 - DOP/Terk Oranı)</li>
-                <li><b>Z (Emsal Alanı):</b> Net İmar Parseli x KAKS (Emsal)</li>
-                <li><b>EFEKTİF TABAN ALANI (TA):</b> Min(Yasal Maksimum Taban, Gabari İçin Optimum Taban)</li>
-                <li><b>TKA (Toplam Kat Alanı):</b> (Z - Efektif TA) x ÇKS (Emsal Artış Çarpanı)</li>
-                <li><b style="color:#2980b9;">TİA (Ruhsat İnşaat Alanı):</b> TKA + (Efektif TA x Subasman Kot Çarpanı). <i>*Zemin kotu Standardı 1x, Asmakatlı 1.5x, Bodrumlu Asmakat 2.5x kütle tüketir.</i></li>
+                <li><b>Z (Ham Emsal Alanı):</b> Net İmar Parseli x KAKS (Emsal)</li>
+                <li><b>Yasal TAKS Sınırı (TA):</b> Net İmar Parseli x TAKS</li>
+                <li><b>Efektif Taban Alanı (TA):</b> Min(Yasal Maksimum Taban, Gabari İçin Optimum Taban, Fiziki Oturum)</li>
+                <li><b style="color:#c0392b;">Kullanılan Z:</b> Min(Ham Z, Efektif TA x Gabari) <i>*(Emsal yanıyorsa inşaat hesabı bu değer üzerinden yapılır)*</i></li>
+                <li><b>TKA (Toplam Kat Alanı):</b> (Kullanılan Z - Efektif TA) x ÇKS (Emsal Artış Çarpanı)</li>
+                <li><b style="color:#2980b9;">TİA (0.50m Subasman):</b> TKA + Efektif TA</li>
+                <li><b style="color:#2980b9;">TİA (2.50m Subasman):</b> (Kullanılan Z x ÇKS) + Efektif TA</li>
+                <li><b style="color:#2980b9;">TİA (5.50m Subasman):</b> (Kullanılan Z x ÇKS) + (Efektif TA x 2)</li>
             </ul>
 
             <div style="font-weight:bold; color:#2c3e50; border-bottom:2px solid #bdc3c7; padding-bottom:4px; margin-bottom:8px;">BÖLÜM 2: Satılabilir Havuz ve Kapalı Döngü Dağılım</div>
@@ -855,6 +874,7 @@
             document.getElementById('arsaOzetUI').style.display = 'none';
             document.getElementById('maliyetOzetUI').style.display = 'none';
             document.getElementById('subasmanInfo').style.display = 'none';
+            document.getElementById('kutuAnalizPanel').style.display = 'none';
             
             document.getElementById('projeTipi').value = 'kat_karsiligi';
             document.getElementById('ticariSlider').value = "50";
@@ -1102,6 +1122,7 @@
             let gabariKapasitesi = state.aktifTaban * kat;
             let kullanilanZ = Math.min(state.Z, gabariKapasitesi);
             
+            state.kullanilanZ = kullanilanZ;
             state.yananEmsal = Math.max(0, state.Z - gabariKapasitesi);
             if(state.yananEmsal > 0) {
                 document.getElementById('uyariEmsal').innerHTML = `⚠️ <strong>UYARI:</strong> Gabari ve taban sınırları nedeniyle <strong>${state.yananEmsal.toLocaleString('tr-TR', {maximumFractionDigits:0})} m²</strong> emsal hakkınız boşa gidiyor (yanıyor). Çıkma yapılması gereklidir.`;
@@ -1122,6 +1143,22 @@
             } else { 
                 state.TIA = (kullanilanZ * cks) + (state.TA * 2); subasmanNitelik = "Bodrumlu Asmakatlı"; subasmanCarpan = 2.5;
             }
+
+            // GÖRSEL PANEL BİLGİLERİNİ DOLDURMA (ŞEFFAF YAPI)
+            document.getElementById('uiNetArsa').innerText = state.arsaNet.toLocaleString('tr-TR', {maximumFractionDigits:0}) + " m²";
+            document.getElementById('uiHamZ').innerText = state.Z.toLocaleString('tr-TR', {maximumFractionDigits:0}) + " m²";
+            document.getElementById('uiKullanilanZ').innerText = state.kullanilanZ.toLocaleString('tr-TR', {maximumFractionDigits:0}) + " m²";
+            document.getElementById('uiYasalTaban').innerText = state.yasalMaxTaban.toLocaleString('tr-TR', {maximumFractionDigits:0}) + " m²";
+            document.getElementById('uiEfektifTA').innerText = state.TA.toLocaleString('tr-TR', {maximumFractionDigits:0}) + " m²";
+            
+            if(state.yananEmsal > 0) {
+                document.getElementById('uiKullanilanZ').classList.replace('text-primary', 'text-danger');
+                document.getElementById('uiKullanilanZ').style.color = '#c0392b';
+            } else {
+                document.getElementById('uiKullanilanZ').classList.replace('text-danger', 'text-primary');
+                document.getElementById('uiKullanilanZ').style.color = '#2980b9';
+            }
+            document.getElementById('kutuAnalizPanel').style.display = 'block';
 
             state.satilabilir = state.TIA * (verim / 100);
             state.kayip = state.TIA - state.satilabilir;
@@ -1236,7 +1273,7 @@
             document.getElementById('uiLiveAdetDubleks').innerHTML = isDubleks ? formatUI(state.adetDubleks) : "-";
             document.getElementById('uiLiveAdetToplam').innerHTML = Math.round(state.toplamBolum);
 
-            // YENİ: OTOPARK ESNEKLİĞİ (Yasal vs Planlanan)
+            // OTOPARK ESNEKLİĞİ (Yasal vs Planlanan)
             let isKapaliOtopark = document.getElementById('chkKapaliOtopark').checked;
             let serefiyeOto = isKapaliOtopark ? (getStandardNum('otoparkSerefiye') || 0) : 0;
             
@@ -1584,9 +1621,16 @@
                 </tbody>
             </table>
 
-            <div style="font-weight:bold; font-size:14px; margin-bottom:5px; color:var(--primary); border-bottom:2px solid #bdc3c7; padding-bottom:4px;">2. MİMARİ SINIRLAR VE ANALİZ</div>
-            <table style="width:100%; font-size:13px; margin-bottom:5px; border-collapse: collapse;">
+            <div style="font-weight:bold; font-size:14px; margin-bottom:5px; color:var(--primary); border-bottom:2px solid #bdc3c7; padding-bottom:4px;">2. MİMARİ SINIRLAR VE ANALİZ</div>`;
+
+            let emsalSatiri = state.yananEmsal > 0
+                ? `<tr style="${trStyle} background-color:#fff5f5;"><td style="${tdLeft} font-weight:bold;">Kullanılan Emsal Alanı</td><td style="${tdRight} color:#c0392b; font-size:14px;">${nf.format(state.kullanilanZ)} m²</td></tr>`
+                : `<tr style="${trStyle}"><td style="${tdLeft}">Kullanılan Emsal Alanı</td><td style="${tdRight} color:#2980b9;">${nf.format(state.kullanilanZ)} m²</td></tr>`;
+
+            outHtml += `<table style="width:100%; font-size:13px; margin-bottom:5px; border-collapse: collapse;">
                 <tr style="${trStyle} background-color:#f8fdfa;"><td style="${tdLeft}">Net İmar Parseli</td><td style="${tdRight} color:#27ae60;">${nf.format(state.arsaNet)} m²</td></tr>
+                <tr style="${trStyle}"><td style="${tdLeft}">Ham Emsal Alanı (Z)</td><td style="${tdRight}">${nf.format(state.Z)} m²</td></tr>
+                ${emsalSatiri}
                 <tr style="${trStyle}"><td style="${tdLeft}">Yasal Max Taban (TAKS)</td><td style="${tdRight} color:#7f8c8d;">${nf.format(state.yasalMaxTaban)} m²</td></tr>
                 <tr style="${trStyle}"><td style="${tdLeft}">Efektif Taban Alanı (TA)</td><td style="${tdRight}">${nf.format(state.TA)} m²</td></tr>
                 <tr style="${trStyle}"><td style="${tdLeft}">Toplam Kat Alanı (TKA)</td><td style="${tdRight}">${nf.format(state.TKA)} m²</td></tr>
@@ -1595,7 +1639,7 @@
 
             if(state.yananEmsal > 0) {
                 outHtml += `<div style="padding:6px; background-color:#fffcf5; border-left:3px solid #f39c12; margin-bottom:20px; font-size:11px; color:#d35400;">
-                    ⚠️ <b>UYARI:</b> Gabari sınırları nedeniyle <b>${nf.format(state.yananEmsal)} m²</b> emsal hakkınız boşa gitmektedir. Çıkma gereklidir.
+                    ⚠️ <b>UYARI:</b> Gabari sınırları veya çekme payları nedeniyle <b>${nf.format(state.yananEmsal)} m²</b> emsal hakkınız boşa gitmektedir. Maliyet hesaplamaları Kullanılan Emsal üzerinden yapılmıştır.
                 </div>`;
             } else {
                 outHtml += `<div style="margin-bottom:20px;"></div>`;
@@ -1818,7 +1862,7 @@
             state.textReport += `🔹 İmar Şartları:\nTapu Arsa: ${nf.format(state.arsaHam)} m² | Terk: %${getStandardNum('fizTerk') || 0} | Emsal: ${getStandardNum('fizEmsal')} | TAKS: ${getStandardNum('fizTaks')} | Gabari: ${state.kat} Kat\n\n`;
             state.textReport += `🔹 Kütle ve Çap Değerleri:\nÇKS: ${cksVal} | Subasman: ${subasmanVal} | Verimlilik: %${getStandardNum('fizVerim') || 80}\nCephe: ${cepheVal} | Derinlik: ${derinlikVal} | Yan Çekme: ${cekmeYanVal} | Ön/Arka Çekme: ${cekmeOnArkaVal}\n\n`;
 
-            state.textReport += `--- 2. MİMARİ ANALİZ ---\nNet Parsel: ${nf.format(state.arsaNet)} m²\nEfektif Taban Alanı: ${nf.format(state.TA)} m²\nToplam Kat Alanı (TKA): ${nf.format(state.TKA)} m²\nKayıp Ortak Alan: ${nf.format(state.kayip)} m²\nToplam Bölüm: ~${Math.round(state.toplamBolum)} Adet\nOtopark İhtiyacı: Yasal ${state.yasalOtoparkArac} Araç | Planlanan ${state.otoparkArac} Araç ${isKapali ? '('+state.otoparkKat+' Kat Kapalı)' : '(Açık)'}\n`;
+            state.textReport += `--- 2. MİMARİ ANALİZ ---\nNet Parsel: ${nf.format(state.arsaNet)} m²\nHam Emsal Alanı (Z): ${nf.format(state.Z)} m²\nKullanılan Emsal: ${nf.format(state.kullanilanZ)} m²\nEfektif Taban Alanı: ${nf.format(state.TA)} m²\nToplam Kat Alanı (TKA): ${nf.format(state.TKA)} m²\nKayıp Ortak Alan: ${nf.format(state.kayip)} m²\nToplam Bölüm: ~${Math.round(state.toplamBolum)} Adet\nOtopark İhtiyacı: Yasal ${state.yasalOtoparkArac} Araç | Planlanan ${state.otoparkArac} Araç ${isKapali ? '('+state.otoparkKat+' Kat Kapalı)' : '(Açık)'}\n`;
             if(state.yananEmsal > 0) state.textReport += `⚠️ UYARI: Gabari sınırları nedeniyle ${nf.format(state.yananEmsal)} m² emsal boşa gidiyor (Çıkma gereklidir).\n`;
             state.textReport += `\n`;
             
