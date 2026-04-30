@@ -1247,15 +1247,13 @@
                 nP3 = (alan31 / state.totalNihaiHavuz) * 100;
             }
 
-            document.getElementById('payMagaza').value = nPM > 0 ? nPM.toFixed(2) : "";
-            document.getElementById('payDubleks').value = nPD > 0 ? nPD.toFixed(2) : "";
-            if (isDubleks && state.totalNihaiHavuz > 0) {
-                 document.getElementById('pay11').value = nP1 > 0 ? nP1.toFixed(2) : "";
-                 document.getElementById('pay21').value = nP2 > 0 ? nP2.toFixed(2) : "";
-                 document.getElementById('pay31').value = nP3 > 0 ? nP3.toFixed(2) : "";
-            }
+           ;document.getElementById('payMagaza').value = nPM > 0 ? nPM.toFixed(2) : "";
+document.getElementById('payDubleks').value = nPD > 0 ? nPD.toFixed(2) : "";
 
-            let kalanPay = 100 - (nPM + nPD + (isDubleks?nP1:originalP1) + (isDubleks?nP2:originalP2) + (isDubleks?nP3:originalP3));
+// DİKKAT: Kullanıcının giriş yaptığı konut pay kutucukları (pay11, pay21, pay31) 
+// oninput esnasında canlı olarak ezilmemelidir. Aksi takdirde veri girişi kilitlenir.
+
+let kalanPay = 100 - (nPM + nPD + originalP1 + originalP2 + originalP3);
             let kalanKutu = document.getElementById('kalanPayUyari');
             if(Math.abs(kalanPay) < 0.1 || state.satilabilir === 0) { 
                 kalanKutu.innerHTML = "✅ Paylar Tamam"; kalanKutu.style.color = "#27ae60"; 
