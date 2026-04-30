@@ -1008,7 +1008,8 @@
         triggerAutoCalc();
         if(state.satilabilir <= 0) { alert("Lütfen önce imar verilerini girerek satılabilir alanı hesaplatın."); return; }
 
-        let availableResArea = state.satilabilir - state.gercekTicariAlan - (isDubleks ? state.dubleksAltAlan : 0);
+        let dubTotalAlan = isDubleks ? (state.adetDubleks * state.icDubleks) : 0;
+        let availableResArea = state.satilabilir - state.gercekTicariAlan - dubTotalAlan;
         if (availableResArea <= 0) return;
 
         let types = ['31', '21', '11']; 
@@ -1224,7 +1225,8 @@
             document.getElementById('icDubleks').value = isDubleks && state.icDubleks > 0 ? state.icDubleks.toFixed(2) : "";
             document.getElementById('m2Dubleks').value = isDubleks && state.m2Dubleks > 0 ? state.m2Dubleks.toFixed(2) : "";
 
-            let availablePool = state.satilabilir - state.gercekTicariAlan - state.dubleksAltAlan;
+            let dubTotalAlan = isDubleks ? (state.adetDubleks * state.icDubleks) : 0;
+            let availablePool = state.satilabilir - state.gercekTicariAlan - dubTotalAlan;
             if (availablePool < 0) availablePool = 0;
 
             let ic1 = getStandardNum('ic11'), ic2 = getStandardNum('ic21'), ic3 = getStandardNum('ic31');
@@ -1245,7 +1247,6 @@
 
             state.toplamBolum = d_mag + d_11 + d_21 + d_31 + d_dub;
 
-            let dubTotalAlan = isDubleks ? (state.adetDubleks * state.icDubleks) : 0;
             let alan11 = state.adet11 * ic1;
             let alan21 = state.adet21 * ic2;
             let alan31 = state.adet31 * ic3;
@@ -1254,8 +1255,6 @@
             
             let nPM = 0, nPD = 0;
             if (state.satilabilir > 0) {
-                // Dükkan ve Dubleks payları geçici havuz toplamına göre değil, 
-                // binanın mutlak satılabilir alanına (fiziksel gerçekliğe) göre oranlanmalıdır.
                 nPM = (state.gercekTicariAlan / state.satilabilir) * 100;
                 nPD = (dubTotalAlan / state.satilabilir) * 100;
             }
