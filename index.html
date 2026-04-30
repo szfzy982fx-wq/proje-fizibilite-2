@@ -234,7 +234,7 @@
                             <input class="form-check-input m-0" type="checkbox" id="chkSadeceKonut" style="cursor:pointer;" onchange="toggleSadeceKonut()">
                             <label class="form-check-label text-white fw-bold" style="font-size:0.7rem; cursor:pointer;" for="chkSadeceKonut">Zemin Konut</label>
                         </div>
-                        <button type="button" id="btnOptimize" onclick="optimizeDaireler()" class="btn btn-sm btn-outline-light" style="font-size: 0.75rem; font-weight: bold; padding: 2px 10px;" title="Küsuratlı daire adetlerini tam sayıya yuvarlar">Optimize Et</button>
+                        <button type="button" id="btnOptimize" onclick="optimizeDaireler()" class="btn btn-sm btn-outline-light" style="font-size: 0.75rem; font-weight: bold; padding: 2px 10px; transition: 0.2s;" title="Küsuratlı daire adetlerini tam sayıya yuvarlar">Optimize Et</button>
                     </div>
                 </div>
                 <div class="card-body pb-2" style="padding-left: 10px; padding-right: 10px;">
@@ -576,6 +576,7 @@
 
 <script>
     let state = {
+        isOptimized: false, // UX VE MATEMATİK KİLİDİ 
         arsaHam:0, arsaNet:0, TA: 0, Z: 0, kullanilanZ: 0, KA: 0, TKA: 0, TIA: 0, satilabilir: 0, kayip: 0, ticariTIA: 0, konutTIA: 0,
         aktifTaban: 0, ticariAlan: 0, konutAlan: 0, ciroArsaT: 0, ciroMutT: 0, ciroArsaK: 0, ciroMutK: 0, toplamCiro: 0, 
         insaatMaliyeti: 0, toplamMaliyet: 0, mutNetKar: 0, mutKarMarji: 0, karmaArsaYuzde: 0, karmaMutYuzde: 0,
@@ -985,9 +986,23 @@
             }
         });
     }
+    
+    function lockOptimizationButton() {
+        state.isOptimized = true;
+        let btn = document.getElementById('btnOptimize');
+        if (btn) {
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Optimize Edildi';
+            btn.classList.replace('btn-outline-light', 'btn-success');
+            btn.classList.add('text-white', 'border-0');
+            btn.disabled = true;
+            btn.style.pointerEvents = 'none';
+        }
+    }
 
     function optimizeDaireler() {
-        triggerAutoCalc(); 
+        if (state.isOptimized) return; // ÇİFTE TIKLAMA VE DÖNGÜ KORUMASI (UX KİLİDİ)
+
+        triggerAutoCalc(true); 
         
         let isSadeceKonut = document.getElementById('chkSadeceKonut').checked;
         let isDubleks = document.getElementById('chkDubleks').checked;
@@ -1005,7 +1020,7 @@
             }
         }
         
-        triggerAutoCalc();
+        triggerAutoCalc(true);
         if(state.satilabilir <= 0) { alert("Lütfen önce imar verilerini girerek satılabilir alanı hesaplatın."); return; }
 
         let dubTotalAlan = isDubleks ? (state.adetDubleks * state.icDubleks) : 0;
@@ -1025,7 +1040,16 @@
             }
         });
 
-        if(data.length === 0) { triggerAutoCalc(); return; }
+        if(data.length === 0) { triggerAutoCalc(true); return; }
+
+        // MATEMATİKSEL ZIRH: Eğer halihazırda adetler tamsa ve havuz milimetrik dağıtılmışsa (fark < 0.5 m²) işlemi durdur.
+        let currentPoolUsed = data.reduce((sum, item) => sum + (getStandardNum('pay' + item.type) > 0 ? getStandardNum('ic' + item.type) * Math.floor(state['adet' + item.type]) : 0), 0);
+        let poolDiff = Math.abs(availableResArea - currentPoolUsed);
+        let areAllIntegers = data.every(item => Number.isInteger(state['adet' + item.type]));
+        if (areAllIntegers && poolDiff < 0.5) {
+            lockOptimizationButton(); // Zaten mükemmel durumda, kitleyip çık.
+            return;
+        }
 
         data.sort((a, b) => b.ic - a.ic);
 
@@ -1066,15 +1090,26 @@
 
         ['11', '21', '31'].forEach(type => { if(!data.find(d => d.type === type)) document.getElementById('pay' + type).value = ''; });
 
-        triggerAutoCalc();
-        let btn = document.getElementById('btnOptimize');
-        btn.innerHTML = '<i class="fa-solid fa-check"></i> Tamamlandı';
-        btn.classList.replace('btn-outline-light', 'btn-success'); btn.classList.add('text-white', 'border-0');
-        setTimeout(() => { btn.innerHTML = 'Optimize Et'; btn.classList.replace('btn-success', 'btn-outline-light'); btn.classList.remove('text-white', 'border-0'); }, 1500);
+        triggerAutoCalc(true);
+        lockOptimizationButton();
     }
 
-    function triggerAutoCalc() {
+    // Parametre eklendi: isFromOptimize=true gönderildiğinde kilit KALKMASIN.
+    function triggerAutoCalc(isFromOptimize = false) {
         try {
+            // VERİ KİRLİLİĞİ KONTROLÜ (DIRTY CHECKING): Kullanıcı manuel bir değişiklik yaparsa kilidi kaldır
+            if (!isFromOptimize && state.isOptimized) {
+                state.isOptimized = false;
+                let btn = document.getElementById('btnOptimize');
+                if(btn) {
+                    btn.innerHTML = 'Optimize Et';
+                    btn.classList.replace('btn-success', 'btn-outline-light');
+                    btn.classList.remove('text-white', 'border-0');
+                    btn.disabled = false;
+                    btn.style.pointerEvents = 'auto';
+                }
+            }
+
             state.isGelistirici = document.getElementById('projeTipi').value === 'gelistirici';
             
             document.getElementById('sliderTicariContainer').style.display = state.isGelistirici ? 'none' : 'block';
