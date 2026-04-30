@@ -1252,20 +1252,16 @@
             
             state.totalNihaiHavuz = state.gercekTicariAlan + dubTotalAlan + alan11 + alan21 + alan31;
             
-            let nPM = 0, nPD = 0, nP1 = 0, nP2 = 0, nP3 = 0;
-            if (state.totalNihaiHavuz > 0) {
-                nPM = (state.gercekTicariAlan / state.totalNihaiHavuz) * 100;
-                nPD = (dubTotalAlan / state.totalNihaiHavuz) * 100;
-                nP1 = (alan11 / state.totalNihaiHavuz) * 100;
-                nP2 = (alan21 / state.totalNihaiHavuz) * 100;
-                nP3 = (alan31 / state.totalNihaiHavuz) * 100;
+            let nPM = 0, nPD = 0;
+            if (state.satilabilir > 0) {
+                // Dükkan ve Dubleks payları geçici havuz toplamına göre değil, 
+                // binanın mutlak satılabilir alanına (fiziksel gerçekliğe) göre oranlanmalıdır.
+                nPM = (state.gercekTicariAlan / state.satilabilir) * 100;
+                nPD = (dubTotalAlan / state.satilabilir) * 100;
             }
 
             document.getElementById('payMagaza').value = nPM > 0 ? nPM.toFixed(2) : "";
             document.getElementById('payDubleks').value = nPD > 0 ? nPD.toFixed(2) : "";
-
-            // DİKKAT: Kullanıcının giriş yaptığı konut pay kutucukları (pay11, pay21, pay31) 
-            // oninput esnasında canlı olarak ezilmemelidir. Aksi takdirde veri girişi kilitlenir.
 
             let kalanPay = 100 - (nPM + nPD + originalP1 + originalP2 + originalP3);
             
@@ -1485,8 +1481,11 @@
 
             let fmtBase = { maximumFractionDigits: 0 };
             document.getElementById('outZ').innerText = state.Z.toLocaleString('tr-TR', fmtBase) + " m²";
-            let outNihai = state.totalNihaiHavuz > 0 ? state.totalNihaiHavuz : state.satilabilir;
+            
+            // Üst paneldeki Satılabilir Alan her zaman projenin mutlak fiziksel hedefini göstersin
+            let outNihai = (Math.abs(kalanPay) < 0.5 && state.totalNihaiHavuz > 0) ? state.totalNihaiHavuz : state.satilabilir;
             document.getElementById('outSatilabilir').innerText = outNihai.toLocaleString('tr-TR', fmtBase) + " m²";
+            
             document.getElementById('outTIA').innerText = state.TIA.toLocaleString('tr-TR', fmtBase) + " m²";
 
             if (state.isGelistirici) {
