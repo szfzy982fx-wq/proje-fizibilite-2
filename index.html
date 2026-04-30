@@ -133,6 +133,7 @@
     <input type="hidden" id="currentPortfoyId" value="">
 
     <div class="row">
+        <!-- SOL PANEL - VERİ GİRİŞİ -->
         <div class="col-lg-5 no-print">
             
             <div class="card mb-3">
@@ -207,6 +208,7 @@
                         <div class="col-6"><input type="text" id="fizCekmeOnArka" class="form-control form-control-sm" placeholder="Ön/Arka Çekme Top. (m)" oninput="triggerAutoCalc();"></div>
                     </div>
 
+                    <!-- YENİ: Canlı Kütle Analizi Paneli -->
                     <div id="kutuAnalizPanel" class="mt-3 p-2 rounded" style="background-color: #f8f9fa; border: 1px solid #ced4da; display:none; font-size: 0.8rem;">
                         <div style="font-weight:bold; color:var(--primary); margin-bottom: 5px; border-bottom: 1px solid #ddd; padding-bottom: 3px;"><i class="fa-solid fa-calculator"></i> Hesaplanan Kütle Sınırları</div>
                         <div class="d-flex justify-content-between mb-1"><span>Net İmar Parseli:</span> <span id="uiNetArsa" class="fw-bold">0 m²</span></div>
@@ -221,6 +223,7 @@
                 </div>
             </div>
 
+            <!-- BÖLÜM 2: BAĞIMSIZ BÖLÜM DAĞILIMI -->
             <div class="card">
                 <div class="card-header" style="background-color: #8e44ad !important;">
                     <div class="d-flex align-items-center gap-2">
@@ -248,6 +251,7 @@
                             </tr>
                         </thead>
                         <tbody id="distTableBody">
+                            <!-- Mağaza -->
                             <tr id="rowMagaza">
                                 <td style="text-align:left;">
                                     <div class="plan-group"><div class="plan-box plan-dukkan"></div></div><br>
@@ -259,6 +263,7 @@
                                 <td><div id="uiLiveAdetMagaza" class="fw-bold text-center">-</div></td>
                                 <td><div id="uiCiroMagaza" class="text-end fw-bold" style="font-size:0.7rem; color:#2c3e50;">0</div></td>
                             </tr>
+                            <!-- 1+1 -->
                             <tr>
                                 <td style="text-align:left;">
                                     <div class="plan-group"><div class="plan-box plan-salon"></div><div class="plan-box plan-oda"></div></div><br>
@@ -270,6 +275,7 @@
                                 <td><div id="uiLiveAdet11" class="fw-bold text-center">-</div></td>
                                 <td><div id="uiCiro11" class="text-end fw-bold" style="font-size:0.7rem; color:#2c3e50;">0</div></td>
                             </tr>
+                            <!-- 2+1 -->
                             <tr>
                                 <td style="text-align:left;">
                                     <div class="plan-group"><div class="plan-box plan-salon"></div><div class="plan-box plan-oda"></div><div class="plan-box plan-oda"></div></div><br>
@@ -281,6 +287,7 @@
                                 <td><div id="uiLiveAdet21" class="fw-bold text-center">-</div></td>
                                 <td><div id="uiCiro21" class="text-end fw-bold" style="font-size:0.7rem; color:#2c3e50;">0</div></td>
                             </tr>
+                            <!-- 3+1 -->
                             <tr>
                                 <td style="text-align:left;">
                                     <div class="plan-group"><div class="plan-box plan-salon"></div><div class="plan-box plan-oda"></div><div class="plan-box plan-oda"></div><div class="plan-box plan-oda"></div></div><br>
@@ -292,6 +299,7 @@
                                 <td><div id="uiLiveAdet31" class="fw-bold text-center">-</div></td>
                                 <td><div id="uiCiro31" class="text-end fw-bold" style="font-size:0.7rem; color:#2c3e50;">0</div></td>
                             </tr>
+                            <!-- 3+2 DUBLEKS -->
                             <tr id="rowDubleks" style="background:#fff4f4; border-top: 1px dashed #e74c3c; border-bottom: 1px dashed #e74c3c;">
                                 <td style="text-align:left; padding-top:6px; padding-bottom:6px;">
                                     <div class="d-flex align-items-center gap-1">
@@ -316,6 +324,7 @@
                 </div>
             </div>
 
+            <!-- BÖLÜM 3: FİNANS VE OTOPARK -->
             <div class="card">
                 <div class="card-header" style="background-color: #27ae60 !important;">
                     <div><i class="fa-solid fa-coins"></i> 3. Finans ve Otopark</div>
@@ -327,6 +336,7 @@
                 </div>
                 <div class="card-body">
                     
+                    <!-- MÜTEAHHİT MODU GEÇİŞ ŞALTERİ -->
                     <div class="row g-2 mb-3 p-2 rounded align-items-center" style="background-color: #e8f4f8; border: 1px solid #3498db;">
                         <div class="col-7">
                             <label class="form-label m-0 text-primary" style="font-size:0.80rem;"><i class="fa-solid fa-handshake"></i> Proje / Yatırım Tipi</label>
@@ -405,11 +415,13 @@
                         </div>
                     </div>
 
+                    <!-- M2 FİYATLARI -->
                     <div class="row g-2 mb-2">
                         <div class="col-6"><label class="form-label text-success">Genel Ticari m² Fiyatı</label><input type="text" id="fiyatTicari" class="form-control border-success" oninput="formatCurrency(this); triggerAutoCalc();" placeholder="Örn: 150.000"></div>
                         <div class="col-6"><label class="form-label text-success">Genel Konut m² Fiyatı</label><input type="text" id="fiyatKonut" class="form-control border-success" oninput="formatCurrency(this); triggerAutoCalc();" placeholder="Örn: 50.000"></div>
                     </div>
 
+                    <!-- BİRİM FİYAT PANELİ -->
                     <div class="price-panel mb-3">
                         <div class="price-panel-header">
                             <span style="font-size:0.8rem; font-weight:bold; color:var(--primary);"><i class="fa-solid fa-tags"></i> Bağımsız Bölüm Birim Fiyatları</span>
@@ -487,6 +499,7 @@
 
         </div>
 
+        <!-- SAĞ PANEL - SONUÇLAR VE RAPOR -->
         <div class="col-lg-7">
             <div class="card mb-3 no-print">
                 <div class="card-body">
@@ -558,6 +571,7 @@
     <div id="portfoyListesi"></div>
 </div>
 
+<!-- YENİ A4 YATIRIM ÖZETİ ÇIKTI KONTEYNERİ -->
 <div id="printSummaryContainer"></div>
 
 <script>
@@ -1247,13 +1261,14 @@
                 nP3 = (alan31 / state.totalNihaiHavuz) * 100;
             }
 
-           ;document.getElementById('payMagaza').value = nPM > 0 ? nPM.toFixed(2) : "";
-document.getElementById('payDubleks').value = nPD > 0 ? nPD.toFixed(2) : "";
+            document.getElementById('payMagaza').value = nPM > 0 ? nPM.toFixed(2) : "";
+            document.getElementById('payDubleks').value = nPD > 0 ? nPD.toFixed(2) : "";
 
-// DİKKAT: Kullanıcının giriş yaptığı konut pay kutucukları (pay11, pay21, pay31) 
-// oninput esnasında canlı olarak ezilmemelidir. Aksi takdirde veri girişi kilitlenir.
+            // DİKKAT: Kullanıcının giriş yaptığı konut pay kutucukları (pay11, pay21, pay31) 
+            // oninput esnasında canlı olarak ezilmemelidir. Aksi takdirde veri girişi kilitlenir.
 
-let kalanPay = 100 - (nPM + nPD + originalP1 + originalP2 + originalP3);
+            let kalanPay = 100 - (nPM + nPD + originalP1 + originalP2 + originalP3);
+            
             let kalanKutu = document.getElementById('kalanPayUyari');
             if(Math.abs(kalanPay) < 0.1 || state.satilabilir === 0) { 
                 kalanKutu.innerHTML = "✅ Paylar Tamam"; kalanKutu.style.color = "#27ae60"; 
@@ -2034,6 +2049,7 @@ let kalanPay = 100 - (nPM + nPD + originalP1 + originalP2 + originalP3);
                     </div>
                 </div>
 
+                <!-- 3 Dev Rakam -->
                 <div style="display: flex; justify-content: space-between; text-align: center; margin-bottom: 40px;">
                     <div style="flex: 1; border: 1px solid #ddd; padding: 20px; border-radius: 8px; margin-right: 15px;">
                         <div style="font-size: 14px; color: #7f8c8d; font-weight: bold; text-transform: uppercase;">Satılabilir Alan</div>
@@ -2049,11 +2065,13 @@ let kalanPay = 100 - (nPM + nPD + originalP1 + originalP2 + originalP3);
                     </div>
                 </div>
 
+                <!-- Finansal Paylaşım Tablosu -->
                 <div style="margin-bottom: 40px;">
                     <h2 style="font-size: 18px; color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 8px; margin-bottom: 20px;">FİNANSAL BEKLENTİ VE KAR MODELİ</h2>
                     ${finansalKutular}
                 </div>
 
+                <!-- Kütle Özeti -->
                 <div>
                     <h2 style="font-size: 18px; color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 8px; margin-bottom: 20px;">PROJE VE KÜTLE ÖZETİ</h2>
                     <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
