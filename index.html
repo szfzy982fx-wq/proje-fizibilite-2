@@ -746,9 +746,23 @@
             title = "Kullanılan Emsal Alanı";
             body = "<p>Çekme payları veya gabari kısıtlaması nedeniyle yasal emsal hakkının tamamı arsaya sığmadığında (emsal yandığında), hayali alanları maliyete katmamak adına tüm inşaat/beton hesaplamaları bu <b>Kullanılan Emsal</b> değeri üzerinden yapılır.</p>";
         } else if (type === 'kilavuz') {
-            title = "❓ Formül ve Mantık Kılavuzu";
-            body = `Açıklamalar mevcuttur...`;
-        }
+    title = "❓ Formül ve Mantık Kılavuzu";
+    body = `
+    <div style="font-size:12px; color:#34495e; line-height:1.6;">
+        <p>Sistem arka planda gayrimenkul geliştirme standartlarına uygun şu ana formülleri kullanır:</p>
+        <ul style="padding-left:15px; margin-bottom:10px;">
+            <li style="margin-bottom:5px;"><b>Net Arsa:</b> Tapu Alanı - (Tapu Alanı × Terk Oranı)</li>
+            <li style="margin-bottom:5px;"><b>Emsal (Z):</b> Net Arsa × Emsal Çarpanı</li>
+            <li style="margin-bottom:5px;"><b>TİA (Ruhsat İnşaat Alanı):</b> (Kullanılan Z × ÇKS) + (Efektif Taban Alanı × Subasman Çarpanı)</li>
+            <li style="margin-bottom:5px;"><b>Satılabilir Alan (Net Havuz):</b> TİA × Verimlilik Oranı (%)</li>
+            <li style="margin-bottom:5px;"><b>İnşaat Fırsat Maliyeti:</b> Toplam İnşaat Maliyeti × Aylık Net Faiz × (İnşaat Süresi / 2)</li>
+            <li><b>Gerçek (Ekonomik) Kar:</b> Muhasebesel Kar - Toplam Fırsat Maliyeti</li>
+        </ul>
+        <div style="background:#eaf2f8; padding:10px; border-radius:4px; border-left:3px solid #3498db; margin-top:10px;">
+            <i><b>Mantık:</b> Sistemin amacı milimetrik statik çizim hesabı yapmak değil, sahada hızlıca en güvenli ve hatasız finansal öngörüyü (Avan Proje Fizibilitesi) oluşturmaktır.</i>
+        </div>
+    </div>`;
+}
         document.getElementById('infoModalTitle').innerHTML = `<i class="fa-solid fa-circle-info"></i> ${title}`;
         document.getElementById('infoModalBody').innerHTML = body;
         openModal('infoModal');
@@ -2232,4 +2246,3 @@
 </script>
 </body>
 </html>
-
