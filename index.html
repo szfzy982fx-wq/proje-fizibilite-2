@@ -746,23 +746,51 @@
             title = "Kullanılan Emsal Alanı";
             body = "<p>Çekme payları veya gabari kısıtlaması nedeniyle yasal emsal hakkının tamamı arsaya sığmadığında (emsal yandığında), hayali alanları maliyete katmamak adına tüm inşaat/beton hesaplamaları bu <b>Kullanılan Emsal</b> değeri üzerinden yapılır.</p>";
         } else if (type === 'kilavuz') {
-    title = "❓ Formül ve Mantık Kılavuzu";
-    body = `
-    <div style="font-size:12px; color:#34495e; line-height:1.6;">
-        <p>Sistem arka planda gayrimenkul geliştirme standartlarına uygun şu ana formülleri kullanır:</p>
-        <ul style="padding-left:15px; margin-bottom:10px;">
-            <li style="margin-bottom:5px;"><b>Net Arsa:</b> Tapu Alanı - (Tapu Alanı × Terk Oranı)</li>
-            <li style="margin-bottom:5px;"><b>Emsal (Z):</b> Net Arsa × Emsal Çarpanı</li>
-            <li style="margin-bottom:5px;"><b>TİA (Ruhsat İnşaat Alanı):</b> (Kullanılan Z × ÇKS) + (Efektif Taban Alanı × Subasman Çarpanı)</li>
-            <li style="margin-bottom:5px;"><b>Satılabilir Alan (Net Havuz):</b> TİA × Verimlilik Oranı (%)</li>
-            <li style="margin-bottom:5px;"><b>İnşaat Fırsat Maliyeti:</b> Toplam İnşaat Maliyeti × Aylık Net Faiz × (İnşaat Süresi / 2)</li>
-            <li><b>Gerçek (Ekonomik) Kar:</b> Muhasebesel Kar - Toplam Fırsat Maliyeti</li>
-        </ul>
-        <div style="background:#eaf2f8; padding:10px; border-radius:4px; border-left:3px solid #3498db; margin-top:10px;">
-            <i><b>Mantık:</b> Sistemin amacı milimetrik statik çizim hesabı yapmak değil, sahada hızlıca en güvenli ve hatasız finansal öngörüyü (Avan Proje Fizibilitesi) oluşturmaktır.</i>
-        </div>
-    </div>`;
-}
+            title = "Formül ve Mantık Kılavuzu";
+            body = `
+            <div style="font-size: 13px; line-height: 1.6; color: #34495e;">
+                <h5 class="text-primary fw-bold border-bottom pb-1" style="font-size: 14px;">BÖLÜM 1: Mimari Kütle ve Ruhsat (TİA) Formülasyonu</h5>
+                <ul class="ps-3 mb-3">
+                    <li><b>Net İmar Parseli:</b> Tapu Arsa m² x (1 - DOP/Terk Oranı)</li>
+                    <li><b>Z (Ham Emsal Alanı):</b> Net İmar Parseli x KAKS (Emsal)</li>
+                    <li><b>Yasal TAKS Sınırı (TA):</b> Net İmar Parseli x TAKS</li>
+                    <li><b>Efektif Taban Alanı (TA):</b> Min(Yasal Maksimum Taban, Gabari İçin Optimum Taban, Fiziki Oturum)</li>
+                    <li><b class="text-danger">Kullanılan Z:</b> Min(Ham Z, Efektif TA x Gabari) <i>*(Emsal yanıyorsa inşaat hesabı bu değer üzerinden yapılır)*</i></li>
+                    <li><b>TKA (Toplam Kat Alanı):</b> (Kullanılan Z - Efektif TA) x ÇKS (Emsal Artış Çarpanı)</li>
+                    <li><b class="text-primary">TİA (0.50m Subasman):</b> TKA + Efektif TA</li>
+                    <li><b class="text-primary">TİA (2.50m Subasman):</b> (Kullanılan Z x ÇKS) + Efektif TA</li>
+                    <li><b class="text-primary">TİA (5.50m Subasman):</b> (Kullanılan Z x ÇKS) + (Efektif TA x 2)</li>
+                </ul>
+
+                <h5 class="text-primary fw-bold border-bottom pb-1" style="font-size: 14px;">BÖLÜM 2: Satılabilir Havuz ve Kapalı Döngü Dağılım</h5>
+                <ul class="ps-3 mb-3">
+                    <li><b>Satılabilir (İç Brüt) Havuz:</b> TİA x Verimlilik (%)</li>
+                    <li><b>Dubleks Optimizasyonu:</b> 3+2 seçildiğinde son kat tabanına 2+1'ler sığdırılır, üzerlerine 1+1 ve teras eklenir. Alt havuzdaki normal daireler bu durumdan etkilenmeden yeniden oranlanır.</li>
+                </ul>
+
+                <h5 class="text-primary fw-bold border-bottom pb-1" style="font-size: 14px;">BÖLÜM 3: Fiyatlama ve Satış Modeli</h5>
+                <ul class="ps-3 mb-3">
+                    <li><b>Otomatik Mod:</b> Genel m² fiyatları, dairelerin iç brütleri ile çarpılarak baz fiyat bulunur. Alt kısımdan girdiğiniz Şerefiyeler bu fiyata otomatik yedirilir.</li>
+                    <li><b>Manuel Mod (Kilidi Aç):</b> Birim fiyatlara kendiniz müdahale edersiniz. Sistem girdiğiniz rakamı direkt ciroya bağlar, çifte hesaplamayı önlemek için şerefiyeyi bu fiyata "dahil edilmiş" kabul eder.</li>
+                </ul>
+
+                <h5 class="text-success fw-bold border-bottom pb-1" style="font-size: 14px;"><i class="fa-solid fa-handshake"></i> BÖLÜM 4: Proje / Yatırım Modelleri</h5>
+                <ul class="ps-3 mb-3">
+                    <li class="mb-2"><b>Kat Karşılığı Modeli:</b> Arsa için nakit ödeme yapılmaz. Müteahhit, arsaya karşılık arsa sahibine önceden anlaşılan oranda bağımsız bölüm (alan/ciro) verir.<br>
+                    <span class="text-danger fw-bold">Net Kar</span> = (Müteahhide Kalan Ciro) - (Toplam İnşaat Maliyeti)</li>
+                    
+                    <li><b>Geliştirici (Müteahhit Öz Malı):</b> Projenin yapılacağı arsa halihazırda müteahhide aittir veya nakit bedelle dışarıdan satın alınmıştır. Bu modelde üretilen cironun tamamı (%100) müteahhide aittir.<br>
+                    <span class="text-danger fw-bold">Net Kar</span> = (Toplam Proje Cirosu) - (Toplam İnşaat Maliyeti + Arsanın Mevcut Piyasa Değeri)</li>
+                </ul>
+
+                <h5 class="text-warning text-darken-2 fw-bold border-bottom pb-1" style="font-size: 14px; color: #d35400;"><i class="fa-solid fa-clock"></i> BÖLÜM 5: Zaman Değeri ve Ekonomik Kar</h5>
+                <ul class="ps-3 mb-0">
+                    <li class="mb-2"><b>Arsa Fırsat Maliyeti:</b> Geliştirici modelinde arsa satın alma bedeli 1. gün peşin ödendiği için faiz kaybı toplam proje süresi üzerinden tam olarak hesaplanır.<br><i>Arsa Bedeli x Aylık Net Faiz x Proje Süresi</i></li>
+                    <li class="mb-2"><b>İnşaat Fırsat Maliyeti:</b> İnşaat maliyeti proje boyunca hakedişlerle kademeli olarak harcanır. Finansal modelleme standartları gereği inşaat parasının faiz kaybı toplam sürenin yarısı (Ortalama Sermaye Bağlama Süresi) üzerinden hesaplanır.<br><i>İnşaat Maliyeti x Aylık Net Faiz x (Proje Süresi / 2)</i></li>
+                    <li><span class="text-success fw-bold">Gerçek (Ekonomik) Kar</span> = Muhasebesel Net Kar - (Arsa Fırsat Maliyeti + İnşaat Fırsat Maliyeti)</li>
+                </ul>
+            </div>`;
+        }
         document.getElementById('infoModalTitle').innerHTML = `<i class="fa-solid fa-circle-info"></i> ${title}`;
         document.getElementById('infoModalBody').innerHTML = body;
         openModal('infoModal');
@@ -1158,7 +1186,6 @@
             document.getElementById('sliderKonutContainer').style.display = state.isGelistirici ? 'none' : 'block';
             document.getElementById('karmaOranContainer').style.display = state.isGelistirici ? 'none' : 'block';
             
-            // DİNAMİK BAŞLIK: "Opsiyonel" Kelimesi Kalktı
             document.getElementById('lblArsaMaliyeti').innerHTML = state.isGelistirici ? 
                 '<i class="fa-solid fa-money-bill-wave"></i> ARSA SATIN ALMA / FIRSAT MALİYETİ' : 
                 '<i class="fa-solid fa-chart-line"></i> ARSA MEVCUT DEĞERİ';
@@ -1554,7 +1581,7 @@
             
             state.mutNetKar = (state.ciroMutT + state.ciroMutK) - state.toplamMaliyet;
 
-            // YENİ: FIRSAT MALİYETİ / EKONOMİK KAR HESAPLAMALARI
+            // FIRSAT MALİYETİ / EKONOMİK KAR HESAPLAMALARI
             let stopajConfig = JSON.parse(localStorage.getItem('ki_stopaj')) || {s1: 17.5, s2: 15, s3: 10};
             state.projeSuresi = getStandardNum('projeSuresi') || 0;
             state.mevduatFaizi = getStandardNum('mevduatFaizi') || 0;
@@ -1572,7 +1599,6 @@
             state.muhasebeselKar = state.mutNetKar;
             state.ekonomikKar = state.muhasebeselKar - state.firsatInsaat - state.firsatArsa;
 
-            // ROI (Maliyet Üzerinden Kar Marjı) Ekonomi Karına Dönüşüyor
             state.mutKarMarji = state.toplamMaliyet > 0 ? (state.muhasebeselKar / state.toplamMaliyet) * 100 : 0;
 
             let fmtBase = { maximumFractionDigits: 0 };
