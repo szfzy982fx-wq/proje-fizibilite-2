@@ -478,14 +478,14 @@
                         <div class="col-4"><label class="form-label text-danger" style="font-size:0.7rem;">Otopark Mal. m² <i class="fa-solid fa-circle-info info-btn" onclick="openInfo('otoMaliyet')"></i></label><input type="text" id="maliyetOtopark" class="form-control form-control-sm border-secondary" oninput="formatCurrency(this); triggerAutoCalc();" placeholder="Manuel"></div>
                     </div>
 
-                    <!-- YENİ: ZAMAN DEĞERİ VE FIRSAT MALİYETİ GİRDİLERİ -->
+                    <!-- ZAMAN DEĞERİ VE FIRSAT MALİYETİ GİRDİLERİ -->
                     <div class="row g-2 mb-3 p-2 rounded" style="background-color: #eaf2f8; border: 1px solid #85c1e9;">
                         <div class="col-12 text-center" style="font-size:0.75rem; font-weight:bold; color:#2980b9; margin-bottom:2px;"><i class="fa-solid fa-clock"></i> ZAMAN DEĞERİ / FIRSAT MALİYETİ</div>
                         <div class="col-6"><label class="form-label text-primary" style="font-size:0.7rem;">Proje Süresi (Ay)</label><input type="text" id="projeSuresi" class="form-control form-control-sm border-primary text-center" oninput="triggerAutoCalc();" placeholder="Örn: 15"></div>
                         <div class="col-6"><label class="form-label text-primary" style="font-size:0.7rem;">Yıllık Brüt Faiz (%)</label><input type="text" id="mevduatFaizi" class="form-control form-control-sm border-primary text-center" oninput="triggerAutoCalc();" placeholder="Örn: 45"></div>
                     </div>
 
-                    <!-- YENİ: GÜNCELLENMİŞ MALİYET VE KAR ÖZETİ -->
+                    <!-- GÜNCELLENMİŞ MALİYET VE KAR ÖZETİ -->
                     <div id="maliyetOzetUI" class="mt-3 p-2 rounded border border-secondary" style="background-color: #f8f9fa; display:none;">
                         <div class="d-flex justify-content-between text-danger mb-1" style="font-size:0.85rem; font-weight:600;"><span id="lblToplamMaliyet">Toplam Yatırım Maliyeti:</span> <span id="uiToplamMaliyet">0</span></div>
                         
@@ -499,9 +499,13 @@
                             <span>Gerçek (Ekonomik) Kar:</span> <span id="uiEkoKar">0</span>
                         </div>
                         
-                        <div class="d-flex justify-content-between text-primary mt-1" style="font-size:0.85rem; font-weight:600;">
-                            <span>Maliyet Üzerinden Kar Marjı (ROI) <i class="fa-solid fa-circle-info info-btn" onclick="openInfo('roi')"></i>:</span> 
+                        <div class="d-flex justify-content-between text-primary mt-1 border-top pt-1" style="font-size:0.85rem; font-weight:600;">
+                            <span>Muhasebesel ROI <i class="fa-solid fa-circle-info info-btn" onclick="openInfo('roi')"></i>:</span> 
                             <span id="uiKarMarji">%0</span>
+                        </div>
+                        <div id="uiEkoKarMarjiGrup" class="d-flex justify-content-between mt-1" style="font-size:0.85rem; font-weight:800; color:#27ae60; display:none;">
+                            <span>Ekonomik ROI (Gerçek Marj):</span> 
+                            <span id="uiEkoKarMarji">%0</span>
                         </div>
                     </div>
                 </div>
@@ -573,7 +577,6 @@
     </div>
 </div>
 
-<!-- YENİ: Stopaj Ayarları Modalı -->
 <div id="stopajModal" class="modal-overlay" onclick="closeModalOutside(event, 'stopajModal')">
     <div class="modal-content-custom">
         <div style="background:#e67e22; padding:15px; display:flex; justify-content:space-between; align-items:center;">
@@ -621,7 +624,7 @@
         isOptimized: false, 
         arsaHam:0, arsaNet:0, TA: 0, Z: 0, kullanilanZ: 0, KA: 0, TKA: 0, TIA: 0, satilabilir: 0, kayip: 0, ticariTIA: 0, konutTIA: 0,
         aktifTaban: 0, ticariAlan: 0, konutAlan: 0, ciroArsaT: 0, ciroMutT: 0, ciroArsaK: 0, ciroMutK: 0, toplamCiro: 0, 
-        insaatMaliyeti: 0, toplamMaliyet: 0, mutNetKar: 0, mutKarMarji: 0, karmaArsaYuzde: 0, karmaMutYuzde: 0,
+        insaatMaliyeti: 0, toplamMaliyet: 0, mutNetKar: 0, mutKarMarji: 0, ekoKarMarji: 0, karmaArsaYuzde: 0, karmaMutYuzde: 0,
         mevcutArsa: 0, arsaDegerArtisi: 0, textReport: "", 
         otoparkArac: 0, yasalOtoparkArac: 0, otoparkAlan: 0, otoparkKat: 0, otoparkEkMaliyet: 0, magazaAdedi: 0, yasalMaxTaban: 0, kat: 0,
         adet11: 0, adet21: 0, adet31: 0, adetDubleks: 0, toplamBolum: 0, siginakZorunlu: false, siginakSebep: "",
@@ -629,8 +632,6 @@
         yananEmsal: 0, icDubleks: 0, m2Dubleks: 0, dubleksKapaliBonus: 0, dubleksTerasBonus: 0, totalNihaiHavuz: 0,
         ciroMagaza: 0, ciro11: 0, ciro21: 0, ciro31: 0, ciroDubleks: 0, gercekTicariAlan: 0, dubleksAltAlan: 0,
         isGelistirici: false,
-        
-        // FİNANS EKLENTİSİ STATE BİLGİLERİ
         projeSuresi: 0, mevduatFaizi: 0, stopajOrani: 0, firsatArsa: 0, firsatInsaat: 0, muhasebeselKar: 0, ekonomikKar: 0
     };
 
@@ -642,7 +643,7 @@
         'fiyatTicari', 'fiyatKonut', 'mevcutArsaDegeri', 'maliyetTicari', 'maliyetKonut', 'maliyetOtopark', 'ticariSlider', 'konutSlider', 
         'paraBirimi', 'chkKapaliOtopark', 'otoparkSerefiye', 'otoManuelAdet', 'otoM2Arac', 'chkDonati', 'donatiM2', 'donatiMaliyet', 'donatiSerefiye', 'terasSerefiye',
         'chkManuelFiyat', 'bfMagaza', 'bf11', 'bf21', 'bf31', 'bfDubleks', 'projeTipi',
-        'projeSuresi', 'mevduatFaizi' // Yeni eklenen inputlar kaydedilecek
+        'projeSuresi', 'mevduatFaizi'
     ];
 
     function autoGenerateTitle() {
@@ -717,10 +718,8 @@
             </div>`;
         } else if (type === 'roi') {
             title = "Kar Marjı (ROI) Nedir?";
-            body = `<p><b>ROI (Yatırımın Geri Dönüş Oranı):</b> Müteahhidin cebinden çıkan (riske attığı) her 1 TL'ye karşılık, işin sonunda cebine net olarak kaç TL kar koyduğunu gösteren orandır.</p>
-            <div style="background:#f8f9fa; padding:10px; border-radius:6px; border-left:4px solid #3498db; margin-bottom:10px;">
-                <b>Formül:</b> (Muhasebesel Net Kar / Toplam Yatırım) x 100
-            </div>`;
+            body = `<p><b>Muhasebesel ROI:</b> Müteahhidin cebinden çıkan her 1 TL'ye karşılık elde ettiği salt net kar orandır. (Muhasebesel Net Kar / Toplam Yatırım Çıkışı)</p>
+            <p><b>Ekonomik ROI:</b> Mevduat faizi gibi fırsat maliyetleri (vazgeçilen kazançlar) düşüldükten sonra elde kalan net gerçek kazanç marjıdır.</p>`;
         } else if (type === 'siginak') {
             title = "🛡️ Yeni Sığınak Yönetmeliği (7 Kasım 2025)";
             body = `<p>Resmî Gazete'de yayımlanan güncel Madde-7'ye göre sığınak yapma zorunluluğu sınırları:</p>
@@ -1600,6 +1599,7 @@
             state.ekonomikKar = state.muhasebeselKar - state.firsatInsaat - state.firsatArsa;
 
             state.mutKarMarji = state.toplamMaliyet > 0 ? (state.muhasebeselKar / state.toplamMaliyet) * 100 : 0;
+            state.ekoKarMarji = state.toplamMaliyet > 0 ? (state.ekonomikKar / state.toplamMaliyet) * 100 : 0;
 
             let fmtBase = { maximumFractionDigits: 0 };
             document.getElementById('outZ').innerText = state.Z.toLocaleString('tr-TR', fmtBase) + " m²";
@@ -1642,6 +1642,7 @@
                 
                 let fgrup = document.getElementById('uiFirsatGrup');
                 let ekoGrup = document.getElementById('uiEkoKarGrup');
+                let ekoGrupMarj = document.getElementById('uiEkoKarMarjiGrup');
                 
                 if (state.projeSuresi > 0 && state.mevduatFaizi > 0) {
                     let fHtml = ``;
@@ -1654,9 +1655,13 @@
                     fgrup.style.display = 'block';
                     ekoGrup.style.display = 'flex';
                     document.getElementById('uiEkoKar').innerText = "+ " + fm.format(state.ekonomikKar);
+
+                    ekoGrupMarj.style.display = 'flex';
+                    document.getElementById('uiEkoKarMarji').innerText = "% " + state.ekoKarMarji.toFixed(1);
                 } else {
                     fgrup.style.display = 'none';
                     ekoGrup.style.display = 'none';
+                    ekoGrupMarj.style.display = 'none';
                 }
 
                 document.getElementById('uiKarMarji').innerText = "% " + state.mutKarMarji.toFixed(1);
@@ -1955,7 +1960,6 @@
                 
                 outHtml += `<tr style="${trStyle} background-color:#fef9e7;"><td style="${tdLeft} font-weight:bold;">MUHASEBESEL NET KAR</td><td style="${tdRight} font-size:14px; color:#27ae60;">${fm.format(state.muhasebeselKar)}</td></tr>`;
                 
-                // YENİ FIRSAT MALİYETİ SATIRLARI (RAPOR)
                 if (state.projeSuresi > 0 && state.mevduatFaizi > 0) {
                     if (state.isGelistirici && state.mevcutArsa > 0) {
                         outHtml += `<tr style="${trStyle} background-color:#fff5f5;"><td style="${tdLeft} color:#d35400;">(-) Arsa Fırsat Maliyeti <span style="font-size:10px; color:#7f8c8d;">(Tam Süre Üzerinden Faiz Kaybı)</span></td><td style="${tdRight} color:#d35400;">- ${fm.format(state.firsatArsa)}</td></tr>`;
@@ -1964,8 +1968,13 @@
                     outHtml += `<tr style="${trStyle} background-color:#eafaf1; border-top:2px solid #bdc3c7;"><td style="${tdLeft} font-weight:bold; color:var(--primary);">GERÇEK (EKONOMİK) NET KAR</td><td style="${tdRight} font-size:15px; color:#27ae60;">${fm.format(state.ekonomikKar)}</td></tr>`;
                 }
                 
-                outHtml += `<tr style="${trStyle}"><td style="${tdLeft}">Maliyet Üzerinden Kar Marjı (ROI)</td><td style="${tdRight} color:#8e44ad;">% ${state.mutKarMarji.toFixed(1)}</td></tr>
-                </table>`;
+                outHtml += `<tr style="${trStyle}"><td style="${tdLeft} font-weight:bold;">Muhasebesel Kar Marjı (ROI)</td><td style="${tdRight} color:#2980b9;">% ${state.mutKarMarji.toFixed(1)}</td></tr>`;
+                
+                if (state.projeSuresi > 0 && state.mevduatFaizi > 0) {
+                    outHtml += `<tr style="${trStyle} background-color:#eafaf1;"><td style="${tdLeft} font-weight:bold; color:#27ae60;">Gerçek (Ekonomik) Kar Marjı (ROI)</td><td style="${tdRight} color:#27ae60; font-size:14px;">% ${state.ekoKarMarji.toFixed(1)}</td></tr>`;
+                }
+
+                outHtml += `</table>`;
             }
 
             let siginakBaslik = `<b style="color:var(--primary); font-size:13px;"><i class="fa-solid fa-shield-halved"></i> SIĞINAK ANALİZİ</b><br>`;
@@ -2073,7 +2082,10 @@
                     state.textReport += `Gerçek (Ekonomik) Kar: +${fm.format(state.ekonomikKar)}\n`;
                 }
                 
-                state.textReport += `Kar Marjı (ROI): %${state.mutKarMarji.toFixed(1)}\n`;
+                state.textReport += `Muhasebesel Kar Marjı (ROI): %${state.mutKarMarji.toFixed(1)}\n`;
+                if (state.projeSuresi > 0 && state.mevduatFaizi > 0) {
+                    state.textReport += `Gerçek (Ekonomik) Kar Marjı: %${state.ekoKarMarji.toFixed(1)}\n`;
+                }
             }
 
             state.textReport += `\n⚠️ YASAL UYARI: Bu rapor bir avan proje öngörüsüdür. Kesin sonuçlar resmi projelerle netleşir.\n`;
