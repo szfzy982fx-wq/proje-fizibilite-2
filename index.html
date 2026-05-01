@@ -310,6 +310,11 @@
                                 <td><div id="uiLiveAdetDubleks" class="fw-bold text-center text-danger">-</div></td>
                                 <td><div id="uiCiroDubleks" class="text-end fw-bold text-danger" style="font-size:0.7rem;">0</div></td>
                             </tr>
+                            <tr id="rowDubleksUyari" style="display:none; background:#fffcf5;">
+                                <td colspan="6" class="text-center p-1" style="border-bottom: 1px dashed #e74c3c; border-left: 1px dashed #e74c3c; border-right: 1px dashed #e74c3c;">
+                                    <div style="color:#d35400; font-size:11px; font-weight:bold;"><i class="fa-solid fa-triangle-exclamation"></i> 3+2 Dubleks hesaplaması için 1+1 ve 2+1 alan verilerini girmelisiniz.</div>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                     
@@ -1140,11 +1145,21 @@
             }
         });
 
-        let totalUnits = data.reduce((sum, item) => sum + item.qty, 0);
-        if(totalUnits > 0 && pool > 0) {
-            let extraIcPerUnit = pool / totalUnits;
-            data.forEach(item => { item.ic += extraIcPerUnit; });
-        } else if (totalUnits === 0 && data.length > 0) {
+        let modifiableData = isDubleks ? data.filter(d => d.type !== '21') : data;
+        if (modifiableData.length === 0) modifiableData = data;
+
+        let totalMultiplierSum = modifiableData.reduce((sum, item) => {
+            let mult = item.qty;
+            if (isDubleks && (item.type === '11' || item.type === '21')) {
+                mult += state.adetDubleks; 
+            }
+            return sum + mult;
+        }, 0);
+
+        if(totalMultiplierSum > 0 && pool > 0) {
+            let extraIcPerUnit = pool / totalMultiplierSum;
+            modifiableData.forEach(item => { item.ic += extraIcPerUnit; });
+        } else if (totalMultiplierSum === 0 && data.length > 0) {
             let smallest = data[data.length - 1];
             smallest.qty = 1;
             smallest.ic = availableResArea; 
@@ -1200,6 +1215,18 @@
 
             let isSadeceKonut = document.getElementById('chkSadeceKonut').checked;
             let isDubleks = document.getElementById('chkDubleks').checked;
+            
+            // Dubleks Uyarı Kontrolü
+            let dubUyari = document.getElementById('rowDubleksUyari');
+            if (dubUyari) {
+                let val11 = getStandardNum('ic11') || getStandardNum('m211');
+                let val21 = getStandardNum('ic21') || getStandardNum('m221');
+                if (isDubleks && (!val11 || !val21)) {
+                    dubUyari.style.display = 'table-row';
+                } else {
+                    dubUyari.style.display = 'none';
+                }
+            }
 
             if (isSadeceKonut) {
                 document.getElementById('fizSubasman').value = "0.50";
@@ -1890,7 +1917,7 @@
                             <td style="padding:8px; font-weight:bold; color:var(--primary);">${fm.format(topTicRapor)}</td>
                         </tr>
                         <tr style="${trStyle}">
-                            <td style="${tdLeft} text-align:left; font-weight:bold;">Konut Alanı</td>
+                            <td style="${tdLeft} text-align:left; font-weight:bold;">Konut Alan</td>
                             <td style="padding:8px; font-weight:bold; color:var(--primary);">${fm.format(topKonRapor)}</td>
                         </tr>
                         <tr style="background-color:#eafaf1; border-top:2px solid #bdc3c7;">
