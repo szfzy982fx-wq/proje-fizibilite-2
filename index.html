@@ -1084,6 +1084,7 @@
         let isSadeceKonut = document.getElementById('chkSadeceKonut').checked;
         let isDubleks = document.getElementById('chkDubleks').checked;
         
+        // 1. Dükkan varsa önce onu optimize et
         if (!isSadeceKonut) {
             let m2Magaza = getStandardNum('m2Magaza');
             if (m2Magaza > 0 && state.ticariTIA > 0) {
@@ -1100,10 +1101,6 @@
         triggerAutoCalc(true);
         if(state.satilabilir <= 0) { alert("Lütfen önce imar verilerini girerek satılabilir alanı hesaplatın."); return; }
 
-        let dubTotalAlan = isDubleks ? (state.adetDubleks * state.icDubleks) : 0;
-        let availableResArea = state.satilabilir - state.gercekTicariAlan - dubTotalAlan;
-        if (availableResArea <= 0) return;
-
         let types = ['31', '21', '11']; 
         let data = []; 
         let totalWeight = 0;
@@ -1119,15 +1116,10 @@
 
         if(data.length === 0) { triggerAutoCalc(true); return; }
 
-        let currentPoolUsed = data.reduce((sum, item) => sum + (getStandardNum('pay' + item.type) > 0 ? getStandardNum('ic' + item.type) * Math.floor(state['adet' + item.type]) : 0), 0);
-        let poolDiff = Math.abs(availableResArea - currentPoolUsed);
-        let areAllIntegers = data.every(item => Number.isInteger(state['adet' + item.type]));
-        if (areAllIntegers && poolDiff < 0.5) {
-            lockOptimizationButton(); 
-            return;
-        }
-
-        data.sort((a, b) => b.ic - a.ic);
+        // İlk Dağılım Hesaplaması
+        let dubTotalAlan = isDubleks ? (state.adetDubleks * state.icDubleks) : 0;
+        let availableResArea = state.satilabilir - state.gercekTicariAlan - dubTotalAlan;
+        if (availableResArea <= 0) return;
 
         let pool = availableResArea;
         data.forEach(item => {
@@ -1144,36 +1136,70 @@
                 pool -= (extraQty * item.originalIc);
             }
         });
-
-        let modifiableData = isDubleks ? data.filter(d => d.type !== '21') : data;
-        if (modifiableData.length === 0) modifiableData = data;
-
-        let totalMultiplierSum = modifiableData.reduce((sum, item) => {
-            let mult = item.qty;
-            if (isDubleks && (item.type === '11' || item.type === '21')) {
-                mult += state.adetDubleks; 
+        
+        // --- WATERFALL + LOOP ALGORITHM ---
+        let maxIterations = 15; // Eksik payı kapatmak için dönüş sınırı
+        let iteration = 0;
+        let poolDiff = 999;
+        
+        while (iteration < maxIterations && Math.abs(poolDiff) > 0.05) {
+            triggerAutoCalc(true); // Güncel durumu yakala
+            
+            let currentDubAlan = isDubleks ? (state.adetDubleks * state.icDubleks) : 0;
+            let currentAvailable = state.satilabilir - state.gercekTicariAlan - currentDubAlan;
+            
+            data.forEach(item => { item.qty = Math.floor(state['adet' + item.type]); });
+            let currentTotalUsed = data.reduce((sum, item) => sum + (item.ic * item.qty), 0);
+            
+            poolDiff = currentAvailable - currentTotalUsed; // Teras küçüldüyse bu fark yeniden oluşur
+            
+            // Eğer ilk girişte mükemmel tuttuysa direkt çık
+            if (iteration === 0 && data.every(item => Number.isInteger(state['adet' + item.type])) && Math.abs(poolDiff) < 0.5) {
+                lockOptimizationButton(); 
+                return;
             }
-            return sum + mult;
-        }, 0);
 
-        if(totalMultiplierSum > 0 && pool > 0) {
-            let extraIcPerUnit = pool / totalMultiplierSum;
-            modifiableData.forEach(item => { item.ic += extraIcPerUnit; });
-        } else if (totalMultiplierSum === 0 && data.length > 0) {
-            let smallest = data[data.length - 1];
-            smallest.qty = 1;
-            smallest.ic = availableResArea; 
+            if (Math.abs(poolDiff) <= 0.05) break;
+
+            let target31 = data.find(d => d.type === '31');
+            if (target31 && target31.qty > 0) {
+                // Şelale Mantığı (Güvenli Liman): 3+1 varsa tüm yükü ona at ve döngüyü bitir
+                target31.ic += (poolDiff / target31.qty);
+            } else {
+                // Döngü Mantığı (Tamir Mekanizması): 3+1 yoksa 1+1 ve 2+1'e dağıt (Dubleksi etkileyecek)
+                let totalMultiplierSum = data.reduce((sum, item) => {
+                    let mult = item.qty;
+                    if (isDubleks && (item.type === '11' || item.type === '21')) {
+                        mult += state.adetDubleks; // Dubleks bağlantısı olduğu için ağırlıklı hesapla
+                    }
+                    return sum + mult;
+                }, 0);
+
+                if (totalMultiplierSum > 0) {
+                    let extraIcPerUnit = poolDiff / totalMultiplierSum;
+                    data.forEach(item => { item.ic += extraIcPerUnit; });
+                }
+            }
+
+            // Arayüze geçici yazıp tekrar triggerAutoCalc için zemini hazırlıyoruz
+            data.forEach((item) => {
+                document.getElementById('ic' + item.type).value = item.ic.toFixed(3);
+                calcBrutFromIc('ic' + item.type, 'm2' + item.type);
+            });
+            
+            iteration++;
         }
 
+        // Final Pay Hesaplaması ve Arayüz Temizliği
         data.sort((a, b) => parseInt(b.type) - parseInt(a.type));
-
         data.forEach((item) => {
-            let newPay = (item.qty * item.ic) / state.satilabilir * 100;
-            document.getElementById('ic' + item.type).value = item.ic.toFixed(2);
+            let finalPay = (item.qty * item.ic) / state.satilabilir * 100;
+            document.getElementById('pay' + item.type).value = finalPay.toFixed(2);
+            document.getElementById('ic' + item.type).value = item.ic.toFixed(2); // Ekranda şık görünmesi için 2 hane
             calcBrutFromIc('ic' + item.type, 'm2' + item.type);
-            document.getElementById('pay' + item.type).value = newPay.toFixed(2);
         });
 
+        // Kullanılmayan tipleri sıfırla
         ['11', '21', '31'].forEach(type => { if(!data.find(d => d.type === type)) document.getElementById('pay' + type).value = ''; });
 
         triggerAutoCalc(true);
