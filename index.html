@@ -1078,13 +1078,12 @@
 
     function optimizeDaireler() {
         if (state.isOptimized) return;
-
+        
         triggerAutoCalc(true); 
         
         let isSadeceKonut = document.getElementById('chkSadeceKonut').checked;
         let isDubleks = document.getElementById('chkDubleks').checked;
         
-        // 1. Dükkan varsa önce onu optimize et
         if (!isSadeceKonut) {
             let m2Magaza = getStandardNum('m2Magaza');
             if (m2Magaza > 0 && state.ticariTIA > 0) {
@@ -1137,69 +1136,66 @@
             }
         });
         
-        // --- WATERFALL + LOOP ALGORITHM ---
-        let maxIterations = 15; // Eksik payı kapatmak için dönüş sınırı
+        // --- İZOLASYONLU WATERFALL + LOOP ALGORİTMASI ---
         let iteration = 0;
         let poolDiff = 999;
+        let currentDubAlan = dubTotalAlan;
+        let verim = getStandardNum('fizVerim') || 80;
         
-        while (iteration < maxIterations && Math.abs(poolDiff) > 0.05) {
-            triggerAutoCalc(true); // Güncel durumu yakala
+        // Tamir döngüsü (DOM'a ve triggerAutoCalc'a asla dokunmuyor)
+        while (iteration < 20 && Math.abs(poolDiff) > 0.05) {
             
-            let currentDubAlan = isDubleks ? (state.adetDubleks * state.icDubleks) : 0;
             let currentAvailable = state.satilabilir - state.gercekTicariAlan - currentDubAlan;
-            
-            data.forEach(item => { item.qty = Math.floor(state['adet' + item.type]); });
             let currentTotalUsed = data.reduce((sum, item) => sum + (item.ic * item.qty), 0);
+            poolDiff = currentAvailable - currentTotalUsed;
             
-            poolDiff = currentAvailable - currentTotalUsed; // Teras küçüldüyse bu fark yeniden oluşur
-            
-            // Eğer ilk girişte mükemmel tuttuysa direkt çık
-            if (iteration === 0 && data.every(item => Number.isInteger(state['adet' + item.type])) && Math.abs(poolDiff) < 0.5) {
-                lockOptimizationButton(); 
-                return;
-            }
-
+            if (iteration === 0 && Math.abs(poolDiff) < 0.5) break; 
             if (Math.abs(poolDiff) <= 0.05) break;
 
             let target31 = data.find(d => d.type === '31');
             if (target31 && target31.qty > 0) {
-                // Şelale Mantığı (Güvenli Liman): 3+1 varsa tüm yükü ona at ve döngüyü bitir
+                // Şelale Mantığı: 3+1 varsa tüm yükü ona at ve döngüyü bitir (Dubleksi etkilemez)
                 target31.ic += (poolDiff / target31.qty);
+                break; 
             } else {
-                // Döngü Mantığı (Tamir Mekanizması): 3+1 yoksa 1+1 ve 2+1'e dağıt (Dubleksi etkileyecek)
-                let totalMultiplierSum = data.reduce((sum, item) => {
-                    let mult = item.qty;
-                    if (isDubleks && (item.type === '11' || item.type === '21')) {
-                        mult += state.adetDubleks; // Dubleks bağlantısı olduğu için ağırlıklı hesapla
-                    }
-                    return sum + mult;
-                }, 0);
-
-                if (totalMultiplierSum > 0) {
-                    let extraIcPerUnit = poolDiff / totalMultiplierSum;
+                // Döngü Mantığı: 1+1 ve 2+1'e dağıt 
+                let totalQty = data.reduce((sum, item) => sum + item.qty, 0);
+                if (totalQty > 0) {
+                    let extraIcPerUnit = poolDiff / totalQty;
                     data.forEach(item => { item.ic += extraIcPerUnit; });
                 }
+                
+                // Dubleks alanının yeni iç brütlere göre ne kadar küçüldüğünü/büyüdüğünü hesapla
+                if (isDubleks) {
+                    let d11 = data.find(d => d.type === '11');
+                    let d21 = data.find(d => d.type === '21');
+                    let ic11 = d11 ? d11.ic : (getStandardNum('ic11') || 0);
+                    let ic21 = d21 ? d21.ic : (getStandardNum('ic21') || 0);
+                    let m2_11 = ic11 / (verim / 100);
+                    let m2_21 = ic21 / (verim / 100);
+                    
+                    let aDub = Math.floor(state.TA / m2_21);
+                    if (aDub > 0) {
+                        let tBonus = Math.max(0, state.TA - (aDub * m2_11)) / aDub;
+                        let icDub = ic21 + ic11 + tBonus;
+                        currentDubAlan = aDub * icDub;
+                    } else {
+                        currentDubAlan = 0;
+                    }
+                }
             }
-
-            // Arayüze geçici yazıp tekrar triggerAutoCalc için zemini hazırlıyoruz
-            data.forEach((item) => {
-                document.getElementById('ic' + item.type).value = item.ic.toFixed(3);
-                calcBrutFromIc('ic' + item.type, 'm2' + item.type);
-            });
-            
             iteration++;
         }
 
-        // Final Pay Hesaplaması ve Arayüz Temizliği
+        // Laboratuvarda hesaplanan final değerleri EKRANA YAZDIR
         data.sort((a, b) => parseInt(b.type) - parseInt(a.type));
         data.forEach((item) => {
             let finalPay = (item.qty * item.ic) / state.satilabilir * 100;
             document.getElementById('pay' + item.type).value = finalPay.toFixed(2);
-            document.getElementById('ic' + item.type).value = item.ic.toFixed(2); // Ekranda şık görünmesi için 2 hane
+            document.getElementById('ic' + item.type).value = item.ic.toFixed(2); 
             calcBrutFromIc('ic' + item.type, 'm2' + item.type);
         });
 
-        // Kullanılmayan tipleri sıfırla
         ['11', '21', '31'].forEach(type => { if(!data.find(d => d.type === type)) document.getElementById('pay' + type).value = ''; });
 
         triggerAutoCalc(true);
@@ -1242,7 +1238,6 @@
             let isSadeceKonut = document.getElementById('chkSadeceKonut').checked;
             let isDubleks = document.getElementById('chkDubleks').checked;
             
-            // Dubleks Uyarı Kontrolü
             let dubUyari = document.getElementById('rowDubleksUyari');
             if (dubUyari) {
                 let val11 = getStandardNum('ic11') || getStandardNum('m211');
