@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -128,7 +129,7 @@
         <button type="button" onclick="savePortfolio()" class="btn btn-success btn-sm fw-bold"><i class="fa-solid fa-floppy-disk"></i> Kaydet</button>
         <button type="button" onclick="toggleSidePanel()" class="btn btn-primary btn-sm fw-bold"><i class="fa-solid fa-folder-open"></i> Kayıtlı Portföyler</button>
         <button type="button" onclick="printYatirimOzeti()" class="btn btn-warning btn-sm shadow-sm fw-bold" style="color: #fff;" id="btnSunum"><i class="fa-solid fa-file-pdf"></i> YATIRIM ÖZETİ</button>
-        <button type="button" onclick="generateReport()" class="btn btn-dark btn-sm shadow-sm"><i class="fa-solid fa-print"></i> Detaylı Rapor</button>
+        <button type="button" onclick="printDetailedReport()" class="btn btn-dark btn-sm shadow-sm fw-bold"><i class="fa-solid fa-floppy-disk"></i> <i class="fa-solid fa-print"></i> Detaylı Rapor</button>
     </div>
 
     <input type="hidden" id="currentPortfoyId" value="">
@@ -529,15 +530,10 @@
                 </div>
             </div>
             
-            <button type="button" class="btn btn-primary w-100 mb-2 fw-bold" onclick="generateReport()"><i class="fa-solid fa-file-invoice"></i> Detaylı Raporu Oluştur</button>
+            <button type="button" class="btn w-100 mb-2 fw-bold" style="background-color: #2c3e50; color: white;" onclick="generateReport()"><i class="fa-solid fa-file-invoice"></i> Detaylı Raporu Oluştur</button>
             
-            <div id="actionButtonsContainer" class="row g-2 mt-2" style="display:none;">
-                <div class="col-6">
-                    <button type="button" class="btn btn-outline-secondary w-100 fw-bold" id="btnCopy" onclick="copyReport()"><i class="fa-solid fa-copy"></i> Kopyala</button>
-                </div>
-                <div class="col-6">
-                    <button type="button" class="btn btn-outline-primary w-100 fw-bold" id="btnPrintReport" onclick="printDetailedReport()"><i class="fa-solid fa-floppy-disk"></i> <i class="fa-solid fa-print"></i> Rapor 💾 🖨️</button>
-                </div>
+            <div id="actionButtonsContainer" style="display:none;">
+                <button type="button" class="btn w-100 fw-bold text-secondary" style="background-color: #ecf0f1; border: 1px solid #bdc3c7;" id="btnCopy" onclick="copyReport()"><i class="fa-solid fa-copy"></i> Rapor Metnini Kopyala</button>
             </div>
 
         </div>
@@ -2251,7 +2247,7 @@
 
             document.getElementById('resFizibilite').innerHTML = outHtml;
             document.getElementById('resFizibilite').style.display = 'block';
-            document.getElementById('actionButtonsContainer').style.display = 'flex';
+            document.getElementById('actionButtonsContainer').style.display = 'block';
             
         } catch(e) {
             console.error("Rapor oluşturma hatası: ", e);
@@ -2261,19 +2257,25 @@
     function copyReport() {
         navigator.clipboard.writeText(state.textReport).then(() => {
             let btn = document.getElementById('btnCopy');
-            btn.innerHTML = '<i class="fa-solid fa-check"></i> Kopyalandı!';
-            btn.classList.replace('btn-outline-secondary', 'btn-success');
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Rapor Kopyalandı!';
+            btn.classList.replace('text-secondary', 'text-success');
             setTimeout(() => {
-                btn.innerHTML = '<i class="fa-solid fa-copy"></i> Kopyala';
-                btn.classList.replace('btn-success', 'btn-outline-secondary');
+                btn.innerHTML = '<i class="fa-solid fa-copy"></i> Rapor Metnini Kopyala';
+                btn.classList.replace('text-success', 'text-secondary');
             }, 2000);
         });
     }
 
-    // YENİ EKLENEN: SADECE OLUŞTURULAN DETAYLI RAPORU YAZDIRMA FONKSİYONU
     function printDetailedReport() {
         let container = document.getElementById('printSummaryContainer');
-        container.innerHTML = document.getElementById('resFizibilite').innerHTML;
+        let fizibiliteContent = document.getElementById('resFizibilite').innerHTML;
+        
+        if (!state.textReport || fizibiliteContent === "") {
+            alert('Lütfen önce sol alt bölümden "Detaylı Raporu Oluştur" butonuna basarak raporu hazırlayın.');
+            return;
+        }
+
+        container.innerHTML = fizibiliteContent;
         document.body.classList.add('print-summary-mode');
         
         setTimeout(() => {
