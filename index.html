@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -129,7 +128,7 @@
         <button type="button" onclick="savePortfolio()" class="btn btn-success btn-sm fw-bold"><i class="fa-solid fa-floppy-disk"></i> Kaydet</button>
         <button type="button" onclick="toggleSidePanel()" class="btn btn-primary btn-sm fw-bold"><i class="fa-solid fa-folder-open"></i> Kayıtlı Portföyler</button>
         <button type="button" onclick="printYatirimOzeti()" class="btn btn-warning btn-sm shadow-sm fw-bold" style="color: #fff;" id="btnSunum"><i class="fa-solid fa-file-pdf"></i> YATIRIM ÖZETİ</button>
-        <button type="button" onclick="window.print()" class="btn btn-dark btn-sm shadow-sm"><i class="fa-solid fa-print"></i> Detaylı Rapor</button>
+        <button type="button" onclick="generateReport()" class="btn btn-dark btn-sm shadow-sm"><i class="fa-solid fa-print"></i> Detaylı Rapor</button>
     </div>
 
     <input type="hidden" id="currentPortfoyId" value="">
@@ -181,8 +180,8 @@
                     <div class="row g-2 mb-2">
                         <div class="col-6"><label class="form-label">Tapu Arsa (m²)</label><input type="text" id="fizArsa" class="form-control border-primary" oninput="formatCurrency(this); triggerAutoCalc();" placeholder="Örn: 1.000" style="font-weight: bold;"></div>
                         <div class="col-6"><label class="form-label">Terk/DOP (%)</label><input type="text" id="fizTerk" class="form-control" placeholder="0" oninput="triggerAutoCalc();"></div>
-                        <div class="col-6"><label class="form-label">Emsal (KAKS)</label><input type="text" id="fizEmsal" class="form-control border-primary" placeholder="1.2" oninput="triggerAutoCalc();" style="font-weight: bold;"></div>
-                        <div class="col-6"><label class="form-label">TAKS</label><input type="text" id="fizTaks" class="form-control" placeholder="0.30" oninput="triggerAutoCalc();"></div>
+                        <div class="col-6"><label class="form-label text-danger">Emsal (KAKS)*</label><input type="text" id="fizEmsal" class="form-control border-danger" placeholder="Zorunlu!" oninput="triggerAutoCalc();" style="font-weight: bold;" required></div>
+                        <div class="col-6"><label class="form-label">TAKS</label><input type="text" id="fizTaks" class="form-control" placeholder="Girilmezse 1 alınır" oninput="triggerAutoCalc();"></div>
                         <div class="col-6"><label class="form-label">Gabari (Kat)</label><input type="text" id="fizKat" class="form-control border-primary" placeholder="5" oninput="triggerAutoCalc();" style="font-weight: bold;"></div>
                         <div class="col-6"><label class="form-label">ÇKS (Emsal Artış) <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('cks')"></i></label><input type="text" id="fizCks" class="form-control" placeholder="Örn: 1.30" oninput="triggerAutoCalc();"></div>
                     </div>
@@ -202,12 +201,18 @@
                         <div class="col-4"><label class="form-label text-primary">Verimlilik % <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('verimlilik')"></i></label><input type="text" id="fizVerim" class="form-control form-control-sm border-primary fw-bold" value="80" oninput="updateAllBrut(); triggerAutoCalc();"></div>
                     </div>
 
-                    <div class="section-title mt-2">Çap ve Çekme Payları (Opsiyonel)</div>
+                    <div class="section-title mt-2 d-flex justify-content-between align-items-center">
+                        <span>Çap ve Çekme Payları <i class="fa-solid fa-circle-info info-btn" onclick="openInfo('capAnaliz')"></i></span>
+                        <div class="form-check form-switch m-0 d-flex align-items-center gap-1">
+                            <input class="form-check-input m-0" type="checkbox" id="chkManuelCap" onchange="toggleCapModu(); triggerAutoCalc();">
+                            <label class="form-check-label" style="font-size:0.75rem; font-weight:bold; cursor:pointer;" for="chkManuelCap">Manuel</label>
+                        </div>
+                    </div>
                     <div class="row g-2 mb-2">
-                        <div class="col-6"><input type="text" id="fizCephe" class="form-control form-control-sm" placeholder="Ort. Cephe (m)" oninput="triggerAutoCalc();"></div>
-                        <div class="col-6"><input type="text" id="fizDerinlik" class="form-control form-control-sm" placeholder="Ort. Derinlik (m)" oninput="triggerAutoCalc();"></div>
-                        <div class="col-6"><input type="text" id="fizCekmeYan" class="form-control form-control-sm" placeholder="Yan Çekme Top. (m)" oninput="triggerAutoCalc();"></div>
-                        <div class="col-6"><input type="text" id="fizCekmeOnArka" class="form-control form-control-sm" placeholder="Ön/Arka Çekme Top. (m)" oninput="triggerAutoCalc();"></div>
+                        <div class="col-6"><input type="text" id="fizCephe" class="form-control form-control-sm" placeholder="Ort. Cephe (m)" oninput="calcCap('cephe'); triggerAutoCalc();"></div>
+                        <div class="col-6"><input type="text" id="fizDerinlik" class="form-control form-control-sm" placeholder="Ort. Derinlik (m)" oninput="calcCap('derinlik'); triggerAutoCalc();"></div>
+                        <div class="col-6"><input type="text" id="fizCekmeYan" class="form-control form-control-sm" placeholder="Yan Toplam: 6m" oninput="triggerAutoCalc();"></div>
+                        <div class="col-6"><input type="text" id="fizCekmeOnArka" class="form-control form-control-sm" placeholder="Ön/Arka Toplam: 8m" oninput="triggerAutoCalc();"></div>
                     </div>
 
                     <!-- Canlı Kütle Analizi Paneli -->
@@ -644,7 +649,7 @@
     const formIds = [
         'pBaslik', 'pIl', 'pIlce', 'pMahalle', 'pAda', 'pParsel', 'pSahibi', 'pNotlar', 'chkGizleSahibi', 'chkGizleNotlar',
         'fizArsa', 'fizTerk', 'fizEmsal', 'fizTaks', 'fizKat', 'fizCks', 'fizSubasman', 'fizVerim',
-        'fizCephe', 'fizDerinlik', 'fizCekmeYan', 'fizCekmeOnArka',
+        'chkManuelCap', 'fizCephe', 'fizDerinlik', 'fizCekmeYan', 'fizCekmeOnArka',
         'chkSadeceKonut', 'chkDubleks', 'payMagaza', 'icMagaza', 'm2Magaza', 'pay11', 'ic11', 'm211', 'pay21', 'ic21', 'm221', 'pay31', 'ic31', 'm231',
         'fiyatTicari', 'fiyatKonut', 'mevcutArsaDegeri', 'maliyetTicari', 'maliyetKonut', 'maliyetOtopark', 'ticariSlider', 'konutSlider', 
         'paraBirimi', 'chkKapaliOtopark', 'otoparkSerefiye', 'otoManuelAdet', 'otoM2Arac', 'chkDonati', 'donatiM2', 'donatiMaliyet', 'donatiSerefiye', 'terasSerefiye',
@@ -750,6 +755,17 @@
         } else if (type === 'kullanilanZ') {
             title = "Kullanılan Emsal Alanı";
             body = "<p>Çekme payları veya gabari kısıtlaması nedeniyle yasal emsal hakkının tamamı arsaya sığmadığında (emsal yandığında), hayali alanları maliyete katmamak adına tüm inşaat/beton hesaplamaları bu <b>Kullanılan Emsal</b> değeri üzerinden yapılır.</p>";
+        } else if (type === 'capAnaliz') {
+            title = "📐 Çap ve Fiziki Oturum Mantığı";
+            body = `<p>Sistemin, arsanıza sığabilecek maksimum taban alanını (Fiziki Oturum) hesaplayabilmesi için parsel boyutlarına ihtiyacı vardır:</p>
+            <ul style="margin:0; padding-left:20px;">
+                <li><b>Manuel Giriş (Tam Veri):</b> Çap belgenizdeki net Cephe ve Derinlik ölçülerini girerseniz, en kusursuz fiziki oturum hesaplanır.</li>
+                <li><b>Tek Yönlü Giriş (Eşdeğer Dikdörtgen):</b> Sadece cephe veya sadece derinlik girerseniz; sistem net imar parselinizi girdiğiniz değere bölerek diğer kenarı <b>otomatik</b> hesaplar. Şekilsiz arsalar için idealdir.</li>
+                <li><b>Boş Bırakma (Kare Parsel Varsayımı):</b> Hiçbir değer girmezseniz sistem arsanızı <b>kare</b> varsayarak yoluna devam eder.</li>
+            </ul>
+            <div style="background:#fffcf5; padding:10px; border-radius:6px; border-left:4px solid #f39c12; margin-top:10px; font-size:12px;">
+                <b>Varsayılan Çekmeler:</b> Çekme mesafelerini boş bırakırsanız, sistem güvenli tarafta kalmak adına Ön/Arka toplam <b>8m</b>, Yanlar toplam <b>6m</b> olarak baz alacaktır.
+            </div>`;
         } else if (type === 'kilavuz') {
             title = "Formül ve Mantık Kılavuzu";
             body = `
@@ -929,6 +945,7 @@
         });
         
         toggleFiyatModu();
+        toggleCapModu();
         toggleSidePanel();
         triggerAutoCalc();
         document.getElementById('resFizibilite').style.display = 'none'; 
@@ -984,6 +1001,7 @@
             document.getElementById('terasSerefiye').value = "30";
             
             toggleFiyatModu();
+            toggleCapModu();
             triggerAutoCalc();
             document.getElementById('resFizibilite').style.display = 'none';
             document.getElementById('btnCopy').style.display = 'none';
@@ -1040,6 +1058,58 @@
     function updateAllBrut() {
         ['Magaza', '11', '21', '31'].forEach(suffix => { if(document.getElementById('ic'+suffix).value) calcBrutFromIc('ic'+suffix, 'm2'+suffix); });
     }
+
+    // --- YENİ EKLENEN ÇAP HESAPLAMA MANTIĞI ---
+    function toggleCapModu() {
+        let isManuel = document.getElementById('chkManuelCap').checked;
+        let elCephe = document.getElementById('fizCephe');
+        let elDerinlik = document.getElementById('fizDerinlik');
+        
+        if(isManuel) {
+            elCephe.readOnly = false; elCephe.classList.remove('bg-light');
+            elDerinlik.readOnly = false; elDerinlik.classList.remove('bg-light');
+        } else {
+            elCephe.readOnly = false; elCephe.classList.remove('bg-light');
+            elDerinlik.readOnly = false; elDerinlik.classList.remove('bg-light');
+            // Formu tekrar hesaplat ki kilitlenmesi gereken varsa kilitlensin
+            if (elCephe.value !== "") calcCap('cephe');
+            else if (elDerinlik.value !== "") calcCap('derinlik');
+        }
+    }
+
+    function calcCap(source) {
+        let isManuel = document.getElementById('chkManuelCap').checked;
+        if(isManuel) return;
+
+        let elCephe = document.getElementById('fizCephe');
+        let elDerinlik = document.getElementById('fizDerinlik');
+        let arsaHam = getFormattedNum('fizArsa');
+        let terk = getStandardNum('fizTerk');
+        let arsaNet = arsaHam * (1 - (terk / 100));
+
+        if(arsaNet <= 0) return;
+
+        if(source === 'cephe') {
+            let val = getStandardNum('fizCephe');
+            if(val > 0) {
+                elDerinlik.value = (arsaNet / val).toFixed(2);
+                elDerinlik.classList.add('bg-light'); elDerinlik.readOnly = true;
+            } else {
+                elDerinlik.value = '';
+                elDerinlik.classList.remove('bg-light'); elDerinlik.readOnly = false;
+            }
+        } else if(source === 'derinlik') {
+            let val = getStandardNum('fizDerinlik');
+            if(val > 0) {
+                elCephe.value = (arsaNet / val).toFixed(2);
+                elCephe.classList.add('bg-light'); elCephe.readOnly = true;
+            } else {
+                elCephe.value = '';
+                elCephe.classList.remove('bg-light'); elCephe.readOnly = false;
+            }
+        }
+    }
+    // ------------------------------------------
 
     function toggleSadeceKonut() {
         triggerAutoCalc(); 
@@ -1143,7 +1213,6 @@
         let currentDubAlan = dubTotalAlan;
         let verim = getStandardNum('fizVerim') || 80;
         
-        // Tamir döngüsü (DOM'a ve triggerAutoCalc'a asla dokunmuyor)
         while (iteration < 20 && Math.abs(poolDiff) > 0.05) {
             
             let currentAvailable = state.satilabilir - state.gercekTicariAlan - currentDubAlan;
@@ -1155,18 +1224,15 @@
 
             let target31 = data.find(d => d.type === '31');
             if (target31 && target31.qty > 0) {
-                // Şelale Mantığı: 3+1 varsa tüm yükü ona at ve döngüyü bitir (Dubleksi etkilemez)
                 target31.ic += (poolDiff / target31.qty);
                 break; 
             } else {
-                // Döngü Mantığı: 1+1 ve 2+1'e dağıt 
                 let totalQty = data.reduce((sum, item) => sum + item.qty, 0);
                 if (totalQty > 0) {
                     let extraIcPerUnit = poolDiff / totalQty;
                     data.forEach(item => { item.ic += extraIcPerUnit; });
                 }
                 
-                // Dubleks alanının yeni iç brütlere göre ne kadar küçüldüğünü/büyüdüğünü hesapla
                 if (isDubleks) {
                     let d11 = data.find(d => d.type === '11');
                     let d21 = data.find(d => d.type === '21');
@@ -1188,7 +1254,6 @@
             iteration++;
         }
 
-        // Laboratuvarda hesaplanan final değerleri EKRANA YAZDIR
         data.sort((a, b) => parseInt(b.type) - parseInt(a.type));
         data.forEach((item) => {
             let finalPay = (item.qty * item.ic) / state.satilabilir * 100;
@@ -1228,8 +1293,15 @@
                 '<i class="fa-solid fa-chart-line"></i> ARSA MEVCUT DEĞERİ';
 
             state.arsaHam = getFormattedNum('fizArsa'); 
-            let terk = getStandardNum('fizTerk'), emsal = getStandardNum('fizEmsal');
-            let taks = getStandardNum('fizTaks'), kat = getStandardNum('fizKat');
+            let terk = getStandardNum('fizTerk');
+            
+            // KAKS ve TAKS Değerlerini Al (TAKS boşsa 1 kabul et)
+            let emsalStr = document.getElementById('fizEmsal').value;
+            let emsal = getStandardNum('fizEmsal');
+            let taksStr = document.getElementById('fizTaks').value;
+            let taks = taksStr === "" ? 1 : getStandardNum('fizTaks');
+
+            let kat = getStandardNum('fizKat');
             state.kat = kat;
             
             let cksInput = getStandardNum('fizCks');
@@ -1267,7 +1339,8 @@
 
             let subasman = document.getElementById('fizSubasman').value;
 
-            if(!state.arsaHam || !emsal || !taks || !kat) return;
+            // Hesaplama için zorunlu koşullar (TAKS zorunluluğu kalktı)
+            if(!state.arsaHam || emsalStr === "" || !kat) return;
 
             state.arsaNet = state.arsaHam * (1 - (terk / 100));
             state.Z = state.arsaNet * emsal;
@@ -1275,17 +1348,29 @@
             let optimumTaban = kat > 0 ? state.Z / kat : state.Z;
             state.aktifTaban = Math.min(state.yasalMaxTaban, optimumTaban);
 
-            let cephe = getStandardNum('fizCephe'), derinlik = getStandardNum('fizDerinlik');
-            let cYan = getStandardNum('fizCekmeYan'), cOnArka = getStandardNum('fizCekmeOnArka');
+            // ÇEKME PAYLARI VE KARE PARSEL KORUMASI
+            let cYanInput = document.getElementById('fizCekmeYan').value;
+            let cOnArkaInput = document.getElementById('fizCekmeOnArka').value;
+            let cYan = cYanInput === "" ? 6 : getStandardNum('fizCekmeYan');
+            let cOnArka = cOnArkaInput === "" ? 8 : getStandardNum('fizCekmeOnArka');
+
+            let cepheStr = document.getElementById('fizCephe').value;
+            let derinlikStr = document.getElementById('fizDerinlik').value;
+            let cephe = getStandardNum('fizCephe');
+            let derinlik = getStandardNum('fizDerinlik');
             let fizikiOturum = 0;
             
-            if(cephe > 0 && derinlik > 0) {
-                fizikiOturum = Math.max(0, cephe - cYan) * Math.max(0, derinlik - cOnArka);
-                state.aktifTaban = Math.min(state.aktifTaban, fizikiOturum);
-                setDisplay('uyariGeometri', fizikiOturum < state.yasalMaxTaban);
+            if(cepheStr === "" && derinlikStr === "") {
+                // Kare Parsel Varsayımı
+                let kenar = Math.sqrt(state.arsaNet);
+                fizikiOturum = Math.max(0, kenar - cYan) * Math.max(0, kenar - cOnArka);
             } else {
-                setDisplay('uyariGeometri', false);
+                // Manuel veya Tamamlanmış Giriş
+                fizikiOturum = Math.max(0, cephe - cYan) * Math.max(0, derinlik - cOnArka);
             }
+
+            state.aktifTaban = Math.min(state.aktifTaban, fizikiOturum);
+            setDisplay('uyariGeometri', fizikiOturum < state.yasalMaxTaban);
 
             let gabariKapasitesi = state.aktifTaban * kat;
             let kullanilanZ = Math.min(state.Z, gabariKapasitesi);
@@ -1723,6 +1808,12 @@
 
     function generateReport() {
         try {
+            let emsalInput = document.getElementById('fizEmsal').value;
+            if(!emsalInput || getStandardNum('fizEmsal') <= 0) {
+                alert("Lütfen İmar Durum Belgesindeki Emsal (KAKS) değerini giriniz.");
+                return;
+            }
+
             triggerAutoCalc();
             if(!state.satilabilir || state.satilabilir <= 0) { alert("Lütfen arsa ve imar verilerini girin."); return; }
 
@@ -1810,7 +1901,7 @@
                                 <tr style="${trStyle}"><td style="${tdLeft}">Tapu Arsa</td><td style="${tdRight}">${nf.format(state.arsaHam)} m²</td></tr>
                                 <tr style="${trStyle}"><td style="${tdLeft}">Terk / DOP</td><td style="${tdRight}">%${getStandardNum('fizTerk') || 0}</td></tr>
                                 <tr style="${trStyle}"><td style="${tdLeft}">Emsal (KAKS)</td><td style="${tdRight}">${getStandardNum('fizEmsal')}</td></tr>
-                                <tr style="${trStyle}"><td style="${tdLeft}">TAKS Sınırı</td><td style="${tdRight}">${getStandardNum('fizTaks')}</td></tr>
+                                <tr style="${trStyle}"><td style="${tdLeft}">TAKS Sınırı</td><td style="${tdRight}">${document.getElementById('fizTaks').value === "" ? "1 (Varsayılan)" : getStandardNum('fizTaks')}</td></tr>
                                 <tr style="${trStyle}"><td style="${tdLeft}">Gabari</td><td style="${tdRight}">${state.kat} Kat</td></tr>
                                 <tr style="${trStyle}"><td style="${tdLeft}">Verimlilik Oranı</td><td style="${tdRight}">%${getStandardNum('fizVerim') || 80}</td></tr>
                             </table>
@@ -2081,7 +2172,7 @@
             state.textReport += `--- STRATEJİK ÖZET ---\nEmsal (Z): ${nf.format(state.Z)} m²\nNihai Satılabilir Alan: ${nf.format(state.totalNihaiHavuz > 0 ? state.totalNihaiHavuz : state.satilabilir)} m²\nRuhsat TİA: ${nf.format(state.TIA)} m²\n\n`;
 
             state.textReport += `--- 1. İMAR VE KÜTLE VERİLERİ ---\n`;
-            state.textReport += `🔹 İmar Şartları:\nTapu Arsa: ${nf.format(state.arsaHam)} m² | Terk: %${getStandardNum('fizTerk') || 0} | Emsal: ${getStandardNum('fizEmsal')} | TAKS: ${getStandardNum('fizTaks')} | Gabari: ${state.kat} Kat\n\n`;
+            state.textReport += `🔹 İmar Şartları:\nTapu Arsa: ${nf.format(state.arsaHam)} m² | Terk: %${getStandardNum('fizTerk') || 0} | Emsal: ${getStandardNum('fizEmsal')} | TAKS: ${document.getElementById('fizTaks').value === "" ? "1 (Varsayılan)" : getStandardNum('fizTaks')} | Gabari: ${state.kat} Kat\n\n`;
             state.textReport += `🔹 Kütle ve Çap Değerleri:\nÇKS: ${cksVal} | Subasman: ${subasmanVal} | Verimlilik: %${getStandardNum('fizVerim') || 80}\nCephe: ${cepheVal} | Derinlik: ${derinlikVal} | Yan Çekme: ${cekmeYanVal} | Ön/Arka Çekme: ${cekmeOnArkaVal}\n\n`;
 
             state.textReport += `--- 2. MİMARİ ANALİZ ---\nNet Parsel: ${nf.format(state.arsaNet)} m²\nHam Emsal Alanı (Z): ${nf.format(state.Z)} m²\nKullanılan Emsal: ${nf.format(state.kullanilanZ)} m²\nEfektif Taban Alanı: ${nf.format(state.TA)} m²\nToplam Kat Alanı (TKA): ${nf.format(state.TKA)} m²\nKayıp Ortak Alan: ${nf.format(state.kayip)} m²\nToplam Bölüm: ~${Math.round(state.toplamBolum)} Adet\nOtopark İhtiyacı: Yasal ${state.yasalOtoparkArac} Araç | Planlanan ${state.otoparkArac} Araç ${isKapali ? '('+state.otoparkKat+' Kat Kapalı)' : '(Açık)'}\n`;
@@ -2162,6 +2253,12 @@
     }
 
     function printYatirimOzeti() {
+        let emsalInput = document.getElementById('fizEmsal').value;
+        if(!emsalInput || getStandardNum('fizEmsal') <= 0) {
+            alert("Lütfen İmar Durum Belgesindeki Emsal (KAKS) değerini giriniz.");
+            return;
+        }
+
         triggerAutoCalc();
         if(!state.satilabilir || state.satilabilir <= 0) { 
             alert("Yatırım özetini oluşturabilmek için lütfen sol taraftaki imar verilerini eksiksiz doldurun."); 
