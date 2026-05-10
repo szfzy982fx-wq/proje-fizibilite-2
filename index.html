@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -184,15 +183,16 @@
                         <div class="col-6"><label class="form-label">TAKS</label><input type="text" id="fizTaks" class="form-control" placeholder="Girilmezse 1 alınır" oninput="triggerAutoCalc();"></div>
                         <div class="col-6"><label class="form-label">Gabari (Kat)</label><input type="text" id="fizKat" class="form-control border-primary" placeholder="5" oninput="triggerAutoCalc();" style="font-weight: bold;"></div>
                         <div class="col-6"><label class="form-label">ÇKS (Emsal Artış) <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('cks')"></i></label><input type="text" id="fizCks" class="form-control" placeholder="Örn: 1.30" oninput="triggerAutoCalc();"></div>
+                        
                         <div class="col-6">
-                            <label class="form-label text-primary" style="font-size:0.75rem;">
-                                Çıkma / Konsol Oranı 
-                                <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('cikma')"></i>
-                            </label>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label m-0 text-primary" style="font-size:0.75rem;">Çıkma (Konsol) %</label>
+                                <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('cikma')" style="font-size:0.85rem; padding-right:2px;"></i>
+                            </div>
                             <select id="fizCikma" class="form-select form-select-sm border-primary fw-bold" onchange="triggerAutoCalc();">
-                                <option value="0.10">Ara Parsel (~%10 Büyüme)</option>
-                                <option value="0.15" selected>Köşe Parsel (~%15 Büyüme)</option>
-                                <option value="0.20">Ayrık Nizam (~%20 Büyüme)</option>
+                                <option value="0.10">Ara Parsel (~%10)</option>
+                                <option value="0.15" selected>Köşe Parsel (~%15)</option>
+                                <option value="0.20">Ayrık Nizam (~%20)</option>
                                 <option value="0.00">Çıkma Yok (%0)</option>
                             </select>
                         </div>
@@ -211,6 +211,18 @@
                             </div>
                         </div>
                         <div class="col-4"><label class="form-label text-primary">Verimlilik % <i class="fa-solid fa-circle-info info-btn info-btn-dark" onclick="openInfo('verimlilik')"></i></label><input type="text" id="fizVerim" class="form-control form-control-sm border-primary fw-bold" value="80" oninput="updateAllBrut(); triggerAutoCalc();"></div>
+                        
+                        <div class="col-12 mt-2">
+                            <div class="form-check form-switch p-2 rounded border border-warning d-flex justify-content-between align-items-center" style="background-color: #fffcf5; margin:0;">
+                                <div class="d-flex align-items-center">
+                                    <input class="form-check-input m-0" type="checkbox" id="chkTicariZemin" onchange="triggerAutoCalc();" style="cursor:pointer; width:2.5em; height:1.25em;">
+                                    <label class="form-check-label ms-2 fw-bold" for="chkTicariZemin" style="font-size:0.8rem; color:#d35400; cursor:pointer;">
+                                        🏢 Maks. Zemin (Ticari)
+                                    </label>
+                                </div>
+                                <i class="fa-solid fa-circle-info info-btn text-warning" onclick="openInfo('ticariZemin')" style="font-size:1rem;"></i>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="section-title mt-2 d-flex justify-content-between align-items-center">
@@ -657,7 +669,7 @@
 
     const formIds = [
         'pBaslik', 'pIl', 'pIlce', 'pMahalle', 'pAda', 'pParsel', 'pSahibi', 'pNotlar', 'chkGizleSahibi', 'chkGizleNotlar',
-        'fizArsa', 'fizTerk', 'fizEmsal', 'fizTaks', 'fizKat', 'fizCks', 'fizCikma', 'fizSubasman', 'fizVerim',
+        'fizArsa', 'fizTerk', 'fizEmsal', 'fizTaks', 'fizKat', 'fizCks', 'fizCikma', 'fizSubasman', 'fizVerim', 'chkTicariZemin',
         'chkManuelCap', 'fizCephe', 'fizDerinlik', 'fizCekmeYan', 'fizCekmeOnArka',
         'chkSadeceKonut', 'chkDubleks', 'payMagaza', 'icMagaza', 'm2Magaza', 'pay11', 'ic11', 'm211', 'pay21', 'ic21', 'm221', 'pay31', 'ic31', 'm231',
         'fiyatTicari', 'fiyatKonut', 'mevcutArsaDegeri', 'maliyetTicari', 'maliyetKonut', 'maliyetOtopark', 'ticariSlider', 'konutSlider', 
@@ -786,6 +798,16 @@
             </ul>
             <div style="background:#fffcf5; padding:10px; border-radius:6px; border-left:4px solid #f39c12; margin-top:10px; font-size:12px;">
                 <b>Optimizasyon:</b> Program, seçtiğiniz arsa tipine göre emsalinizin havada ne kadar genişleyebileceğini hesaplar ve taban oturumunuzu (TA) gereksiz yere büyük yapmanızı engeller.
+            </div>`;
+        } else if (type === 'ticariZemin') {
+            title = "🏢 Maksimum Zemin (Ticari Odaklı Tasarım)";
+            body = `<p>Köşe parsellerde veya ana arterlerde zemin kat (Dükkan/Mağaza) m² fiyatları çok yüksektir.</p>
+            <ul style="margin:0; padding-left:20px;">
+                <li><b>Kapalıysa (Standart Mod):</b> Sistem, üst katlardaki emsal artış (balkon vb.) haklarınızı maksimize etmek için zemini küçültür ve bahçeyi/peyzajı büyütür. (Toplam inşaat alanı daha büyük çıkar).</li>
+                <li><b>Açıksa (Ticari Mod):</b> Sistem, üst katlarda kaybedeceği inşaat alanını umursamaz; çekme payları elverdiği ölçüde zemine yayılarak <b>en büyük Dükkan alanını</b> üretir.</li>
+            </ul>
+            <div style="background:#fffcf5; padding:10px; border-radius:6px; border-left:4px solid #f39c12; margin-top:10px; font-size:12px;">
+                <b>Tavsiye:</b> Dükkan fiyatının, konut fiyatından en az 2.5 - 3 kat değerli olduğu durumlarda bu butonu açmanız, toplam inşaat alanınız düşse bile projenin <b>toplam cirosunu ve karını</b> devasa oranda artıracaktır.
             </div>`;
         } else if (type === 'kilavuz') {
             title = "Formül ve Mantık Kılavuzu";
@@ -1098,7 +1120,6 @@
         } else {
             elCephe.readOnly = false; elCephe.classList.remove('bg-light');
             elDerinlik.readOnly = false; elDerinlik.classList.remove('bg-light');
-            // Formu tekrar hesaplat ki kilitlenmesi gereken varsa kilitlensin
             if (elCephe.value !== "") calcCap('cephe');
             else if (elDerinlik.value !== "") calcCap('derinlik');
         }
@@ -1333,6 +1354,7 @@
 
             let isSadeceKonut = document.getElementById('chkSadeceKonut').checked;
             let isDubleks = document.getElementById('chkDubleks').checked;
+            let isTicariZemin = document.getElementById('chkTicariZemin') ? document.getElementById('chkTicariZemin').checked : false;
             
             let dubUyari = document.getElementById('rowDubleksUyari');
             if (dubUyari) {
@@ -1368,14 +1390,13 @@
             state.Z = state.arsaNet * emsal;
             state.yasalMaxTaban = state.arsaNet * taks; 
 
-            // Yeni Çıkma Oranını Al
+            // Çıkma Oranını Al
             let cikmaSelect = document.getElementById('fizCikma');
             let cikmaOrani = cikmaSelect ? parseFloat(cikmaSelect.value) : 0.15; // Varsayılan %15
 
             // TERSİNE MÜHENDİSLİK: Emsali yakmamak için gereken minimum Taban Alanı (Optimum TA)
             let optimumTaban = 0;
             if (kat > 1) {
-                // Formül: (Z * ÇKS) / [ ((Kat-1)*(1+Çıkma)) + ÇKS ]
                 optimumTaban = (state.Z * cks) / (((kat - 1) * (1 + cikmaOrani)) + cks);
             } else {
                 optimumTaban = state.Z; // Tek katsa emsale eşittir
@@ -1400,10 +1421,16 @@
                 fizikiOturum = Math.max(0, cephe - cYan) * Math.max(0, derinlik - cOnArka);
             }
 
-            // AKTİF TABAN: Yasal Maksimum, Fiziki Çekme Sınırı ve Optimum Taban'ın en küçüğü!
-            state.aktifTaban = Math.min(state.yasalMaxTaban, fizikiOturum, optimumTaban);
+            // AKTİF TABAN HESABI
+            if (isTicariZemin) {
+                // TİCARİ MOD: Zemin katta dükkan için yasal ve fiziki olarak oturabildiğin en büyük alana otur!
+                state.aktifTaban = Math.min(state.yasalMaxTaban, fizikiOturum);
+            } else {
+                // STANDART MOD: Üst katlarda çıkma yap, zemini küçült, peyzaj kalsın.
+                state.aktifTaban = Math.min(state.yasalMaxTaban, fizikiOturum, optimumTaban);
+            }
 
-            // YENİ GABARİ KAPASİTESİ (FİZİKİ KABUK) HESABI: Zemin + (Çıkmalı Üst Katlar)
+            // GABARİ KAPASİTESİ (FİZİKİ KABUK) HESABI: Zemin + (Çıkmalı Üst Katlar)
             let zeminKatKapasite = state.aktifTaban;
             let ustKatlarKapasite = (kat > 1) ? (state.aktifTaban * (1 + cikmaOrani) * (kat - 1)) : 0;
             let fizikiKabukKapasitesi = zeminKatKapasite + ustKatlarKapasite;
@@ -1430,6 +1457,9 @@
             if (state.yananEmsal > 0.5) {
                 durumBar.className = 'mt-2 p-2 rounded alert-danger-custom';
                 durumBar.innerHTML = `❌ <strong>HATA:</strong> Gabari ve çıkma sınırları nedeniyle emsalinizin tamamı arsaya sığmıyor (~${(state.yananEmsal/cks).toLocaleString('tr-TR', {maximumFractionDigits:0})} m² emsal yanıyor). Ekstra kat gereklidir.`;
+            } else if (isTicariZemin) {
+                durumBar.className = 'mt-2 p-2 rounded alert-info-custom';
+                durumBar.innerHTML = `ℹ️ <strong>TİCARİ MOD AKTİF:</strong> Zemin kat oturumu yasal ve fiziki maksimum sınırlara çekildi.`;
             } else if (optimumTaban < fizikiOturum) {
                 durumBar.className = 'mt-2 p-2 rounded alert-success-custom';
                 durumBar.innerHTML = `✅ <strong>MÜKEMMEL OPTİMİZASYON:</strong> Emsalin tamamı arsaya sığdırıldı. Geri kalan alan peyzaj ve donatıya bırakıldı.`;
@@ -1616,20 +1646,15 @@
 
            let acikOtoparkAlan = isKapaliOtopark ? 0 : state.otoparkAlan;
             
-            // YENİ MANTIK: Peyzaj Alanı = Toplam Net Arsa - Bina Oturumu (TA) - Açık Otopark
             state.peyzajAlan = Math.max(0, state.arsaNet - state.aktifTaban - acikOtoparkAlan);
-            
-            // YENİ MANTIK: Mevzuata uygun %20 sınırı
             state.maxHavuzAlan = state.peyzajAlan * 0.20;
             
             document.getElementById('lblDonatiMax').innerHTML = state.maxHavuzAlan > 0 ? `Donatı <span style="color:#c0392b;">(Max: ${Math.floor(state.maxHavuzAlan)} m²)</span>` : `Donatı (m²)`;
             document.getElementById('donatiM2').placeholder = "Maks: " + Math.floor(state.maxHavuzAlan);
 
-            // Girilen değer sınırı aşıyorsa input'u sabitle
             let mevcutDonatiM2 = getStandardNum('donatiM2');
             if (mevcutDonatiM2 > state.maxHavuzAlan) {
                 document.getElementById('donatiM2').value = Math.floor(state.maxHavuzAlan);
-                // state güncellenmesini bir sonraki adımda yakalayacak
             }
 
             let isDonati = document.getElementById('chkDonati').checked;
@@ -1805,7 +1830,6 @@
             document.getElementById('outSatilabilir').innerText = outNihai.toLocaleString('tr-TR', fmtBase) + " m²";
             document.getElementById('outTIA').innerText = state.TIA.toLocaleString('tr-TR', fmtBase) + " m²";
             
-            // YENİ EKLENEN KÜTLE VERİLERİNİ GÜNCELLE
             document.getElementById('uiTKA').innerText = state.TKA.toLocaleString('tr-TR', fmtBase) + " m²";
             document.getElementById('uiTIA').innerText = state.TIA.toLocaleString('tr-TR', fmtBase) + " m²";
             document.getElementById('uiSatilabilir').innerText = outNihai.toLocaleString('tr-TR', fmtBase) + " m²";
@@ -1890,6 +1914,7 @@
 
             let isSadeceKonut = document.getElementById('chkSadeceKonut').checked;
             let isDubleks = document.getElementById('chkDubleks').checked;
+            let isTicariZemin = document.getElementById('chkTicariZemin') ? document.getElementById('chkTicariZemin').checked : false;
             let subasman = document.getElementById('fizSubasman').value; 
             
             let pBaslik = document.getElementById('pBaslik').value || "İsimsiz Portföy";
@@ -1970,7 +1995,7 @@
                                 <tr style="${trStyle}"><td style="${tdLeft}">Emsal (KAKS)</td><td style="${tdRight}">${getStandardNum('fizEmsal')}</td></tr>
                                 <tr style="${trStyle}"><td style="${tdLeft}">TAKS Sınırı</td><td style="${tdRight}">${document.getElementById('fizTaks').value === "" ? "1 (Varsayılan)" : getStandardNum('fizTaks')}</td></tr>
                                 <tr style="${trStyle}"><td style="${tdLeft}">Gabari</td><td style="${tdRight}">${state.kat} Kat</td></tr>
-                                <tr style="${trStyle}"><td style="${tdLeft}">Verimlilik Oranı</td><td style="${tdRight}">%${getStandardNum('fizVerim') || 80}</td></tr>
+                                <tr style="${trStyle}"><td style="${tdLeft}">Tasarım Modu</td><td style="${tdRight}">${isTicariZemin ? '<span style="color:#d35400;">Maksimum Zemin (Ticari)</span>' : 'Standart (Konut Odaklı)'}</td></tr>
                             </table>
                         </td>
                         <td style="padding:4px; vertical-align:top; border-left:1px solid #ecf0f1;">
@@ -2222,7 +2247,7 @@
             state.textReport += `--- STRATEJİK ÖZET ---\nEmsal Alanı: ${nf.format(state.Z)} m²\nNihai Satılabilir Alan: ${nf.format(state.totalNihaiHavuz > 0 ? state.totalNihaiHavuz : state.satilabilir)} m²\nRuhsat TİA: ${nf.format(state.TIA)} m²\n\n`;
 
             state.textReport += `--- 1. İMAR VE KÜTLE VERİLERİ ---\n`;
-            state.textReport += `🔹 İmar Şartları:\nTapu Arsa: ${nf.format(state.arsaHam)} m² | Terk: %${getStandardNum('fizTerk') || 0} | Emsal: ${getStandardNum('fizEmsal')} | TAKS: ${document.getElementById('fizTaks').value === "" ? "1 (Varsayılan)" : getStandardNum('fizTaks')} | Gabari: ${state.kat} Kat\n\n`;
+            state.textReport += `🔹 İmar Şartları:\nTapu Arsa: ${nf.format(state.arsaHam)} m² | Terk: %${getStandardNum('fizTerk') || 0} | Emsal: ${getStandardNum('fizEmsal')} | TAKS: ${document.getElementById('fizTaks').value === "" ? "1 (Varsayılan)" : getStandardNum('fizTaks')} | Gabari: ${state.kat} Kat | Tasarım Modu: ${isTicariZemin ? 'Maksimum Zemin (Ticari)' : 'Standart (Konut Odaklı)'}\n\n`;
             state.textReport += `🔹 Kütle ve Çap Değerleri:\nÇKS: ${cksVal} | Subasman: ${subasmanVal} | Verimlilik: %${getStandardNum('fizVerim') || 80}\nCephe: ${cepheVal} | Derinlik: ${derinlikVal} | Yan Çekme: ${cekmeYanVal} | Ön/Arka Çekme: ${cekmeOnArkaVal}\n\n`;
 
             state.textReport += `--- 2. MİMARİ ANALİZ ---\nNet Parsel: ${nf.format(state.arsaNet)} m²\nEmsal Alanı: ${nf.format(state.Z)} m²\nKullanılan Emsal Alanı: ${nf.format(state.kullanilanZ)} m²\nEfektif Taban Alanı: ${nf.format(state.TA)} m²\nToplam Kat Alanı (TKA): ${nf.format(state.TKA)} m²\nKayıp Ortak Alan: ${nf.format(state.kayip)} m²\nToplam Bölüm: ~${Math.round(state.toplamBolum)} Adet\nOtopark İhtiyacı: Yasal ${state.yasalOtoparkArac} Araç | Planlanan ${state.otoparkArac} Araç ${isKapali ? '('+state.otoparkKat+' Kat Kapalı)' : '(Açık)'}\n`;
