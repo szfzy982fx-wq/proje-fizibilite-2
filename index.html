@@ -278,12 +278,13 @@
                     <table class="dist-table">
                         <thead>
                             <tr>
-                                <th style="text-align:left; width:22%;">TİP</th>
+                                <th style="text-align:left; width:18%;">TİP</th>
+                                <th style="width:10%; font-size:9px;" title="Bir kata sığabilecek maksimum daire sayısı">KAT/KPS. <i class="fa-solid fa-circle-info text-muted info-btn" onclick="openInfo('katKps')"></i></th>
                                 <th style="width:14%;">PAY(%)</th>
-                                <th style="width:16%;">İÇ BRÜT</th>
-                                <th style="width:16%;">TAPU BRÜT</th>
-                                <th style="width:14%;">ADET</th>
-                                <th style="width:18%;">CİRO(₺)</th>
+                                <th style="width:15%;">İÇ BRÜT</th>
+                                <th style="width:15%;">TAPU BRÜT</th>
+                                <th style="width:12%;">ADET</th>
+                                <th style="width:16%;">CİRO(₺)</th>
                             </tr>
                         </thead>
                         <tbody id="distTableBody">
@@ -292,6 +293,7 @@
                                     <div class="plan-group"><div class="plan-box plan-dukkan"></div></div><br>
                                     <small style="font-weight:bold;">Dükkan</small>
                                 </td>
+                                <td><div id="uiKattaMagaza" class="fw-bold text-center text-muted" style="font-size:0.75rem;">-</div></td>
                                 <td><input type="text" id="payMagaza" class="form-control dist-input bg-light text-primary fw-bold" readonly placeholder="%"></td>
                                 <td><input type="text" id="icMagaza" class="form-control dist-input border-secondary" placeholder="İç Brüt" oninput="calcBrutFromIc('icMagaza', 'm2Magaza'); triggerAutoCalc();"></td>
                                 <td><input type="text" id="m2Magaza" class="form-control dist-input border-secondary" placeholder="Tapu Brüt" oninput="calcIcFromBrut('m2Magaza', 'icMagaza'); triggerAutoCalc();"></td>
@@ -303,6 +305,7 @@
                                     <div class="plan-group"><div class="plan-box plan-salon"></div><div class="plan-box plan-oda"></div></div><br>
                                     <small style="font-weight:bold;">1+1</small>
                                 </td>
+                                <td><div id="uiKatta11" class="fw-bold text-center text-muted" style="font-size:0.75rem;">-</div></td>
                                 <td><input type="text" id="pay11" class="form-control dist-input" placeholder="%" oninput="triggerAutoCalc();"></td>
                                 <td><input type="text" id="ic11" class="form-control dist-input" placeholder="İç Brüt" oninput="calcBrutFromIc('ic11', 'm211'); triggerAutoCalc();"></td>
                                 <td><input type="text" id="m211" class="form-control dist-input" placeholder="Tapu Brüt" oninput="calcIcFromBrut('m211', 'ic11'); triggerAutoCalc();"></td>
@@ -314,6 +317,7 @@
                                     <div class="plan-group"><div class="plan-box plan-salon"></div><div class="plan-box plan-oda"></div><div class="plan-box plan-oda"></div></div><br>
                                     <small style="font-weight:bold;">2+1</small>
                                 </td>
+                                <td><div id="uiKatta21" class="fw-bold text-center text-muted" style="font-size:0.75rem;">-</div></td>
                                 <td><input type="text" id="pay21" class="form-control dist-input" placeholder="%" oninput="triggerAutoCalc();"></td>
                                 <td><input type="text" id="ic21" class="form-control dist-input" placeholder="İç Brüt" oninput="calcBrutFromIc('ic21', 'm221'); triggerAutoCalc();"></td>
                                 <td><input type="text" id="m221" class="form-control dist-input" placeholder="Tapu Brüt" oninput="calcIcFromBrut('m221', 'ic21'); triggerAutoCalc();"></td>
@@ -325,6 +329,7 @@
                                     <div class="plan-group"><div class="plan-box plan-salon"></div><div class="plan-box plan-oda"></div><div class="plan-box plan-oda"></div><div class="plan-box plan-oda"></div></div><br>
                                     <small style="font-weight:bold;">3+1</small>
                                 </td>
+                                <td><div id="uiKatta31" class="fw-bold text-center text-muted" style="font-size:0.75rem;">-</div></td>
                                 <td><input type="text" id="pay31" class="form-control dist-input" placeholder="%" oninput="triggerAutoCalc();"></td>
                                 <td><input type="text" id="ic31" class="form-control dist-input" placeholder="İç Brüt" oninput="calcBrutFromIc('ic31', 'm231'); triggerAutoCalc();"></td>
                                 <td><input type="text" id="m231" class="form-control dist-input" placeholder="Tapu Brüt" oninput="calcIcFromBrut('m231', 'ic31'); triggerAutoCalc();"></td>
@@ -339,6 +344,7 @@
                                     </div>
                                     <div class="plan-group mt-1"><div class="plan-box plan-salon"></div><div class="plan-box plan-oda"></div><div class="plan-box plan-oda"></div><div class="plan-plus">+</div><div class="plan-box plan-salon"></div><div class="plan-box plan-oda"></div></div>
                                 </td>
+                                <td><div id="uiKattaDubleks" class="fw-bold text-center text-danger" style="font-size:0.75rem;">-</div></td>
                                 <td><input type="text" id="payDubleks" class="form-control dist-input bg-light text-danger fw-bold" readonly placeholder="Oto"></td>
                                 <td><input type="text" id="icDubleks" class="form-control dist-input bg-light text-danger fw-bold" readonly placeholder="Ter.Dh" title="Teras Dahil İç Brüt"></td>
                                 <td><input type="text" id="m2Dubleks" class="form-control dist-input bg-light text-danger fw-bold" readonly placeholder="Ter.Dh" title="Teras Dahil Tapu Brüt"></td>
@@ -346,7 +352,7 @@
                                 <td><div id="uiCiroDubleks" class="text-end fw-bold text-danger" style="font-size:0.7rem;">0</div></td>
                             </tr>
                             <tr id="rowDubleksUyari" style="display:none; background:#fffcf5;">
-                                <td colspan="6" class="text-center p-1" style="border-bottom: 1px dashed #e74c3c; border-left: 1px dashed #e74c3c; border-right: 1px dashed #e74c3c;">
+                                <td colspan="7" class="text-center p-1" style="border-bottom: 1px dashed #e74c3c; border-left: 1px dashed #e74c3c; border-right: 1px dashed #e74c3c;">
                                     <div style="color:#d35400; font-size:11px; font-weight:bold;"><i class="fa-solid fa-triangle-exclamation"></i> 3+2 Dubleks hesaplaması için 1+1 ve 2+1 alan verilerini girmelisiniz.</div>
                                 </td>
                             </tr>
@@ -718,6 +724,14 @@
         if(type === 'cks') {
             title = "ÇKS / Emsal Artış Çarpanı";
             body = `<p>Toplam İnşaat (TİA) betonunu hesaplarken kullanılır.</p><p>Eğer imar çap belgesinde <b>"Emsal harici alanlar %30'u geçemez"</b> yazıyorsa, bu alana çarpan olarak <b>1.30</b> girmelisiniz.</p>`;
+        } else if (type === 'katKps') {
+            title = "Kat Kapasitesi (KAT/KPS.) Nedir?";
+            body = `<p>Bu değer, belirlediğiniz daire büyüklüklerinin <b>tek bir standart kata</b> maksimum kaç adet sığabileceğini gösteren bir öngörü aracıdır. Dağılım yüzdelerini (%) girerken size mimari bir referans sağlar.</p>
+            <ul style="margin:0; padding-left:20px;">
+                <li><b>Ticari Alanlar:</b> Çıkma (konsol) yapılamayan Zemin Kat (TA) sınırlarına göre hesaplanır.</li>
+                <li><b>Konutlar:</b> Zemin katın üzerindeki Çıkmalı/Konsollu <b>Normal Kat Alanı</b> baz alınarak hesaplanır.</li>
+                <li><b>Dubleksler:</b> 2+1 dairenin taban izi referans alınarak çatı katına sığabilecek kapasiteyi gösterir.</li>
+            </ul>`;
         } else if (type === 'firsatMaliyeti') {
             title = "Fırsat Maliyeti / Ekonomik Kar Mantığı";
             body = `<p>Yatırımcının nakit parasını inşaat/arsa yerine mevduata bağlasaydı elde edeceği <b>Vazgeçilen Net Getiri (Kayıp)</b> tutarıdır.</p>
@@ -1055,6 +1069,7 @@
             ['Magaza', '11', '21', '31', 'Dubleks'].forEach(s => {
                 document.getElementById('uiLiveAdet' + s).innerHTML = '-';
                 document.getElementById('uiCiro' + s).innerHTML = '0';
+                if(document.getElementById('uiKatta' + s)) document.getElementById('uiKatta' + s).innerHTML = '-';
             });
             document.getElementById('uiLiveAdetToplam').innerHTML = '0';
 
@@ -1423,10 +1438,8 @@
 
             // AKTİF TABAN HESABI
             if (isTicariZemin) {
-                // TİCARİ MOD: Zemin katta dükkan için yasal ve fiziki olarak oturabildiğin en büyük alana otur!
                 state.aktifTaban = Math.min(state.yasalMaxTaban, fizikiOturum);
             } else {
-                // STANDART MOD: Üst katlarda çıkma yap, zemini küçült, peyzaj kalsın.
                 state.aktifTaban = Math.min(state.yasalMaxTaban, fizikiOturum, optimumTaban);
             }
 
@@ -1435,22 +1448,17 @@
             let ustKatlarKapasite = (kat > 1) ? (state.aktifTaban * (1 + cikmaOrani) * (kat - 1)) : 0;
             let fizikiKabukKapasitesi = zeminKatKapasite + ustKatlarKapasite;
 
-            // Yasal Olarak İhtiyaç Duyulan İnşaat (ÇKS ile şişirilmiş)
             let yasalIhtiyacTia = state.aktifTaban + ((state.Z - state.aktifTaban) * cks);
 
-            // Emsal Yanıyor mu? (İhtiyaç, Kabuğa sığıyor mu?)
             state.yananEmsal = Math.max(0, yasalIhtiyacTia - fizikiKabukKapasitesi);
-            if (state.yananEmsal < 0.5) state.yananEmsal = 0; // Küsurat kaynaklı sahte uyarıları engeller
+            if (state.yananEmsal < 0.5) state.yananEmsal = 0; 
             
-            // Kullanılan Z (Emsal) değerini yanan emsali düşerek buluyoruz
             let kullanilanZ = state.Z;
             if (state.yananEmsal > 0.5) {
-                // Ne kadar emsal yandığını geri hesapla (ÇKS'ye bölerek net emsale dön)
                 kullanilanZ = state.Z - (state.yananEmsal / cks); 
             }
             state.kullanilanZ = kullanilanZ;
 
-            // Durum Barı Uyarıları
             let durumBar = document.getElementById('kutuDurumBar');
             durumBar.style.display = 'block';
 
@@ -1551,6 +1559,7 @@
             if (availablePool < 0) availablePool = 0;
 
             let ic1 = getStandardNum('ic11'), ic2 = getStandardNum('ic21'), ic3 = getStandardNum('ic31');
+            let m2_11 = getStandardNum('m211'), m2_31 = getStandardNum('m231');
             let originalP1 = getStandardNum('pay11'), originalP2 = getStandardNum('pay21'), originalP3 = getStandardNum('pay31');
             let totalOriginalKonutPay = originalP1 + originalP2 + originalP3;
             
@@ -1567,6 +1576,20 @@
             let d_dub = isDubleks ? getMathCount(state.adetDubleks) : 0;
 
             state.toplamBolum = d_mag + d_11 + d_21 + d_31 + d_dub;
+
+            // KAT/KPS. HESAPLAMA (Görsel Yardımcı)
+            let nka = state.TA * (1 + cikmaOrani); // Normal Kat Alanı
+            let uiKattaMagaza = (isSadeceKonut || dukkanTabanIzi <= 0) ? '-' : (state.TA / dukkanTabanIzi).toFixed(1);
+            let uiKatta11 = (m2_11 > 0 && nka > 0) ? (nka / m2_11).toFixed(1) : '-';
+            let uiKatta21 = (m2_21 > 0 && nka > 0) ? (nka / m2_21).toFixed(1) : '-';
+            let uiKatta31 = (m2_31 > 0 && nka > 0) ? (nka / m2_31).toFixed(1) : '-';
+            let uiKattaDub = (isDubleks && m2_21 > 0 && nka > 0) ? (nka / m2_21).toFixed(1) : '-';
+            
+            document.getElementById('uiKattaMagaza').innerText = uiKattaMagaza;
+            document.getElementById('uiKatta11').innerText = uiKatta11;
+            document.getElementById('uiKatta21').innerText = uiKatta21;
+            document.getElementById('uiKatta31').innerText = uiKatta31;
+            document.getElementById('uiKattaDubleks').innerText = uiKattaDub;
 
             let alan11 = state.adet11 * ic1;
             let alan21 = state.adet21 * ic2;
@@ -1683,24 +1706,41 @@
 
             let bfM = 0, bf1 = 0, bf2 = 0, bf3 = 0, bfD = 0;
 
+            // Otomatik Değerlerin Hesaplanması (Güvenlik Ağı için her halükarda hesaplanmalı)
+            let oto_bfM = getStandardNum('icMagaza') * genFiyatTic;
+            let oto_bf1 = getStandardNum('ic11') * genFiyatKon * topSerefiyeCarpan;
+            let oto_bf2 = getStandardNum('ic21') * genFiyatKon * topSerefiyeCarpan;
+            let oto_bf3 = getStandardNum('ic31') * genFiyatKon * topSerefiyeCarpan;
+            let oto_bfD = 0;
+            
+            if(isDubleks) {
+                let dubKapaliAlan = (getStandardNum('ic21')||0) + (getStandardNum('ic11')||0);
+                let dubKapaliFiyat = dubKapaliAlan * genFiyatKon * topSerefiyeCarpan;
+                let dubTerasFiyat = state.dubleksTerasBonus * genFiyatKon * tSerOran;
+                oto_bfD = dubKapaliFiyat + dubTerasFiyat;
+            }
+
             if(isManuelFiyat) {
                 bfM = getFormattedNum('bfMagaza');
-                bf1 = getFormattedNum('bf11');
-                bf2 = getFormattedNum('bf21');
-                bf3 = getFormattedNum('bf31');
-                bfD = getFormattedNum('bfDubleks');
-            } else {
-                bfM = getStandardNum('icMagaza') * genFiyatTic;
-                bf1 = getStandardNum('ic11') * genFiyatKon * topSerefiyeCarpan;
-                bf2 = getStandardNum('ic21') * genFiyatKon * topSerefiyeCarpan;
-                bf3 = getStandardNum('ic31') * genFiyatKon * topSerefiyeCarpan;
+                if (bfM === 0 && oto_bfM > 0) { bfM = oto_bfM; document.getElementById('bfMagaza').value = bfM.toLocaleString('tr-TR'); }
                 
-                if(isDubleks) {
-                    let dubKapaliAlan = (getStandardNum('ic21')||0) + (getStandardNum('ic11')||0);
-                    let dubKapaliFiyat = dubKapaliAlan * genFiyatKon * topSerefiyeCarpan;
-                    let dubTerasFiyat = state.dubleksTerasBonus * genFiyatKon * tSerOran;
-                    bfD = dubKapaliFiyat + dubTerasFiyat;
-                }
+                bf1 = getFormattedNum('bf11');
+                if (bf1 === 0 && oto_bf1 > 0) { bf1 = oto_bf1; document.getElementById('bf11').value = bf1.toLocaleString('tr-TR'); }
+                
+                bf2 = getFormattedNum('bf21');
+                if (bf2 === 0 && oto_bf2 > 0) { bf2 = oto_bf2; document.getElementById('bf21').value = bf2.toLocaleString('tr-TR'); }
+                
+                bf3 = getFormattedNum('bf31');
+                if (bf3 === 0 && oto_bf3 > 0) { bf3 = oto_bf3; document.getElementById('bf31').value = bf3.toLocaleString('tr-TR'); }
+                
+                bfD = getFormattedNum('bfDubleks');
+                if (bfD === 0 && oto_bfD > 0) { bfD = oto_bfD; document.getElementById('bfDubleks').value = bfD.toLocaleString('tr-TR'); }
+            } else {
+                bfM = oto_bfM;
+                bf1 = oto_bf1;
+                bf2 = oto_bf2;
+                bf3 = oto_bf3;
+                bfD = oto_bfD;
 
                 document.getElementById('bfMagaza').value = bfM > 0 ? bfM.toLocaleString('tr-TR') : "";
                 document.getElementById('bf11').value = bf1 > 0 ? bf1.toLocaleString('tr-TR') : "";
