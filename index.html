@@ -469,11 +469,11 @@
                             </div>
                         </div>
                         <div class="row g-2">
-                            <div class="col-6"><div class="input-group input-group-sm"><span class="input-group-text bg-light text-muted" style="width:40px; font-size:0.7rem; font-weight:bold;">Dük</span><input type="text" id="bfMagaza" class="form-control price-input bg-light" readonly oninput="formatCurrency(this); triggerAutoCalc();"></div></div>
-                            <div class="col-6"><div class="input-group input-group-sm"><span class="input-group-text bg-light text-muted" style="width:40px; font-size:0.7rem; font-weight:bold;">1+1</span><input type="text" id="bf11" class="form-control price-input bg-light" readonly oninput="formatCurrency(this); triggerAutoCalc();"></div></div>
-                            <div class="col-6"><div class="input-group input-group-sm"><span class="input-group-text bg-light text-muted" style="width:40px; font-size:0.7rem; font-weight:bold;">2+1</span><input type="text" id="bf21" class="form-control price-input bg-light" readonly oninput="formatCurrency(this); triggerAutoCalc();"></div></div>
-                            <div class="col-6"><div class="input-group input-group-sm"><span class="input-group-text bg-light text-muted" style="width:40px; font-size:0.7rem; font-weight:bold;">3+1</span><input type="text" id="bf31" class="form-control price-input bg-light" readonly oninput="formatCurrency(this); triggerAutoCalc();"></div></div>
-                            <div class="col-12" id="divBfDubleks" style="display:none;"><div class="input-group input-group-sm"><span class="input-group-text bg-light text-danger" style="width:60px; font-size:0.7rem; font-weight:bold;">Dubleks</span><input type="text" id="bfDubleks" class="form-control price-input bg-light text-danger fw-bold" readonly oninput="formatCurrency(this); triggerAutoCalc();"></div></div>
+                            <div class="col-6"><div class="input-group input-group-sm"><span class="input-group-text bg-light text-muted" style="width:40px; font-size:0.7rem; font-weight:bold;">Dük</span><input type="text" id="bfMagaza" class="form-control price-input bg-light" readonly oninput="formatCurrency(this); triggerAutoCalc();" onblur="triggerAutoCalc();"></div></div>
+                            <div class="col-6"><div class="input-group input-group-sm"><span class="input-group-text bg-light text-muted" style="width:40px; font-size:0.7rem; font-weight:bold;">1+1</span><input type="text" id="bf11" class="form-control price-input bg-light" readonly oninput="formatCurrency(this); triggerAutoCalc();" onblur="triggerAutoCalc();"></div></div>
+                            <div class="col-6"><div class="input-group input-group-sm"><span class="input-group-text bg-light text-muted" style="width:40px; font-size:0.7rem; font-weight:bold;">2+1</span><input type="text" id="bf21" class="form-control price-input bg-light" readonly oninput="formatCurrency(this); triggerAutoCalc();" onblur="triggerAutoCalc();"></div></div>
+                            <div class="col-6"><div class="input-group input-group-sm"><span class="input-group-text bg-light text-muted" style="width:40px; font-size:0.7rem; font-weight:bold;">3+1</span><input type="text" id="bf31" class="form-control price-input bg-light" readonly oninput="formatCurrency(this); triggerAutoCalc();" onblur="triggerAutoCalc();"></div></div>
+                            <div class="col-12" id="divBfDubleks" style="display:none;"><div class="input-group input-group-sm"><span class="input-group-text bg-light text-danger" style="width:60px; font-size:0.7rem; font-weight:bold;">Dubleks</span><input type="text" id="bfDubleks" class="form-control price-input bg-light text-danger fw-bold" readonly oninput="formatCurrency(this); triggerAutoCalc();" onblur="triggerAutoCalc();"></div></div>
                         </div>
                     </div>
                     
@@ -821,7 +821,7 @@
                 <li><b>Açıksa (Ticari Mod):</b> Sistem, üst katlarda kaybedeceği inşaat alanını umursamaz; çekme payları elverdiği ölçüde zemine yayılarak <b>en büyük Dükkan alanını</b> üretir.</li>
             </ul>
             <div style="background:#fffcf5; padding:10px; border-radius:6px; border-left:4px solid #f39c12; margin-top:10px; font-size:12px;">
-                <b>Tavsiye:</b> Dükkan fiyatının, konut fiyatından en az 2.5 - 3 kat değerli olduğu durumlarda bu butonu açmanız, toplam inşaat alanınız düşse bile projenin <b>toplam cirosunu ve karını</b> devasa oranda artıracaktır.
+                <b>Tavsiye:</b> Dükkan fiyatının, konut fiyatından en az 2.5 - 3 kat değerli olduğu durumlarda bu bu butonu açmanız, toplam inşaat alanınız düşse bile projenin <b>toplam cirosunu ve karını</b> devasa oranda artıracaktır.
             </div>`;
         } else if (type === 'kilavuz') {
             title = "Formül ve Mantık Kılavuzu";
@@ -1720,21 +1720,27 @@
                 oto_bfD = dubKapaliFiyat + dubTerasFiyat;
             }
 
+            // GÜVENLİK AĞI + ODAK (FOCUS) KONTROLÜ EKLENDİ
             if(isManuelFiyat) {
+                let elM = document.getElementById('bfMagaza');
                 bfM = getFormattedNum('bfMagaza');
-                if (bfM === 0 && oto_bfM > 0) { bfM = oto_bfM; document.getElementById('bfMagaza').value = bfM.toLocaleString('tr-TR'); }
+                if (bfM === 0 && oto_bfM > 0 && document.activeElement !== elM) { bfM = oto_bfM; elM.value = bfM.toLocaleString('tr-TR'); }
                 
+                let el1 = document.getElementById('bf11');
                 bf1 = getFormattedNum('bf11');
-                if (bf1 === 0 && oto_bf1 > 0) { bf1 = oto_bf1; document.getElementById('bf11').value = bf1.toLocaleString('tr-TR'); }
+                if (bf1 === 0 && oto_bf1 > 0 && document.activeElement !== el1) { bf1 = oto_bf1; el1.value = bf1.toLocaleString('tr-TR'); }
                 
+                let el2 = document.getElementById('bf21');
                 bf2 = getFormattedNum('bf21');
-                if (bf2 === 0 && oto_bf2 > 0) { bf2 = oto_bf2; document.getElementById('bf21').value = bf2.toLocaleString('tr-TR'); }
+                if (bf2 === 0 && oto_bf2 > 0 && document.activeElement !== el2) { bf2 = oto_bf2; el2.value = bf2.toLocaleString('tr-TR'); }
                 
+                let el3 = document.getElementById('bf31');
                 bf3 = getFormattedNum('bf31');
-                if (bf3 === 0 && oto_bf3 > 0) { bf3 = oto_bf3; document.getElementById('bf31').value = bf3.toLocaleString('tr-TR'); }
+                if (bf3 === 0 && oto_bf3 > 0 && document.activeElement !== el3) { bf3 = oto_bf3; el3.value = bf3.toLocaleString('tr-TR'); }
                 
+                let elD = document.getElementById('bfDubleks');
                 bfD = getFormattedNum('bfDubleks');
-                if (bfD === 0 && oto_bfD > 0) { bfD = oto_bfD; document.getElementById('bfDubleks').value = bfD.toLocaleString('tr-TR'); }
+                if (bfD === 0 && oto_bfD > 0 && document.activeElement !== elD) { bfD = oto_bfD; elD.value = bfD.toLocaleString('tr-TR'); }
             } else {
                 bfM = oto_bfM;
                 bf1 = oto_bf1;
